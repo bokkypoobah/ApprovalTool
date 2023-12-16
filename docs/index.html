@@ -306,10 +306,10 @@
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div v-if="!sync.section" class="mt-0 pr-1">
-                  <b-button size="sm" @click="syncIt(false)" variant="primary" v-b-popover.hover.bottom="'Sync data'">Sync</b-button>
+                  <b-button size="sm" @click="checkIt(false)" variant="primary" v-b-popover.hover.bottom="'Check approvals'">Check</b-button>
                 </div>
                 <div v-if="!sync.section" class="mt-0 pr-1">
-                  <b-button size="sm" @click="syncIt(true)" variant="outline-primary" v-b-popover.hover.bottom="'This will do dev things'">Dev</b-button>
+                  <b-button size="sm" @click="checkIt(true)" variant="outline-primary" v-b-popover.hover.bottom="'This will do dev things'">Dev</b-button>
                 </div>
                 <div v-if="sync.section" class="mt-1 p-0" style="width: 350px;">
                   <b-progress height="1.5rem" :max="sync.total" show-progress :animated="!sync.section" :variant="sync.section ? 'success' : 'secondary'" v-b-popover.hover.bottom="'{processed blocked number}/{latest block number}. Click the button on the right to stop this process. This process can be continued later'">
@@ -2097,7 +2097,7 @@
             // console.log(moment().format("HH:mm:ss") + " showModalTx: " + txHashIndex + " => " + JSON.stringify(this.modalTx, null, 2));
           },
 
-          async syncIt(devMode) {
+          async checkIt(devMode) {
             const db = new Dexie(this.db.name);
             db.version(this.db.version).stores(this.db.schemaDefinition);
             const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -2108,12 +2108,16 @@
             localStorage.approvalToolChainId = network.chainId;
             const block = await provider.getBlock();
             const latestBlockNumber = block && block.number || null;
-            console.log(moment().format("HH:mm:ss") + " syncIt - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
+            console.log(moment().format("HH:mm:ss") + " checkIt - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
+
+            await this.checkApprovalEvents(provider, latestBlockNumber);
+
+
             let newAddressIndexes = [];
             if (!devMode) {
             //   newAddressIndexes = await this.syncEventsOld(db, provider, latestBlockNumber);
             // } else {
-              newAddressIndexes = await this.syncEvents(db, provider, latestBlockNumber);
+              // newAddressIndexes = await this.syncEvents(db, provider, latestBlockNumber);
             }
             // if (!devMode) {
             //   await this.syncENSNames(newAddressIndexes, db, provider);
@@ -2130,10 +2134,14 @@
               // await this.processDataNew(db);
             }
             // if (!devMode) {
-              await this.loadCurrentData();
+              // await this.loadCurrentData();
             // }
             this.sync.section = null;
             this.sync.halt = false;
+          },
+
+          async checkApprovalEvents(provider, latestBlockNumber) {
+            console.log("Hi hi!");
           },
 
           async syncEvents(db, provider, latestBlockNumber) {
