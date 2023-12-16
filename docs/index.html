@@ -1358,6 +1358,8 @@
             halt: false,
           },
 
+          approvalLogs: {},
+
           syncStates: {},
           blockTimestamps: {},
           exchangeRates: {},
@@ -2162,16 +2164,18 @@
               address: null,
               fromBlock,
               toBlock,
-              topics: [ '0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925', accountAs32Bytes, null ],
+              topics: [[
+                  '0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925',
+                  '0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31'
+                ],
+                accountAs32Bytes,
+                null
+              ],
             });
-            console.log("approvalLogs: " + JSON.stringify(approvalLogs, null, 2));
-            const approvalForAllLogs = await provider.getLogs({
-              address: null,
-              fromBlock,
-              toBlock,
-              topics: [ '0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31', accountAs32Bytes, null ],
-            });
-            console.log("approvalForAllLogs: " + JSON.stringify(approvalForAllLogs, null, 2));
+            for (const log of approvalLogs) {
+              console.log("log: " + JSON.stringify(log));
+            }
+            Vue.set(this, 'approvalLogs', approvalLogs);
           },
 
           async syncEvents(db, provider, latestBlockNumber) {
