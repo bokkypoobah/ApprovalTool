@@ -2145,7 +2145,7 @@
           async checkApprovalEvents(provider, latestBlockNumber) {
             const accounts = [this.coinbase];
             const accountsAs32Bytes = accounts.map(e => '0x000000000000000000000000' + e.substring(2, 42).toLowerCase());
-            console.log("accountsAs32Bytes: " + JSON.stringify(accountsAs32Bytes));
+            // console.log("accountsAs32Bytes: " + JSON.stringify(accountsAs32Bytes));
             const fromBlock = 0;
             const toBlock = latestBlockNumber;
 
@@ -2182,20 +2182,23 @@
               }
               const topic0 = log.topics[0];
               const eventName = topic0 == '0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31' ? 'ApprovalForAll': 'Approval';
-              let owner = null, spender = null, value = null;
+              let owner = null;
+              let spender = null;
+              let value = null;
               // console.log("log: " + eventName + " " + JSON.stringify(log));
               if (log.topics.length == 3) {
                 owner = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
                 spender = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
                 value = ethers.BigNumber.from(log.data).toString();
-                console.log("  " + eventName + " " + owner + " " + spender + " " + value);
               } else if (log.topics.length == 4) {
                 owner = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
                 spender = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
                 value = ethers.BigNumber.from(log.topics[3]).toString();
-                console.log("  " + eventName + " " + owner + " " + spender + " " + value);
               } else {
                 console.log("topic length <> 4: " + log.topics.length + " " + JSON.stringify(log));
+              }
+              if (owner) {
+                console.log(log.blockNumber + "." + log.transactionIndex + "." + log.logIndex + " " + log.address + " " + eventName + " " + owner + " " + spender + " " + value);
               }
             }
             Vue.set(this, 'approvalLogs', approvalLogs);
