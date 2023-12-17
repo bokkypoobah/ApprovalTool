@@ -416,7 +416,7 @@
                 </b-card-body>
               </b-card>
 
-              <b-table v-if="!settings.showInfo && approvals" small fixed striped responsive hover :fields="approvalFields" :items="approvals" show-empty empty-html="Click Check above to retrieve ERC-20, ERC-721 and ERC-1155 Approval and ApprovalForAll events" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="!settings.showInfo && events" small fixed striped responsive hover :fields="eventsFields" :items="events" show-empty empty-html="Click Check above to retrieve ERC-20, ERC-721 and ERC-1155 Approval and ApprovalForAll events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   {{ parseInt(data.index) + ((settings.activityTable.currentPage - 1) * settings.activityTable.pageSize) + 1 }}
                 </template>
@@ -574,7 +574,7 @@
             halt: false,
           },
 
-          approvals: [],
+          events: [],
 
           syncStates: {},
           blockTimestamps: {},
@@ -598,7 +598,6 @@
           tokens: {},
           offers: { "1": {}, "2": {} },
           v2Bids: {},
-          events: [],
           modalPunk: {
             punkId: null,
             v1: {
@@ -662,7 +661,7 @@
             { value: 10000, text: '10k' },
           ],
 
-          approvalFields: [
+          eventsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
             { key: 'owner', label: 'Owner', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
@@ -1294,7 +1293,7 @@
                 null
               ],
             });
-            const approvals = [];
+            const events = [];
             for (const log of approvalLogs) {
               const topic0 = log.topics[0];
               const eventName = topic0 == '0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31' ? 'ApprovalForAll': 'Approval';
@@ -1313,7 +1312,7 @@
                 console.log("topic length <> 4: " + log.topics.length + " " + JSON.stringify(log));
               }
               if (owner) {
-                approvals.push({
+                events.push({
                   blockNumber: log.blockNumber,
                   txIndex: log.transactionIndex,
                   txHash: log.transactionHash,
@@ -1326,15 +1325,15 @@
                 });
               }
             }
-            localStorage.approvalApprovals = JSON.stringify(approvals);
-            Vue.set(this, 'approvals', approvals);
-            console.log("approvals: " + JSON.stringify(approvals, null, 2));
+            localStorage.approvalEvents = JSON.stringify(events);
+            Vue.set(this, 'events', events);
+            console.log("events: " + JSON.stringify(events, null, 2));
           },
 
           async syncNames(db, provider) {
             console.log("syncNames");
 
-            
+
           },
 
           // TODO: Refresh sync
@@ -2017,9 +2016,9 @@
               // }
             }
           }
-          if ('approvalApprovals' in localStorage) {
-            const tempApprovals = JSON.parse(localStorage.approvalApprovals);
-            this.approvals = tempApprovals;
+          if ('approvalEvents' in localStorage) {
+            const tempEvents = JSON.parse(localStorage.approvalEvents);
+            this.events = tempEvents;
           }
           (async() => {
             const db = new Dexie(this.db.name);
