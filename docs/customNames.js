@@ -1,9 +1,19 @@
 const CUSTOMNAMES = {
-  "0x0000000000000000000000000000000000000000": ["eoa", "Dead", "Dead:0x0000...0000"],
-  "0x000000000022D473030F116dDEE9F6B43aC78BA3": ["erc20", "Dead", "Dead:0x0000...0000"],
-  "0x1E0049783F008A0085193E00003D00cd54003c71": ["nftexchange", "OS:Conduit", "OpenSea: Conduit"],
+  "0x0000000000000000000000000000000000000000": ["eoa", "Null", "Null:0x0000...0000"],
+  "0x00000000000111AbE46ff893f3B2fdF1F759a8A8": ["nftexchange", "ExecutionDelegate", "Blur:ExecutionDelegate"],
+  "0x000000000022D473030F116dDEE9F6B43aC78BA3": ["erc20", "Permit2", "Uniswap:Permit2"],
+  "0x0fc584529a2AEfA997697FAfAcbA5831faC0c22d": ["nftexchange", "NFTXMarketplaceZap", "NFTX:NFTXMarketplaceZap"],
+  "0x1E0049783F008A0085193E00003D00cd54003c71": ["nftexchange", "OS:Conduit", "OpenSea:Conduit"],
   "0x495f947276749Ce646f68AC8c248420045cb7b5e": ["erc1155", "OSSSF", "OpenSea Shared StoreFront"],
+  "0x4feE7B061C97C9c496b01DbcE9CDb10c02f0a0Be": ["nfttransfer", "TransferProxy", "Rarible:TransferProx"],
   "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85": ["erc721", "ENS", "Ethereum Name Service"],
+  "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45": ["erc20exchange", "SwapRouter02", "UniswapV3:SwapRouter02"],
+  "0x941A6d105802CCCaa06DE58a13a6F49ebDCD481C": ["erc721exchange", "NFTXMarketplace0xZap", "NFTX:Marketplace0xZap"],
+  "0x9996FCFa25B234e80BcF876d83d2e7F338F9BDA5": ["erc721exchange", "EnsSubdomainStorefront_v2", "ENSVision:EnsSubdomainStorefront_v2"],
+  "0xA42f6cADa809Bcf417DeefbdD69C5C5A909249C0": ["erc721exchange", "NFT20CasUpgreadableV2", "NFT20:NFT20CasUpgreadableV2"],
+  "0xB32979486938AA9694BFC898f35DBED459F44424": ["erc1155", "NYAN", "Nyan Cat"],
+  "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2": ["erc20", "WETH", "Wrapped Ether"],
+  "0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401": ["erc1155", "NameWrapper", "ENS:NameWrapper"],
 };
 
 const CUSTOMNAMESOLD = {

@@ -340,6 +340,9 @@
                 <div v-if="settings.tabIndex == 112 && totalEvents" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(totalEvents) }}</font>
                 </div>
+                <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
+                  <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredEvents.length) }}</font>
+                </div>
                 <div v-if="settings.tabIndex == 112 && blockNumber && timestamp" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'latest block'">
                     <b-link v-if="blockNumber" :href="'https://etherscan.io/block/' + blockNumber" v-b-popover.hover.bottom="formatTimestamp(timestamp)" target="_blank">
