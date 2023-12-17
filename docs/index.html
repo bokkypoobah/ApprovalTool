@@ -549,9 +549,13 @@
               pageSize: 100,
               sortOption: 'txorderdsc',
             },
-            editAccounts: false,
-            accounts: {},
-            version: 2,
+            accountsTable: {
+              filter: null,
+              currentPage: 1,
+              pageSize: 100,
+              sortOption: 'symbolasc',
+            },
+            version: 3,
           },
 
           sync: {
@@ -562,6 +566,7 @@
           },
 
           events: [],
+          accounts: {},
 
           syncStates: {},
           blockTimestamps: {},
