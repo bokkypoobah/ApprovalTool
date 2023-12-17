@@ -861,12 +861,12 @@
             if (!devMode) {
               await this.checkApprovalEvents(provider, latestBlockNumber);
             }
-            // if (!devMode) {
+            if (!devMode) {
               await this.syncNames(db, provider);
-            // }
+            }
 
-            // if (!devMode) {
-            //   await this.syncBlockTimestamps(db);
+            // if (devMode) {
+              await this.syncBlockTimestamps(db);
             // }
             // if (!devMode) {
             //   await this.syncExchangeRates(db);
@@ -925,22 +925,12 @@
                 console.log("topic length <> 4: " + log.topics.length + " " + JSON.stringify(log));
               }
               if (owner) {
-                events.push({
-                  blockNumber: log.blockNumber,
-                  txIndex: log.transactionIndex,
-                  txHash: log.transactionHash,
-                  logIndex: log.logIndex,
-                  contract: log.address,
-                  eventName,
-                  owner,
-                  spender,
-                  value,
-                });
+                events.push({ blockNumber: log.blockNumber, txIndex: log.transactionIndex, txHash: log.transactionHash,
+                  logIndex: log.logIndex, contract: log.address, eventName, owner, spender, value });
               }
             }
             localStorage.approvalEvents = JSON.stringify(events);
             Vue.set(this, 'events', events);
-            console.log("events: " + JSON.stringify(events, null, 2));
           },
 
           async syncNames(db, provider) {
@@ -962,13 +952,6 @@
             const owners = Object.keys(ownersMap);
             const contracts = Object.keys(contractsMap);
             const spenders = Object.keys(spendersMap);
-            console.log("owners.length: " + owners.length);
-            console.log("contracts.length: " + contracts.length);
-            console.log("spenders.length: " + spenders.length);
-            // console.log("owners: " + JSON.stringify(owners));
-            // console.log("contracts: " + JSON.stringify(contracts));
-            // console.log("spenders: " + JSON.stringify(spenders));
-
             const accounts = {};
             for (const account of owners) {
               accounts[account] = { source: "owner" };
@@ -983,11 +966,8 @@
                 accounts[account] = { source: "spenders" };
               }
             }
-            console.log("accounts: " + JSON.stringify(accounts));
-
             const erc721Helper = new ethers.Contract(ERC721HELPERADDRESS, ERC721HELPERABI, provider);
             const accountsToCheck = [...owners, ...contracts, ...spenders];
-            console.log("accountsToCheck: " + JSON.stringify(accountsToCheck));
             for (const account of accountsToCheck) {
               if (account in CUSTOMNAMES) {
                 accounts[account].type = CUSTOMNAMES[account][0];
@@ -1046,7 +1026,7 @@
             }
             localStorage.approvalAccounts = JSON.stringify(accounts);
             Vue.set(this, 'accounts', accounts);
-            console.log("accounts: " + JSON.stringify(accounts, null, 2));
+            // console.log("accounts: " + JSON.stringify(accounts, null, 2));
           },
 
           // TODO: Refresh sync
@@ -1114,27 +1094,21 @@
 
           async syncBlockTimestamps(db) {
             console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps");
-            // TODO: Low priority - Handle blockTimestamp entries with unconfirmed blocks to handle reorgs
-            const blockNumbersToProcess = [];
-            for (const process of this.contracts) {
-              const contractIndex = this.addressToIndex[process.address];
-              const eventsDataItems = await db.cache.where("objectName").equals(this.chainId + "_" + process.address + "_events").toArray();
-              if (eventsDataItems.length == 1) {
-                const storedLatestBlockNumber = eventsDataItems[0].object.latestBlockNumber;
-                events = eventsDataItems[0].object.events;
-                for (const [blockNumber, txIndexes] of Object.entries(events)) {
-                  if (!(blockNumber in this.blockTimestamps)) {
-                    blockNumbersToProcess.push(blockNumber);
-                  }
-                }
+            const blockNumbersMap = {};
+            for (const event of this.events) {
+              if (!(event.blockNumber in blockNumbersMap)) {
+                blockNumbersMap[event.blockNumber] = true;
               }
             }
+            const blockNumbers = Object.keys(blockNumbersMap);
+            // console.log("blockNumbers: " + JSON.stringify(blockNumbers));
             this.sync.completed = 0;
-            this.sync.total = blockNumbersToProcess.length;
+            this.sync.total = blockNumbers.length;
             this.sync.section = 'Block Timestamps';
             const BATCHSIZE = 1000;
-            for (let i = 0; i < blockNumbersToProcess.length; i += BATCHSIZE) {
-              const batch = blockNumbersToProcess.slice(i, parseInt(i) + BATCHSIZE);
+            const blockTimestamps = {};
+            for (let i = 0; i < blockNumbers.length; i += BATCHSIZE) {
+              const batch = blockNumbers.slice(i, parseInt(i) + BATCHSIZE);
               const data = await fetch(BLOCKTIMESTAMPSUBGRAPHURL, {
                 method: 'POST',
                 headers: {
@@ -1151,15 +1125,13 @@
               });
               const timestamps = data.data && data.data.blocks || [];
               for (const timestampItem of timestamps) {
-                Vue.set(this.blockTimestamps, timestampItem.number, parseInt(timestampItem.timestamp));
+                blockTimestamps[timestampItem.number] = parseInt(timestampItem.timestamp);
               }
               this.sync.completed += timestamps.length;
-              console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps " + this.sync.completed + " of " + blockNumbersToProcess.length);
+              console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps " + this.sync.completed + " of " + blockNumbers.length);
             }
-            await db.cache.put({ objectName: this.chainId + "_blockTimestamps", object: this.blockTimestamps }).then (function() {
-            }).catch(function(error) {
-              console.log("error: " + error);
-            });
+            localStorage.approvalBlockTimestamps = JSON.stringify(blockTimestamps);
+            Vue.set(this, 'blockTimestamps', blockTimestamps);
           },
 
           async processDataNew(db) {
@@ -1744,7 +1716,12 @@
           if ('approvalAccounts' in localStorage) {
             const tempAccounts = JSON.parse(localStorage.approvalAccounts);
             this.accounts = tempAccounts;
-            console.log("accounts: " + JSON.stringify(this.accounts, null, 2));
+            // console.log("accounts: " + JSON.stringify(this.accounts, null, 2));
+          }
+          if ('approvalBlockTimestamps' in localStorage) {
+            const tempBlockTimestamps = JSON.parse(localStorage.approvalBlockTimestamps);
+            this.blockTimestamps = tempBlockTimestamps;
+            // console.log("blockTimestamps: " + JSON.stringify(this.blockTimestamps, null, 2));
           }
           (async() => {
             const db = new Dexie(this.db.name);
