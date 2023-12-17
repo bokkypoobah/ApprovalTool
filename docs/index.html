@@ -732,408 +732,44 @@
             }
             return totalCount;
           },
-          punkAttributes() {
-            return PUNKATTRIBUTES;
-          },
-          punkAttributesWithTokenIds() {
-            const collator = {};
-            for (const [punkId, punkAttribute] of this.punkAttributes.entries()) {
-              for (const attribute of punkAttribute) {
-                const trait_type = attribute.trait_type;
-                const value = attribute.value;
-                if (!collator[trait_type]) {
-                  collator[trait_type] = {};
-                }
-                if (!collator[trait_type][value]) {
-                  collator[trait_type][value] = [punkId];
-                } else {
-                  collator[trait_type][value].push(punkId);
-                }
-              }
-            }
-            const results = [];
-            for (const [attributeType, attributes] of Object.entries(collator)) {
-              const attributeList = [];
-              for (const [attribute, punks] of Object.entries(attributes)) {
-                attributeList.push({ attribute, punks });
-              }
-              attributeList.sort((a, b) => a.punks.length - b.punks.length);
-              results.push({ attributeType, attributeList });
-            }
-            results.sort((a, b) => ('' + a.attributeType).localeCompare(b.attributeType))
-            return results;
-          },
-          filteredPunkIds() {
-            let filteredIds = null;
-            if (this.settings.filterByIds) {
-              const searchIds = this.settings.filterByIds.split(/[, \t\n]+/).map(s => s.trim());
-              filteredIds = [];
-              for (s of searchIds) {
-                var range = s.match(/(\d+)-(\d+)/)
-                if (range != null) {
-                  for (let i = parseInt(range[1]); i <= parseInt(range[2]); i++) {
-                    if (i >= 0 && i < 10000) {
-                      filteredIds.push(i);
-                    }
-                  }
-                } else if (s >= 0 && s < 10000) {
-                  filteredIds.push(parseInt(s));
-                } else {
-                  if (s.match(/[a-zA-Z0-9 \-]{3,}/)) {
-                    const searchFor = s.toLowerCase();
-                    for (const attributeInfo of this.punkAttributesWithTokenIds) {
-                      for (const attribute of attributeInfo.attributeList) {
-                        if (attribute.attribute.indexOf(searchFor) == 0) {
-                          filteredIds = [...new Set([...filteredIds, ...attribute.punks])]
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            const results = [];
-            if (Object.keys(this.settings.filters).length == 0) {
-              for (const [punkId, attributes] of this.punkAttributes.entries()) {
-                if (!filteredIds || filteredIds.includes(punkId)) {
-                  results.push(punkId);
-                }
-              }
-            } else {
-              let selectedTokenIds = [];
-              for (const [attributeType, attributeList] of Object.entries(this.settings.filters)) {
-                let thisAttributeTypeTokenIds = [];
-                for (const attribute of Object.keys(attributeList)) {
-                  for (const attributeInfo of this.punkAttributesWithTokenIds) {
-                    if (attributeInfo.attributeType == attributeType) {
-                      const tokenIds = attributeInfo.attributeList.filter(e => e.attribute == attribute).map(e => e.punks).flat();
-                      thisAttributeTypeTokenIds = [...thisAttributeTypeTokenIds, ...tokenIds];
-                      break;
-                    }
-                  }
-                }
-                if (selectedTokenIds.length == 0) {
-                  selectedTokenIds = thisAttributeTypeTokenIds;
-                } else {
-                  selectedTokenIds = selectedTokenIds.filter(tokenId => thisAttributeTypeTokenIds.includes(tokenId));
-                }
-              }
-              for (const punkId of selectedTokenIds) {
-                if (!filteredIds || filteredIds.includes(punkId)) {
-                  results.push(punkId);
-                }
-              }
-            }
-            return results;
-          },
-          ownerFilteredPunks() {
-            const w1Index = this.addressToIndex[WRAPPEDCRYPTOPUNKSV1ADDRESS];
-            const w2Index = this.addressToIndex[WRAPPEDCRYPTOPUNKSV2ADDRESS];
-            let filteredOwners = null;
-            if (this.settings.filterByOwners) {
-              const searchOwners = this.settings.filterByOwners.split(/[, \t\n]+/).map(s => new RegExp(s.toLowerCase().trim(), "i"));
-              filteredOwners = {};
-              for (s of searchOwners) {
-                for (const [index, name] of Object.entries(this.indexToAddressName)) {
-                  if (s.test(name)) {
-                    filteredOwners[index] = name;
-                  }
-                }
-                for (const [index, address] of Object.entries(this.indexToAddress)) {
-                  if (s.test(address)) {
-                    filteredOwners[index] = address;
-                  }
-                }
-              }
-            }
-            const results = [];
-            for (let punkId of this.filteredPunkIds) {
-              const attributes = this.punkAttributes[punkId];
-              const v1OwnerIndex = this.tokens[1] && this.tokens[1][punkId] || null;
-              const v2OwnerIndex = this.tokens[2] && this.tokens[2][punkId] || null;
-              const w1OwnerIndex = this.tokens[3] && this.tokens[3][punkId] || null;
-              const w2OwnerIndex = this.tokens[4] && this.tokens[4][punkId] || null;
-              let v1 = {};
-              if (v1OwnerIndex != null && v1OwnerIndex == w1Index) {
-                v1.ownerIndex = w1OwnerIndex || 0;
-                v1.wrapped = true;
-              } else {
-                v1.ownerIndex = v1OwnerIndex;
-                v1.wrapped = false;
-              }
-              v1.offer = this.offers[1] && this.offers[1][punkId] || null;
-              let v2 = {};
-              if (v2OwnerIndex != null && v2OwnerIndex == w2Index) {
-                v2.ownerIndex = w2OwnerIndex;
-                v2.wrapped = true;
-              } else {
-                v2.ownerIndex = v2OwnerIndex;
-                v2.wrapped = false;
-              }
-              v2.offer = this.offers[2] && this.offers[2][punkId] || null;
-              v2.bid = this.v2Bids[punkId] || null;
-              if (!filteredOwners || (v1.ownerIndex in filteredOwners || v2.ownerIndex in filteredOwners)) {
-                results.push({ punkId, v1, v2, attributes });
-              }
-            }
-
-            return results;
-          },
-          filteredSortedPunks() {
-            let results = this.ownerFilteredPunks;
-            if (this.settings.punksTable.sortOption == 'punkidasc') {
-              results.sort((a, b) => {
-                return a.punkId - b.punkId;
-              });
-            } else if (this.settings.punksTable.sortOption == 'punkiddsc') {
-              results.sort((a, b) => {
-                return b.punkId - a.punkId;
-              });
-            }
-            return results;
-          },
-          pagedFilteredSortedPunks() {
-            return this.filteredSortedPunks.slice((this.settings.punksTable.currentPage - 1) * this.settings.punksTable.pageSize, this.settings.punksTable.currentPage * this.settings.punksTable.pageSize);
-          },
-
-          filteredActivityOld() {
-            const results = [];
-            let filteredIds = {};
-            for (const punkId of this.filteredPunkIds) {
-              filteredIds[punkId] = true;
-            }
-            const selectedContractFilter = (this.settings.selectedContracts.length == 0 || this.settings.selectedContracts.length == 4) ? null : this.settings.selectedContracts;
-
-            let ownerIndexMap = null;
-            if (this.settings.filterByOwners) {
-              const searchOwners = this.settings.filterByOwners ? this.settings.filterByOwners.split(/[, \t\n]+/).map(s => new RegExp(s.toLowerCase(), "i")) : [];
-              ownerIndexMap = {};
-              for (const [index, name] of Object.entries(this.indexToAddressName)) {
-                for (const searchItem of searchOwners) {
-                  if (searchItem.test(name)) {
-                    ownerIndexMap[index] = name;
-                  }
-                }
-              }
-              for (const [index, address] of Object.entries(this.indexToAddress)) {
-                for (const searchItem of searchOwners) {
-                  if (searchItem.test(address)) {
-                    ownerIndexMap[index] = address;
-                  }
-                }
-              }
-            }
-
-            for (const tx of this.txs) {
-              let include = true;
-              if (selectedContractFilter) {
-                include = false;
-                for (let contractIndex of tx[6]) {
-                  if (selectedContractFilter.includes(contractIndex)) {
-                    include = true;
-                    break;
-                  }
-                }
-              }
-              if (include && filteredIds) {
-                include = false;
-                const punkId = tx[5] && tx[5][3] && parseInt(tx[5][3]);
-                if (punkId in filteredIds) {
-                  include = true;
-                }
-              }
-              if (include && ownerIndexMap) {
-                include = false;
-                const [txType, fromIndex, toIndex] = [tx[5][0], tx[5][1], tx[5][2]];
-                if ((txType >= 3 && (fromIndex in ownerIndexMap)) || (txType != 4 && (toIndex in ownerIndexMap))) {
-                  include = true;
-                }
-              }
-              if (include) {
-                results.push(tx);
-              }
-            }
-            // console.log(moment().format("HH:mm:ss") + " filteredActivity - results: " + JSON.stringify(results.slice(0, 10)) + ", ...");
-            return results;
-          },
 
           filteredEvents() {
             return this.events;
           },
-
           filteredSortedEvents() {
             let results = this.filteredEvents;
-            // if (this.settings.activityTable.sortOption == 'txorderasc') {
-            //   results.sort((a, b) => {
-            //     if (a[1] == b[1]) {
-            //       if (a[2] == b[2]) {
-            //         return a[3] - b[3];
-            //       } else {
-            //         return a[2] - b[2];
-            //       }
-            //     } else {
-            //       return a[1] - b[1];
-            //     }
-            //   });
-            // } else if (this.settings.activityTable.sortOption == 'txorderdsc') {
-            //   results.sort((a, b) => {
-            //     if (a[1] == b[1]) {
-            //       if (a[2] == b[2]) {
-            //         return b[3] - a[3];
-            //       } else {
-            //         return b[2] - a[2];
-            //       }
-            //     } else {
-            //       return b[1] - a[1];
-            //     }
-            //   });
-            // }
+            if (this.settings.eventsTable.sortOption == 'txorderasc') {
+              results.sort((a, b) => {
+                if (a.blockNumber == b.blockNumber) {
+                  if (a.txIndex == b.txIndex) {
+                    return a.logIndex - b.logIndex;
+                  } else {
+                    return a.txIndex - b.txIndex;
+                  }
+                } else {
+                  return a.blockNumber - b.blockNumber;
+                }
+              });
+            } else if (this.settings.eventsTable.sortOption == 'txorderdsc') {
+              results.sort((a, b) => {
+                if (a.blockNumber == b.blockNumber) {
+                  if (a.txIndex == b.txIndex) {
+                    return b.logIndex - a.logIndex;
+                  } else {
+                    return b.txIndex - a.txIndex;
+                  }
+                } else {
+                  return b.blockNumber - a.blockNumber;
+                }
+              });
+            }
             return results;
           },
           pagedFilteredSortedEvents() {
-            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedEvents - results[0..9]: " + JSON.stringify(this.filteredSortedEvents.slice(0, 10)));
+            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedEvents - results[0..9]: " + JSON.stringify(this.filteredSortedEvents.slice(0, 10)));
             return this.filteredSortedEvents.slice((this.settings.eventsTable.currentPage - 1) * this.settings.eventsTable.pageSize, this.settings.eventsTable.currentPage * this.settings.eventsTable.pageSize);
           },
 
-          owners() {
-            const w1Index = this.addressToIndex[WRAPPEDCRYPTOPUNKSV1ADDRESS];
-            const w2Index = this.addressToIndex[WRAPPEDCRYPTOPUNKSV2ADDRESS];
-            const results = [];
-            const punks = this.filteredPunks;
-            const ownersByPunkIds = {};
-            const punkIdsByOwnerIndexes = {};
-            for (const punkId of this.filteredPunkIds) {
-              const v1OwnerIndex = this.tokens[1] && this.tokens[1][punkId] || null;
-              const v2OwnerIndex = this.tokens[2] && this.tokens[2][punkId] || null;
-              const w1OwnerIndex = this.tokens[3] && this.tokens[3][punkId] || null;
-              const w2OwnerIndex = this.tokens[4] && this.tokens[4][punkId] || null;
-              if (w1OwnerIndex != null) {
-                if (!(w1OwnerIndex in punkIdsByOwnerIndexes)) {
-                  punkIdsByOwnerIndexes[w1OwnerIndex] = {};
-                }
-                if (!(punkId in punkIdsByOwnerIndexes[w1OwnerIndex])) {
-                  punkIdsByOwnerIndexes[w1OwnerIndex][punkId] = {};
-                }
-                punkIdsByOwnerIndexes[w1OwnerIndex][punkId][1] = true;
-              } else if (v1OwnerIndex != null) {
-                if (!(v1OwnerIndex in punkIdsByOwnerIndexes)) {
-                  punkIdsByOwnerIndexes[v1OwnerIndex] = {};
-                }
-                if (!(punkId in punkIdsByOwnerIndexes[v1OwnerIndex])) {
-                  punkIdsByOwnerIndexes[v1OwnerIndex][punkId] = {};
-                }
-                punkIdsByOwnerIndexes[v1OwnerIndex][punkId][1] = false;
-              }
-              if (w2OwnerIndex != null) {
-                if (!(w2OwnerIndex in punkIdsByOwnerIndexes)) {
-                  punkIdsByOwnerIndexes[w2OwnerIndex] = {};
-                }
-                if (!(punkId in punkIdsByOwnerIndexes[w2OwnerIndex])) {
-                  punkIdsByOwnerIndexes[w2OwnerIndex][punkId] = {};
-                }
-                punkIdsByOwnerIndexes[w2OwnerIndex][punkId][2] = true;
-              } else if (v2OwnerIndex != null) {
-                if (!(v2OwnerIndex in punkIdsByOwnerIndexes)) {
-                  punkIdsByOwnerIndexes[v2OwnerIndex] = {};
-                }
-                if (!(punkId in punkIdsByOwnerIndexes[v2OwnerIndex])) {
-                  punkIdsByOwnerIndexes[v2OwnerIndex][punkId] = {};
-                }
-                punkIdsByOwnerIndexes[v2OwnerIndex][punkId][2] = false;
-              }
-            }
-            for (const [ownerIndex, ownerData] of Object.entries(punkIdsByOwnerIndexes)) {
-              const v1Punks = [];
-              const v2Punks = [];
-              for (const [punkId, ownerInfo] of Object.entries(ownerData)) {
-                for (const [version, wrapped] of Object.entries(ownerInfo)) {
-                  if (version == 1) {
-                    v1Punks.push([parseInt(punkId), wrapped]);
-                  } else {
-                    v2Punks.push([parseInt(punkId), wrapped]);
-                  }
-                }
-              }
-              results.push([parseInt(ownerIndex), v1Punks, v2Punks]);
-            }
-            return results;
-          },
-          filteredOwners() {
-            let stage1Results = this.owners;
-            let results;
-            if (this.settings.filterByOwners) {
-              const searchOwners = this.settings.filterByOwners ? this.settings.filterByOwners.split(/[, \t\n]+/).map(s => new RegExp(s.toLowerCase(), "i")) : [];
-              results = [];
-              const ownerIndexMap = {};
-              for (const [index, name] of Object.entries(this.indexToAddressName)) {
-                for (const searchItem of searchOwners) {
-                  if (searchItem.test(name)) {
-                    ownerIndexMap[index] = name;
-                  }
-                }
-              }
-              for (const [index, address] of Object.entries(this.indexToAddress)) {
-                for (const searchItem of searchOwners) {
-                  if (searchItem.test(address)) {
-                    ownerIndexMap[index] = address;
-                  }
-                }
-              }
-              for (const row of stage1Results) {
-                if (row[0] in ownerIndexMap) {
-                  results.push(row);
-                }
-              }
-            } else {
-              results = stage1Results;
-            }
-            return results;
-          },
-          filteredSortedOwners() {
-            let results = this.filteredOwners;
-            if (this.settings.ownersTable.sortOption == 'count1asc') {
-              results.sort((a, b) => {
-                return a[1].length - b[1].length;
-              });
-            } else if (this.settings.ownersTable.sortOption == 'count1dsc') {
-              results.sort((a, b) => {
-                return b[1].length - a[1].length;
-              });
-            } else if (this.settings.ownersTable.sortOption == 'count2asc') {
-              results.sort((a, b) => {
-                return a[2].length - b[2].length;
-              });
-            } else if (this.settings.ownersTable.sortOption == 'count2dsc') {
-              results.sort((a, b) => {
-                return b[2].length - a[2].length;
-              });
-            } else if (this.settings.ownersTable.sortOption == 'count12asc') {
-              results.sort((a, b) => {
-                return a[1].length + a[2].length - b[1].length - b[2].length;
-              });
-            } else if (this.settings.ownersTable.sortOption == 'count12dsc') {
-              results.sort((a, b) => {
-                return b[1].length + b[2].length - a[1].length - a[2].length;
-              });
-            } else if (this.settings.ownersTable.sortOption == 'accountasc') {
-              results.sort((a, b) => {
-                const namea = this.indexToAddressName[a[0]] || this.indexToAddress[a[0]] || "";
-                const nameb = this.indexToAddressName[b[0]] || this.indexToAddress[b[0]] || "";
-                return namea.localeCompare(nameb);
-              });
-            } else if (this.settings.ownersTable.sortOption == 'accountdsc') {
-              results.sort((a, b) => {
-                const namea = this.indexToAddressName[a[0]] || this.indexToAddress[a[0]] || "";
-                const nameb = this.indexToAddressName[b[0]] || this.indexToAddress[b[0]] || "";
-                return nameb.localeCompare(namea);
-              });
-            }
-            // console.log(moment().format("HH:mm:ss") + " filteredSortedOwners - results: " + JSON.stringify(results.slice(0, 10)) + ", ...");
-            return results;
-          },
-          pagedFilteredSortedOwners() {
-            return this.filteredSortedOwners.slice((this.settings.ownersTable.currentPage - 1) * this.settings.ownersTable.pageSize, this.settings.ownersTable.currentPage * this.settings.ownersTable.pageSize);
-          },
         },
 
         // --- METHODS ---
@@ -1207,9 +843,9 @@
             if (!devMode) {
               await this.checkApprovalEvents(provider, latestBlockNumber);
             }
-            if (!devMode) {
+            // if (!devMode) {
               await this.syncNames(db, provider);
-            }
+            // }
 
             // if (!devMode) {
             //   await this.syncBlockTimestamps(db);
@@ -1290,8 +926,9 @@
           },
 
           async syncNames(db, provider) {
-            console.log("syncNames");
-
+            for (const event of this.events) {
+              console.log("syncNames: " + JSON.stringify(event));
+            }
 
           },
 
