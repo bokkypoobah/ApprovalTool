@@ -785,7 +785,7 @@
             return results;
           },
           pagedFilteredSortedEvents() {
-            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedEvents - results[0..9]: " + JSON.stringify(this.filteredSortedEvents.slice(0, 10), null, 2));
+            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedEvents - results[0..9]: " + JSON.stringify(this.filteredSortedEvents.slice(0, 10), null, 2));
             return this.filteredSortedEvents.slice((this.settings.eventsTable.currentPage - 1) * this.settings.eventsTable.pageSize, this.settings.eventsTable.currentPage * this.settings.eventsTable.pageSize);
           },
 
@@ -1147,19 +1147,41 @@
               if (account.type == "erc20") {
                 // console.log(eventIndex + " account BEFORE: " + JSON.stringify(account));
                 // console.log(eventIndex + " " + JSON.stringify(event));
-                if (!('approved' in account)) {
-                  account.approved = {};
+                if (!('approvals' in account)) {
+                  account.approvals = {};
                 }
-                if (!(event.owner in account.approved)) {
-                  account.approved[event.owner] = {};
+                if (!(event.owner in account.approvals)) {
+                  account.approvals[event.owner] = {};
                 }
-                account.approved[event.owner][event.spender] = event.value;
+                account.approvals[event.owner][event.spender] = event.value;
                 // console.log(eventIndex + " account AFTER: " + JSON.stringify(account));
               } else if (account.type == "erc721") {
+                console.log(eventIndex + " account BEFORE: " + JSON.stringify(account));
+                console.log(eventIndex + " " + JSON.stringify(event));
+                if (event.eventName == "Approval") {
+                  if (!('approvals' in account)) {
+                    account.approvals = {};
+                  }
+                  if (!(event.owner in account.approvals)) {
+                    account.approvals[event.owner] = {};
+                  }
+                  account.approvals[event.owner][event.value] = event.spender;
+                  // console.log(eventIndex + " account AFTER: " + JSON.stringify(account));
+                } else if (event.eventName == "ApprovalForAll") {
+                  if (!('approvalsForAll' in account)) {
+                    account.approvalsForAll = {};
+                  }
+                  if (!(event.owner in account.approvalsForAll)) {
+                    account.approvalsForAll[event.owner] = {};
+                  }
+                  account.approvalsForAll[event.owner][event.spender] = event.value;
+                  // console.log(eventIndex + " account AFTER: " + JSON.stringify(account));
+
+                }
               } else if (account.type == "erc1155") {
               }
             }
-            console.log("this.accounts: " + JSON.stringify(this.accounts, null, 2));
+            console.log("accounts: " + JSON.stringify(this.accounts, null, 2));
           },
 
           async processDataOld(db) {
