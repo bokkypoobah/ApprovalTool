@@ -287,7 +287,7 @@
                   <b-button size="sm" :pressed.sync="settings.showFilter" @click="saveSettings" variant="link" v-b-popover.hover.bottom="'Show filter'"><span v-if="settings.showFilter"><b-icon-layout-sidebar-inset shift-v="+1" font-scale="1.0"></b-icon-layout-sidebar-inset></span><span v-else><b-icon-layout-sidebar shift-v="+1" font-scale="1.0"></b-icon-layout-sidebar></span></b-button>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-1">
-                  <b-form-checkbox size="sm" v-model.trim="settings.includeFluff" @input="saveSettings" v-b-popover.hover.bottom="'Include ERC-721 Approval to Null:0x0000...0000'">
+                  <b-form-checkbox size="sm" v-model.trim="settings.includeFluff" @input="saveSettings" v-b-popover.hover.bottom="'Include unimportant events like ERC-721 Approval to Null:0x0000...0000'">
                     Fluff
                   </b-form-checkbox>
                 </div>
