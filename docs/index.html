@@ -2263,6 +2263,7 @@
                 });
               }
             }
+            localStorage.approvalApprovals = JSON.stringify(approvals);
             Vue.set(this, 'approvals', approvals);
             console.log("approvals: " + JSON.stringify(approvals, null, 2));
             // console.log("contracts: " + Object.keys(contracts));
@@ -3860,6 +3861,10 @@
               //   this.settings.ownersTable.currentPage = 1;
               // }
             }
+          }
+          if ('approvalApprovals' in localStorage) {
+            const tempApprovals = JSON.parse(localStorage.approvalApprovals);
+            this.approvals = tempApprovals;
           }
           (async() => {
             const db = new Dexie(this.db.name);
