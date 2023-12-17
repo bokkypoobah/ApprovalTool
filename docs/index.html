@@ -990,6 +990,12 @@
                       accounts[account].type = "erc20";
                       accounts[account].symbol = symbol;
                       accounts[account].name = name;
+                      const erc20Contract = new ethers.Contract(account, ERC20ABI, provider);
+                      try {
+                        accounts[account].decimals = await erc20Contract.decimals();
+                      } catch (e1) {
+                        accounts[account].decimals = 18;
+                      }
                       // accounts[account] = { type: "erc20", symbol, name };
                     } else if ((mask & MASK_ISERC721) == MASK_ISERC721) {
                       accounts[account].type = "erc721";
@@ -1555,6 +1561,9 @@
           addressDescription(address) {
             if (address in this.accounts) {
               result = "type=" + this.accounts[address].type + "; symbol=" + this.accounts[address].symbol + "; name=" + this.accounts[address].name + "; source=" + this.accounts[address].source + "; address=" + address;
+              if (this.accounts[address].decimals) {
+                result = result + "; decimals=" + this.accounts[address].decimals;
+              }
             } else {
               result = address;
             }
