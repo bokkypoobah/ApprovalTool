@@ -328,8 +328,8 @@
                 </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
-                <div v-if="settings.tabIndex == 110" class="mt-0 pl-1">
-                  <b-form-select size="sm" v-model="settings.activityTable.sortOption" @change="saveSettings" :options="activitySortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
+                <div class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.eventsTable.sortOption" @change="saveSettings" :options="eventsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 110" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'# events'">{{ filteredSortedEvents.length + '/' + Object.keys(txs).length }}</font>
@@ -604,29 +604,9 @@
             txFee: null,
             txFeeInReportingCurrency: null,
           },
-          punksSortOptions: [
-            { value: 'punkidasc', text: '▲ PunkId' },
-            { value: 'punkiddsc', text: '▼ PunkId' },
-          ],
-          activitySortOptions: [
+          eventsSortOptions: [
             { value: 'txorderasc', text: '▲ TxOrder' },
             { value: 'txorderdsc', text: '▼ TxOrder' },
-          ],
-          ownersSortOptions: [
-            { value: 'count1asc', text: '▲ Σv1 Punks' },
-            { value: 'count1dsc', text: '▼ Σv1 Punks' },
-            { value: 'count2asc', text: '▲ Σv2 Punks' },
-            { value: 'count2dsc', text: '▼ Σv2 Punks' },
-            { value: 'count12asc', text: '▲ Σv1 & v2 Punks' },
-            { value: 'count12dsc', text: '▼ Σv1 & v2 Punks' },
-            { value: 'accountasc', text: '▲ Account' },
-            { value: 'accountdsc', text: '▼ Account' },
-          ],
-          contractOptions: [
-            { text: 'v1', value: 1 },
-            { text: 'v2', value: 2 },
-            { text: 'w1', value: 3 },
-            { text: 'w2', value: 4 }
           ],
           pageSizes: [
             { value: 5, text: '5' },
