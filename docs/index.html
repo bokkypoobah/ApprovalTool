@@ -1358,7 +1358,7 @@
             halt: false,
           },
 
-          approvalLogs: {},
+          approvals: {},
 
           syncStates: {},
           blockTimestamps: {},
@@ -2176,6 +2176,7 @@
             const owners = {};
             const contracts = {};
             const spenders = {};
+            const approvals = [];
             for (const log of approvalLogs) {
               if (!(log.address in contracts)) {
                 contracts[log.address] = true;
@@ -2198,11 +2199,22 @@
                 console.log("topic length <> 4: " + log.topics.length + " " + JSON.stringify(log));
               }
               if (owner) {
-                console.log(log.blockNumber + "." + log.transactionIndex + "." + log.logIndex + " " + log.address + " " + eventName + " " + owner + " " + spender + " " + value);
+                // console.log(log.blockNumber + "." + log.transactionIndex + "." + log.logIndex + " " + log.address + " " + eventName + " " + owner + " " + spender + " " + value);
+                approvals.push({
+                  blockNumber: log.blockNumber,
+                  txIndex: log.transactionIndex,
+                  logIndex: log.logIndex,
+                  contract: log.address,
+                  eventName,
+                  owner,
+                  spender,
+                  value,
+                });
               }
             }
-            Vue.set(this, 'approvalLogs', approvalLogs);
-            console.log("contracts: " + Object.keys(contracts));
+            Vue.set(this, 'approvals', approvals);
+            console.log("approvals: " + JSON.stringify(approvals, null, 2));
+            // console.log("contracts: " + Object.keys(contracts));
           },
 
           async syncEvents(db, provider, latestBlockNumber) {
