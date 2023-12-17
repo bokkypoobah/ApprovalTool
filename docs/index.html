@@ -432,9 +432,8 @@
                       {{ data.item.blockNumber }}
                     </b-link>
                     <font size="-1">
-                      <b-badge pill variant="transparent" v-b-popover.hover="'Transaction Index'">{{ data.item.txIndex }}</b-badge>
-                      .
-                      <b-badge pill variant="transparent" v-b-popover.hover="'Log Index'">{{ data.item.logIndex }}</b-badge>
+                      <b-badge pill variant="transparent" v-b-popover.hover="'Transaction Index'" class="px-0">{{ data.item.txIndex }}</b-badge>
+                      <b-badge pill variant="transparent" v-b-popover.hover="'Log Index'" class="px-0">{{ data.item.logIndex }}</b-badge>
                     </font>
                   </font>
                 </template>
@@ -648,7 +647,7 @@
 
           eventsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-            { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
+            { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
             { key: 'owner', label: 'Owner', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
