@@ -1,5 +1,6 @@
 const CUSTOMNAMES = {
   "0x0000000000000000000000000000000000000000": ["eoa", "Dead", "Dead:0x0000...0000"],
+  "0x000000000022D473030F116dDEE9F6B43aC78BA3": ["erc20", "Dead", "Dead:0x0000...0000"],
   "0x1E0049783F008A0085193E00003D00cd54003c71": ["nftexchange", "OS:Conduit", "OpenSea: Conduit"],
   "0x495f947276749Ce646f68AC8c248420045cb7b5e": ["erc1155", "OSSSF", "OpenSea Shared StoreFront"],
   "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85": ["erc721", "ENS", "Ethereum Name Service"],
