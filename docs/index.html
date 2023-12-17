@@ -60,8 +60,8 @@
             <!-- <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings(); loadCurrentData();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'Status'">Status</b-nav-item> -->
             <!-- <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings()" :active="settings.tabIndex == 1002" active-class="active" v-b-popover.hover="'View Owners'">Owners</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings()" :active="settings.tabIndex == 1003" active-class="active" v-b-popover.hover="'Configure Settings'">Config</b-nav-item> -->
-            <b-avatar v-if="coinbase && coinbase != ensOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + ensOrAddress(coinbase, 100)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
-            <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock(0);" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? ensOrAddress(coinbase, 16) : 'Connect' }}</b-button>
+            <b-avatar v-if="coinbase && coinbase != nameOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + nameOrAddress(coinbase, 100)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
+            <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock(0);" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? nameOrAddress(coinbase, 16) : 'Connect' }}</b-button>
           </b-navbar-nav>
         </b-navbar>
 
@@ -99,7 +99,7 @@
               <b-form-group label="Owner:" label-for="punk-v1owner" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
                   <b-button size="sm" variant="link" id="punk-v1owner" :href="'https://etherscan.io/address/' + indexToAddress[modalPunk.v1.ownerIndex]" v-b-popover.hover.bottom="'v1 Owner. Click to view in etherscan.io'" target="_blank">
-                    {{ ensOrAddress(indexToAddress[modalPunk.v1.ownerIndex], 42) }}
+                    {{ nameOrAddress(indexToAddress[modalPunk.v1.ownerIndex], 42) }}
                   </b-button>
                 </font>
               </b-form-group>
@@ -120,7 +120,7 @@
               <b-form-group label="Owner:" label-for="punk-v2owner" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
                   <b-button size="sm" variant="link" id="punk-v2owner" :href="'https://etherscan.io/address/' + indexToAddress[modalPunk.v2.ownerIndex]" v-b-popover.hover.bottom="'v2 Owner. Click to view in etherscan.io'" target="_blank">
-                    {{ ensOrAddress(indexToAddress[modalPunk.v2.ownerIndex], 42) }}
+                    {{ nameOrAddress(indexToAddress[modalPunk.v2.ownerIndex], 42) }}
                   </b-button>
                 </font>
               </b-form-group>
@@ -181,13 +181,13 @@
               </b-form-group>
               <b-form-group v-if="modalTx.tx && modalTx.tx.from" label="From:" label-for="tx-from" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="link" id="tx-from" :href="'https://etherscan.io/address/' + modalTx.tx.from" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ ensOrAddress(modalTx.tx.from, 42) }}</b-button>
+                  <b-button size="sm" variant="link" id="tx-from" :href="'https://etherscan.io/address/' + modalTx.tx.from" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ nameOrAddress(modalTx.tx.from, 42) }}</b-button>
                   <b-button size="sm" @click="copyToClipboard(modalTx.tx.from);" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </font>
               </b-form-group>
               <b-form-group v-if="modalTx.tx && modalTx.tx.to" label="To:" label-for="tx-to" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="link" id="tx-to" :href="'https://etherscan.io/address/' + modalTx.tx.to" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ ensOrAddress(modalTx.tx.to, 42) }}</b-button>
+                  <b-button size="sm" variant="link" id="tx-to" :href="'https://etherscan.io/address/' + modalTx.tx.to" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ nameOrAddress(modalTx.tx.to, 42) }}</b-button>
                   <b-button size="sm" @click="copyToClipboard(modalTx.tx.to);" variant="link" class="m-0 p-0" v-b-popover.hover.top="'Copy to clipboard'"><b-icon-clipboard shift-v="+1" font-scale="1.1"></b-icon-clipboard></b-button>
                 </font>
               </b-form-group>
@@ -203,7 +203,7 @@
                     <template #cell(value)="data">
                       <span v-if="data.item.type == 'address'">
                         <b-link :href="'https://etherscan.io/address/' + data.item.value" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
-                          {{ ensOrAddress(data.item.value, 42) }}
+                          {{ nameOrAddress(data.item.value, 42) }}
                         </b-link>
                       </span>
                       <span v-else-if="['minSalePriceInWei'].includes(data.item.parameter)">
@@ -249,7 +249,7 @@
                   <b-table small fixed striped :fields="eventLogFields" :items="modalTx.logs" head-variant="light">
                     <template #cell(contract)="data">
                       <b-link :href="'https://etherscan.io/address/' + data.item.contract" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
-                        {{ ensOrAddress(data.item.contract, 42) }}
+                        {{ nameOrAddress(data.item.contract, 42) }}
                       </b-link>
                     </template>
                     <template #cell(fields)="data">
@@ -257,7 +257,7 @@
                         <span v-if="field.type == 'address'" class="m-0 p-0">
                           {{ field.field + '=' }}
                           <b-link :href="'https://etherscan.io/address/' + field.value" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
-                            <b-badge pill variant="invisible">{{ ensOrAddress(field.value, 42) + '...' }}</b-badge>
+                            <b-badge pill variant="invisible">{{ nameOrAddress(field.value, 42) + '...' }}</b-badge>
                           </b-link>
                         </span>
                         <span v-else class="m-0 p-0">
@@ -436,17 +436,17 @@
                 </template>
                 <template #cell(owner)="data">
                   <b-link :href="'https://etherscan.io/address/' + data.item.owner" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
-                    {{ ensOrAddress(data.item.owner, 16) }}
+                    {{ nameOrAddress(data.item.owner, 16) }}
                   </b-link>
                 </template>
                 <template #cell(contract)="data">
                   <b-link :href="'https://etherscan.io/address/' + data.item.contract" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
-                    {{ ensOrAddress(data.item.contract, 16) }}
+                    {{ nameOrAddress(data.item.contract, 16) }}
                   </b-link>
                 </template>
                 <template #cell(spender)="data">
                   <b-link :href="'https://etherscan.io/address/' + data.item.spender" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
-                    {{ ensOrAddress(data.item.spender, 16) }}
+                    {{ nameOrAddress(data.item.spender, 16) }}
                   </b-link>
                 </template>
               </b-table>
@@ -672,44 +672,6 @@
             { key: 'value', label: 'Value', /*sortable: true,*/ thStyle: 'width: 20%;', thClass: 'text-right', tdClass: 'text-right' },
           ],
 
-          punksFields: [
-            { key: 'punkId', label: 'PunkId', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
-            { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'v1Owner', label: 'v1', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'v1Wrapped', label: '', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'v2Owner', label: 'v2', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'v2Wrapped', label: '', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'attribute', label: 'Attributes', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
-          ],
-          activityFields: [
-            { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-            { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
-            // { key: 'action', label: 'Action', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            // { key: 'from', label: 'From', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            // { key: 'to', label: 'To', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            // { key: 'punk', label: 'Punk', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
-            // { key: 'value', label: 'Value', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'events', label: 'Events', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
-          ],
-          statusFields: [
-            { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-            { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 35%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'firstEventBlockNumber', label: 'First Event #', /*sortable: true,*/ thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
-            { key: 'latestEventBlockNumber', label: 'Latest Event #', /*sortable: true,*/ thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
-            { key: 'latestBlockNumber', label: 'Synced To #', /*sortable: true,*/ thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
-            { key: 'count', label: '# Events', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
-          ],
-          ownersFields: [
-            { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-            { key: 'owner', label: 'Owner', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'v1', label: 'v1', sortable: false, thStyle: 'width: 40%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'v2', label: 'v2', sortable: false, thStyle: 'width: 40%;', thClass: 'text-left', tdClass: 'text-left' },
-          ],
-          punkAttributesFields: [
-            { key: 'select', label: '', thStyle: 'width: 10%;' },
-            { key: 'attributeOption', label: 'Attribute' /*, sortable: true*/ },
-            { key: 'attributeTotal', label: 'Count', /*sortable: true,*/ thStyle: 'width: 30%;', thClass: 'text-right', tdClass: 'text-right' },
-          ],
           functionCallParametersFields: [
             { key: 'parameter', label: 'Parameter', sortable: false, thStyle: 'width: 40%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
@@ -720,54 +682,6 @@
             { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'truncate' },
             { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'fields', label: 'Fields', sortable: false, thStyle: 'width: 50%;', thClass: 'text-left', tdClass: 'text-left' },
-          ],
-          indexToEventTypes: [
-            "ABIChanged", // 0
-            "AddressChanged", // 1
-            "AddrChanged", // 2
-            "Approval", // 3
-            "ApprovalForAll", // 4
-            "Approved", // 5
-            "ContenthashChanged", // 6
-            "ControllerAdded", // 7
-            "ControllerChanged", // 8
-            "ControllerRemoved", // 9
-            "DefaultResolverChanged", // 10
-            "DNSRecordChanged", // 11
-            "ExpiryExtended", // 12
-            "FusesSet", // 13
-            "NameChanged", // 14
-            "NameRegistered", // 15
-            "NameRenewed", // 16
-            "NameUnwrapped", // 17
-            "NameWrapped", // 18
-            "NewPriceOracle", // 19
-            "OwnershipTransferred", // 20
-            "PubkeyChanged", // 21
-            "ReverseClaimed", // 22
-            "Transfer", // 23
-            "TransferBatch", // 24
-            "TransferSingle", // 25
-            "TextChanged", // 26
-            "VersionChanged", // 27
-          ],
-          indexToTransactionTypes: [
-            "Reserve", // 0
-            "Claim", // 1
-            "Airdrop", // 2
-            "Transfer", // 3
-            "Offer", // 4
-            "RemoveOffer", // 5
-            "Purchase", // 6
-            "Bid", // 7
-            "RemoveBid", // 8
-            "AcceptBid", // 9
-            "Wrap", // 10
-            "Unwrap", // 11
-            "Approval", // 12
-            "ApprovalForAll", // 13
-            "OwnershipTransferred", // 14
-            "ProxyRegistered", // 15
           ],
           contracts: [
             // Jan-30-2020 12:37:12 AM +UTC 0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e
@@ -827,13 +741,6 @@
 
         // --- COMPUTED ---
         computed: {
-          eventTypesToIndex() {
-            const results = {};
-            for (const [eventTypeIndex, eventType] of this.indexToEventTypes.entries()) {
-              results[eventType] = eventTypeIndex;
-            }
-            return results;
-          },
           status() {
             const results = [];
             let totalCount = 0;
@@ -2096,7 +2003,7 @@
               return moment.unix(unixtime).fromNow();
             }
           },
-          ensOrAddress(addressOrAddressIndex, length = 0) {
+          nameOrAddress(addressOrAddressIndex, length = 0) {
             let result = null;
             if (new RegExp('^[0-9,]+$').test(addressOrAddressIndex)) {
               if (addressOrAddressIndex in this.indexToAddressName) {
