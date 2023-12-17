@@ -1294,20 +1294,13 @@
                 null
               ],
             });
-            // const owners = {};
-            // const contracts = {};
-            // const spenders = {};
             const approvals = [];
             for (const log of approvalLogs) {
-              // if (!(log.address in contracts)) {
-              //   contracts[log.address] = true;
-              // }
               const topic0 = log.topics[0];
               const eventName = topic0 == '0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31' ? 'ApprovalForAll': 'Approval';
               let owner = null;
               let spender = null;
               let value = null;
-              // console.log("log: " + eventName + " " + JSON.stringify(log));
               if (log.topics.length == 3) {
                 owner = ethers.utils.getAddress('0x' + log.topics[1].substring(26));
                 spender = ethers.utils.getAddress('0x' + log.topics[2].substring(26));
@@ -1320,7 +1313,6 @@
                 console.log("topic length <> 4: " + log.topics.length + " " + JSON.stringify(log));
               }
               if (owner) {
-                // console.log(log.blockNumber + "." + log.transactionIndex + "." + log.logIndex + " " + log.address + " " + eventName + " " + owner + " " + spender + " " + value);
                 approvals.push({
                   blockNumber: log.blockNumber,
                   txIndex: log.transactionIndex,
@@ -1337,10 +1329,75 @@
             localStorage.approvalApprovals = JSON.stringify(approvals);
             Vue.set(this, 'approvals', approvals);
             console.log("approvals: " + JSON.stringify(approvals, null, 2));
-            // console.log("contracts: " + Object.keys(contracts));
           },
 
           async syncNames(db, provider) {
+            console.log("syncNames");
+
+            
+          },
+
+          // TODO: Refresh sync
+          async syncENSNames(newAddressIndexes, db, provider) {
+            const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
+            let indexToAddress = [];
+            let addressToIndex = {};
+            const indexToAddressDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
+            if (indexToAddressDataItems.length == 1) {
+              indexToAddress = indexToAddressDataItems[0].object;
+              for (const [index, address] of indexToAddress.entries()) {
+                addressToIndex[address] = index;
+              }
+            }
+            const addresses = newAddressIndexes.map(e => indexToAddress[e]);
+            this.sync.completed = 0;
+            this.sync.total = addresses.length;
+            this.sync.section = 'ENS Names';
+            const MAXBATCHSIZE = 1000;
+            let batchSize = MAXBATCHSIZE;
+            let completed = 0;
+            let done = false;
+            let start = completed;
+            do {
+              let end = parseInt(start) + batchSize - 1;
+              if (end > addresses.length) {
+                end = addresses.length;
+              }
+              try {
+                const batch = addresses.slice(start, end + 1);
+                const allnames = await ensReverseRecordsContract.getNames(batch);
+                for (let j = 0; j < batch.length; j++) {
+                  const account = batch[j];
+                  const name = allnames[j];
+                  // TODO: const normalized = normalize(account);
+                  if (name.length > 0) {
+                    // console.log(account + " => " + name);
+                    Vue.set(this.indexToAddressName, addressToIndex[account], name);
+                  }
+                }
+                start = parseInt(end) + 1;
+              } catch (e) {
+                if (batchSize > 1) {
+                  batchSize = parseInt(batchSize / 2);
+                } else {
+                  console.log("Skipping #" + start + " " + addresses[start]);
+                  start = parseInt(start) + 1;
+                  batchSize = MAXBATCHSIZE;
+                }
+              }
+              this.sync.completed = start;
+              done = start > addresses.length;
+            } while (!done);
+
+            for (const [address, name] of Object.entries(CUSTOMNAMES)) {
+              Vue.set(this.indexToAddressName, addressToIndex[address], name);
+            }
+            // console.log("this.indexToAddressName: " + JSON.stringify(this.indexToAddressName, null, 2));
+            await db.cache.put({ objectName: CHAINID_MAINNET + "_indexToAddressName", object: this.indexToAddressName }).then (function() {
+            }).catch(function(error) {
+              console.log("error: " + error);
+            });
+            console.log(moment().format("HH:mm:ss") + " syncENSNames END");
           },
 
           async syncBlockTimestamps(db) {
@@ -1547,163 +1604,11 @@
                     contractIndexes[contractIndex] = 1;
                   }
                  events.push([ parseInt(logIndex), ...event ]);
-                  // // Assign
-                  // if (eventType == 0) {
-                  //   if (!(contractIndex in tokens)) {
-                  //     tokens[contractIndex] = {};
-                  //   }
-                  //   const [ ownerIndex, punkId ] = [ event[2], event[3].toString() ];
-                  //   if (parseInt(punkId) < 10000) {
-                  //     tokens[contractIndex][punkId] = ownerIndex;
-                  //     if (!(punkId in punkIds)) {
-                  //       punkIds[punkId] = 1;
-                  //     }
-                  //   }
-                  //   if (parseInt(punkId) > 9999 || punkId.length > 5) {
-                  //     console.log(moment().format("HH:mm:ss") + " processData: " + this.indexToTxHash[txHashIndex] + " - Invalid punkId" + " " + blockNumber + " " + txIndex + " " + txHashIndex + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
-                  //   }
-                  //   events.push([ parseInt(logIndex), contractIndex, eventType, event[2], event[3] ]);
-                  //
-                  // // Transfer - W1 & W2
-                  // } else if (eventType == 1) {
-                  //   if (contractIndex == 3 || contractIndex == 4) {
-                  //     if (!(contractIndex in tokens)) {
-                  //       tokens[contractIndex] = {};
-                  //     }
-                  //     // console.log(blockNumber + " " + txIndex + " " + txHashIndex + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
-                  //     const [ fromOwnerIndex, toOwnerIndex, punkId ] = [ event[2], event[3], event[4].toString() ];
-                  //     if (parseInt(punkId) < 10000) {
-                  //       tokens[contractIndex][punkId] = toOwnerIndex;
-                  //       if (!(punkId in punkIds)) {
-                  //         punkIds[punkId] = 1;
-                  //       }
-                  //     }
-                  //   } else {
-                  //     const [ fromOwnerIndex, toOwnerIndex, punkId ] = [ event[2], event[3], event[4].toString() ];
-                  //     lastToOwnerIndex = toOwnerIndex;
-                  //   }
-                  //   events.push([ parseInt(logIndex), contractIndex, eventType, event[2], event[3], event[4] ]);
-                  //
-                  // // PunkTransfer - V1 & V2 only
-                  // } else if (eventType == 2) {
-                  //   const [ fromOwnerIndex, toOwnerIndex, punkId ] = [ event[2], event[3], event[4].toString() ];
-                  //   if (parseInt(punkId) < 10000) {
-                  //     tokens[contractIndex][punkId] = toOwnerIndex;
-                  //     if (!(punkId in punkIds)) {
-                  //       punkIds[punkId] = 1;
-                  //     }
-                  //   }
-                  //   // console.log(blockNumber + " " + txIndex + " " + txHashIndex + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
-                  //   events.push([ parseInt(logIndex), contractIndex, eventType, event[2], event[3], event[4] ]);
-                  //
-                  // // PunkOffered - V1 & V2
-                  // } else if (eventType == 3) {
-                  //   const [ punkId, minValue, toOwnerIndex ] = [ event[2], event[3].toString(), event[4] ];
-                  //   offers[contractIndex][punkId] = { minValue, toOwnerIndex };
-                  //   if (!(punkId in punkIds)) {
-                  //     punkIds[punkId] = 1;
-                  //   }
-                  //   // if (punkId == 5309) {
-                  //   //   console.log("PunkOffered " + blockNumber + " " + txIndex + " " + txHashIndex + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
-                  //   // //   console.log("  offers[contractIndex][7144]: " + JSON.stringify(offers[contractIndex][7144]));
-                  //   // }
-                  //   events.push([ parseInt(logIndex), contractIndex, eventType, event[2], event[3], event[4], tokens[contractIndex][punkId] ]);
-                  //
-                  // // PunkNoLongerForSale - V1 & V2
-                  // } else if (eventType == 4) {
-                  //   const [ punkId ] = [ event[2] ];
-                  //   delete offers[contractIndex][punkId];
-                  //   if (!(punkId in punkIds)) {
-                  //     punkIds[punkId] = 1;
-                  //   }
-                  //   // if (punkId == 7144) {
-                  //   //   console.log("PunkNoLongerForSale " + blockNumber + " " + txIndex + " " + txHashIndex + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
-                  //   //   console.log("  offers[contractIndex][7144]: " + JSON.stringify(offers[contractIndex][7144]));
-                  //   // }
-                  //   events.push([ parseInt(logIndex), contractIndex, eventType, event[2], tokens[contractIndex][punkId] ]);
-                  //
-                  // // PunkBidEntered - V2
-                  // } else if (eventType == 5) {
-                  //   const [ punkId, value, fromOwnerIndex ] = [ event[2], event[3].toString(), event[4] ];
-                  //   v2Bids[punkId] = { value, fromOwnerIndex };
-                  //   if (!(punkId in punkIds)) {
-                  //     punkIds[punkId] = 1;
-                  //   }
-                  //   // if (punkId == 0) {
-                  //   //   console.log("PunkBidEntered " + blockNumber + " " + txIndex + " " + txHashIndex + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
-                  //   //   console.log("  v2Bids[0]: " + JSON.stringify(v2Bids[0]));
-                  //   // }
-                  //   events.push([ parseInt(logIndex), contractIndex, eventType, event[2], event[3], event[4] ]);
-                  //
-                  // // PunkBidWithdrawn - V2
-                  // } else if (eventType == 6) {
-                  //   const [ punkId, value, fromOwnerIndex ] = [ event[2], event[3].toString(), event[4] ];
-                  //   delete v2Bids[punkId];
-                  //   if (!(punkId in punkIds)) {
-                  //     punkIds[punkId] = 1;
-                  //   }
-                  //   // if (punkId == 0) {
-                  //   //   console.log("PunkBidWithdrawn " + blockNumber + " " + txIndex + " " + txHashIndex + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
-                  //   //   console.log("  v2Bids[0]: " + JSON.stringify(v2Bids[0]));
-                  //   // }
-                  //   events.push([ parseInt(logIndex), contractIndex, eventType, event[2], event[3], event[4] ]);
-                  //
-                  // // PunkBought - V1 & V2
-                  // } else if (eventType == 7) {
-                  //   let [ punkId, value, fromOwnerIndex, toOwnerIndex ] = [ event[2].toString(), event[3].toString(), event[4], event[5] ];
-                  //   // acceptBidForPunk() bug where value = 0 and fromOwner = 0x0
-                  //   const bidAccepted = (value == 0 && toOwnerIndex == 0) ? 1 : 0;
-                  //   if (value == 0 && toOwnerIndex == 0) {
-                  //     value = v2Bids[punkId].value;
-                  //     toOwnerIndex = v2Bids[punkId].fromOwnerIndex;
-                  //     delete v2Bids[punkId];
-                  //     delete offers[contractIndex][punkId];
-                  //   }
-                  //   if (parseInt(punkId) < 10000) {
-                  //     tokens[contractIndex][punkId] = toOwnerIndex;
-                  //     if (!(punkId in punkIds)) {
-                  //       punkIds[punkId] = 1;
-                  //     }
-                  //   }
-                  //   events.push([ parseInt(logIndex), contractIndex, eventType, event[2], value, fromOwnerIndex, toOwnerIndex, bidAccepted ]);
-                  //   // if (punkId == 0) {
-                  //   //   console.log("PunkBought " + blockNumber + " " + txIndex + " " + txHashIndex + " " + logIndex + " " + contractIndex + " " + eventType + " " + JSON.stringify(event));
-                  //   //   console.log("  v2Bids[0]: " + JSON.stringify(v2Bids[0]));
-                  //   // }
-                  //
-                  // // Approval - W1 & W2
-                  // } else if (eventType == 8) {
-                  //   events.push([ parseInt(logIndex), contractIndex, eventType, event[2], event[3], event[4] ]);
-                  //
-                  // // ApprovalForAll - W1 & W2
-                  // } else if (eventType == 9) {
-                  //   events.push([ parseInt(logIndex), contractIndex, eventType, event[2], event[3], event[4] ]);
-                  //
-                  // // OwnershipTransferred - ? W1 & W2
-                  // } else if (eventType == 10) {
-                  //   events.push([ parseInt(logIndex), contractIndex, eventType, event[2], event[3] ]);
-                  //
-                  // // ProxyRegistered - W2
-                  // } else if (eventType == 11) {
-                  //   events.push([ parseInt(logIndex), contractIndex, eventType, event[2], event[3] ]);
-                  //
-                  // }
                 }
-                // console.log(moment().format("HH:mm:ss") + " processData - events: " + JSON.stringify(events));
-                // const contractIndexList = Object.keys(contractIndexes).map(e => parseInt(e));
                 txs.push([ timestamp, parseInt(blockNumber), parseInt(txIndex), txHashIndex, events ]);
-                // const punkIdList = Object.keys(punkIds).map(e => parseInt(e));
-                // const txSummary = parsePunkTx(txHashIndex, events, this.addressToIndex, exchangeRate);
-                // if (txSummary) {
-                //   for (const [index, summary] of txSummary.entries()) {
-                //     // TODO: Get rid of punkIdList
-                //     txs.push([ timestamp, parseInt(blockNumber), parseInt(txIndex), index, txHashIndex, summary, contractIndexList, punkIdList, events ]);
-                //   }
-                // }
               }
               this.sync.completed++;
             }
-
             console.log(moment().format("HH:mm:ss") + " processData - txs: " + JSON.stringify(txs));
             await db.cache.put({ objectName: this.chainId + "_txs", object: txs }).then (function() {
             }).catch(function(error) {
@@ -1768,69 +1673,6 @@
               console.log("error: " + error);
             });
             this.exchangeRates = exchangeRates;
-          },
-
-          // TODO: Refresh sync
-          async syncENSNames(newAddressIndexes, db, provider) {
-            const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
-            let indexToAddress = [];
-            let addressToIndex = {};
-            const indexToAddressDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
-            if (indexToAddressDataItems.length == 1) {
-              indexToAddress = indexToAddressDataItems[0].object;
-              for (const [index, address] of indexToAddress.entries()) {
-                addressToIndex[address] = index;
-              }
-            }
-            const addresses = newAddressIndexes.map(e => indexToAddress[e]);
-            this.sync.completed = 0;
-            this.sync.total = addresses.length;
-            this.sync.section = 'ENS Names';
-            const MAXBATCHSIZE = 1000;
-            let batchSize = MAXBATCHSIZE;
-            let completed = 0;
-            let done = false;
-            let start = completed;
-            do {
-              let end = parseInt(start) + batchSize - 1;
-              if (end > addresses.length) {
-                end = addresses.length;
-              }
-              try {
-                const batch = addresses.slice(start, end + 1);
-                const allnames = await ensReverseRecordsContract.getNames(batch);
-                for (let j = 0; j < batch.length; j++) {
-                  const account = batch[j];
-                  const name = allnames[j];
-                  // TODO: const normalized = normalize(account);
-                  if (name.length > 0) {
-                    // console.log(account + " => " + name);
-                    Vue.set(this.indexToAddressName, addressToIndex[account], name);
-                  }
-                }
-                start = parseInt(end) + 1;
-              } catch (e) {
-                if (batchSize > 1) {
-                  batchSize = parseInt(batchSize / 2);
-                } else {
-                  console.log("Skipping #" + start + " " + addresses[start]);
-                  start = parseInt(start) + 1;
-                  batchSize = MAXBATCHSIZE;
-                }
-              }
-              this.sync.completed = start;
-              done = start > addresses.length;
-            } while (!done);
-
-            for (const [address, name] of Object.entries(CUSTOMNAMES)) {
-              Vue.set(this.indexToAddressName, addressToIndex[address], name);
-            }
-            // console.log("this.indexToAddressName: " + JSON.stringify(this.indexToAddressName, null, 2));
-            await db.cache.put({ objectName: CHAINID_MAINNET + "_indexToAddressName", object: this.indexToAddressName }).then (function() {
-            }).catch(function(error) {
-              console.log("error: " + error);
-            });
-            console.log(moment().format("HH:mm:ss") + " syncENSNames END");
           },
 
           async loadCurrentData() {
