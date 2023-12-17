@@ -455,11 +455,9 @@
                   <b-badge pill variant="transparent" class="px-0">{{ accounts[data.item.contract] && ('type' in accounts[data.item.contract]) && accounts[data.item.contract].type || "(unknown)" }}</b-badge>
                 </template>
                 <template #cell(contract)="data">
-                  <font size="-1">
-                    <b-link :href="'https://etherscan.io/address/' + data.item.contract" target="_blank">
-                      <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)" class="px-0">{{ nameOrAddress(data.item.contract, 28) }}</b-badge>
-                    </b-link>
-                  </font>
+                  <b-link :href="'https://etherscan.io/address/' + data.item.contract" target="_blank">
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)" class="px-0">{{ nameOrAddress(data.item.contract, 28) }}</b-badge>
+                  </b-link>
                 </template>
                 <template #cell(eventName)="data">
                   <b-badge pill variant="transparent" class="px-0">{{ data.item.eventName }}</b-badge>
