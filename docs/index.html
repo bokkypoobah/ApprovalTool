@@ -434,9 +434,11 @@
                     <!-- <b-link @click="showModalTx(data.item[4]);" v-b-popover.hover.bottom="'Click for details'" target="_blank"> -->
                     <!-- {{ formatTimestamp(data.item[0]) }} -->
                     <b-link :href="'https://etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
-                      {{ commify0(data.item.blockNumber) }}
+                      {{ formatTimestamp(data.item.timestamp) }}
                     </b-link>
+                    <br />
                     <font size="-1">
+                      <b-badge pill variant="transparent" v-b-popover.hover="'Block Number'" class="px-0">{{ commify0(data.item.blockNumber) }}</b-badge>
                       <b-badge pill variant="transparent" v-b-popover.hover="'Transaction Index'" class="px-0">{{ data.item.txIndex }}</b-badge>
                       <b-badge pill variant="transparent" v-b-popover.hover="'Log Index'" class="px-0">{{ data.item.logIndex }}</b-badge>
                     </font>
@@ -749,7 +751,8 @@
                 }
               }
               if (include) {
-                results.push(event);
+                const timestamp = this.blockTimestamps[event.blockNumber] || "(unknown)";
+                results.push({ ...event, timestamp });
               }
             }
             return results;
@@ -784,7 +787,7 @@
             return results;
           },
           pagedFilteredSortedEvents() {
-            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedEvents - results[0..9]: " + JSON.stringify(this.filteredSortedEvents.slice(0, 10)));
+            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedEvents - results[0..9]: " + JSON.stringify(this.filteredSortedEvents.slice(0, 10), null, 2));
             return this.filteredSortedEvents.slice((this.settings.eventsTable.currentPage - 1) * this.settings.eventsTable.pageSize, this.settings.eventsTable.currentPage * this.settings.eventsTable.pageSize);
           },
 
