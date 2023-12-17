@@ -1145,8 +1145,6 @@
               const contract = event.contract;
               const account = this.accounts[contract];
               if (account.type == "erc20") {
-                // console.log(eventIndex + " account BEFORE: " + JSON.stringify(account));
-                // console.log(eventIndex + " " + JSON.stringify(event));
                 if (!('approvals' in account)) {
                   account.approvals = {};
                 }
@@ -1154,10 +1152,7 @@
                   account.approvals[event.owner] = {};
                 }
                 account.approvals[event.owner][event.spender] = event.value;
-                // console.log(eventIndex + " account AFTER: " + JSON.stringify(account));
               } else if (account.type == "erc721") {
-                // console.log(eventIndex + " account BEFORE: " + JSON.stringify(account));
-                // console.log(eventIndex + " " + JSON.stringify(event));
                 if (event.eventName == "Approval") {
                   if (!('approvals' in account)) {
                     account.approvals = {};
@@ -1166,7 +1161,6 @@
                     account.approvals[event.owner] = {};
                   }
                   account.approvals[event.owner][event.value] = event.spender;
-                  // console.log(eventIndex + " account AFTER: " + JSON.stringify(account));
                 } else if (event.eventName == "ApprovalForAll") {
                   if (!('approvalsForAll' in account)) {
                     account.approvalsForAll = {};
@@ -1175,11 +1169,8 @@
                     account.approvalsForAll[event.owner] = {};
                   }
                   account.approvalsForAll[event.owner][event.spender] = event.value;
-                  // console.log(eventIndex + " account AFTER: " + JSON.stringify(account));
                 }
               } else if (account.type == "erc1155") {
-                // console.log(eventIndex + " account BEFORE: " + JSON.stringify(account));
-                // console.log(eventIndex + " " + JSON.stringify(event));
                 if (!('approvalsForAll' in account)) {
                   account.approvalsForAll = {};
                 }
@@ -1187,7 +1178,6 @@
                   account.approvalsForAll[event.owner] = {};
                 }
                 account.approvalsForAll[event.owner][event.spender] = event.value;
-                // console.log(eventIndex + " account AFTER: " + JSON.stringify(account));
               }
             }
             console.log("accounts: " + JSON.stringify(this.accounts, null, 2));
