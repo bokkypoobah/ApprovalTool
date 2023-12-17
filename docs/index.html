@@ -429,7 +429,7 @@
                     <!-- <b-link @click="showModalTx(data.item[4]);" v-b-popover.hover.bottom="'Click for details'" target="_blank"> -->
                     <!-- {{ formatTimestamp(data.item[0]) }} -->
                     <b-link :href="'https://etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
-                      {{ data.item.blockNumber }}
+                      {{ commify0(data.item.blockNumber) }}
                     </b-link>
                     <font size="-1">
                       <b-badge pill variant="transparent" v-b-popover.hover="'Transaction Index'" class="px-0">{{ data.item.txIndex }}</b-badge>
