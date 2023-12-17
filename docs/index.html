@@ -641,34 +641,6 @@
             { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'fields', label: 'Fields', sortable: false, thStyle: 'width: 50%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
-          contracts: [
-            // Jan-30-2020 12:37:12 AM +UTC 0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e
-            { name: "ENSRegistryWithFallback", address: ENSREGISTRYWITHFALLBACKADDRESS, abi: ENSREGISTRYWITHFALLBACKABI, deploymentBlockNumber: ENSREGISTRYWITHFALLBACKDEPLOYMENTBLOCKNUMBER },
-            // Jan-30-2020 12:43:54 AM +UTC 0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85
-            { name: "BaseRegistrarImplementation", address: BASEREGISTRARIMPLEMENTATIONADDRESS, abi: BASEREGISTRARIMPLEMENTATIONABI, deploymentBlockNumber: BASEREGISTRARIMPLEMENTATIONDEPLOYMENTBLOCKNUMBER },
-            // Jan-30-2020 12:56:38 AM +UTC 0x283Af0B28c62C092C9727F1Ee09c02CA627EB7F5
-            { name: "OldETHRegistrarController", address: OLDETHREGISTRARCONTROLLERADDRESS, abi: OLDETHREGISTRARCONTROLLERABI, deploymentBlockNumber: OLDETHREGISTRARCONTROLLERDEPLOYMENTBLOCKNUMBER },
-
-            // TODO: Confirm there are no events
-            // { name: "RegistrarMigration", address: REGISTRARMIGRATIONADDRESS, abi: REGISTRARMIGRATIONABI, deploymentBlockNumber: REGISTRARMIGRATIONDEPLOYMENTBLOCKNUMBER },
-            // Feb-03-2020 12:55:01 AM +UTC 0x6109DD117AA5486605FC85e040ab00163a75c662
-
-            // Mar-28-2023 11:42:35 AM +UTC 0xa58E81fe9b61B5c3fE2AFD33CF304c454AbFc7Cb
-            { name: "ReverseRegistrar", address: REVERSEREGISTRARADDRESS, abi: REVERSEREGISTRARABI, deploymentBlockNumber: REVERSEREGISTRARDEPLOYMENTBLOCKNUMBER },
-            // Mar-28-2023 11:42:59 AM +UTC 0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401
-            { name: "NameWrapper", address: NAMEWRAPPERADDRESS, abi: NAMEWRAPPERABI, deploymentBlockNumber: NAMEWRAPPERDEPLOYMENTBLOCKNUMBER },
-            // Mar-28-2023 11:44:59 AM +UTC 0x253553366Da8546fC250F225fe3d25d0C782303b
-            { name: "ETHRegistrarController", address: ETHREGISTRARCONTROLLERADDRESS, abi: ETHREGISTRARCONTROLLERABI, deploymentBlockNumber: ETHREGISTRARCONTROLLERDEPLOYMENTBLOCKNUMBER },
-            // Mar-28-2023 11:45:11 AM +UTC 0x231b0Ee14048e9dCcD1d247744d114a4EB5E8E63
-            { name: "PublicResolver", address: PUBLICRESOLVERADDRESS, abi: PUBLICRESOLVERABI, deploymentBlockNumber: PUBLICRESOLVERDEPLOYMENTBLOCKNUMBER },
-          ],
-          backgroundStyles: [
-            "",
-            "background-color: #a599fd;", // V1
-            "background-color: #638596;", // V2
-            "background-color: #a599fd; border: 3px solid #00ff00;", // W1
-            "background-color: #638596; border: 3px solid #00ff00;", // W2
-          ],
           // As supported by https://min-api.cryptocompare.com/data/v2/histoday?fsym=ETH&tsym={ccy}&limit=2000
           reportingCurrencyOptions: [
             { value: 'AUD', text: 'AUD' },
@@ -926,24 +898,49 @@
           },
 
           async syncNames(db, provider) {
-            const owners = {};
-            const contracts = {};
-            const spenders = {};
+            const ownersMap = {};
+            const contractsMap = {};
+            const spendersMap = {};
             // console.log("syncNames: " + JSON.stringify(event));
             for (const event of this.events) {
-              if (!(event.owner in owners)) {
-                owners[event.owner] = true;
+              if (!(event.owner in ownersMap)) {
+                ownersMap[event.owner] = true;
               }
-              if (!(event.contract in contracts)) {
-                contracts[event.contract] = true;
+              if (!(event.contract in contractsMap)) {
+                contractsMap[event.contract] = true;
               }
-              if (!(event.spender in spenders)) {
-                spenders[event.spender] = true;
+              if (!(event.spender in spendersMap)) {
+                spendersMap[event.spender] = true;
               }
             }
-            console.log("owners: " + JSON.stringify(Object.keys(owners)));
-            console.log("contracts: " + JSON.stringify(Object.keys(contracts)));
-            console.log("spenders: " + JSON.stringify(Object.keys(spenders)));
+            const owners = Object.keys(ownersMap);
+            const contracts = Object.keys(contractsMap);
+            const spenders = Object.keys(spendersMap);
+            // console.log("owners: " + JSON.stringify(owners));
+            // console.log("contracts: " + JSON.stringify(contracts));
+            // console.log("spenders: " + JSON.stringify(spenders));
+
+            const erc721Helper = new ethers.Contract(ERC721HELPERADDRESS, ERC721HELPERABI, provider);
+            const accountsToCheck = [...owners, ...contracts, ...spenders];
+            console.log("accountsToCheck: " + JSON.stringify(accountsToCheck));
+            for (const account of accountsToCheck) {
+              try {
+                const tokenInfos = await erc721Helper.tokenInfo([account], { gasLimit: 1000000 });
+                for (let i = 0; i < tokenInfos[0].length; i++) {
+                  const mask = tokenInfos[0][i].toNumber();
+                  const symbol = tokenInfos[1][i];
+                  const name = tokenInfos[2][i];
+                  console.log("  " + account + " " + symbol + " " + name + " " + mask);
+                }
+              } catch (e) {
+                console.log("syncNames erc721Helper - ERROR: " + account + ", message: " + e.message);
+                // results.mask = 0;
+                // results.symbol = null;
+                // results.name = null;
+              }
+            }
+
+
 
           },
 
