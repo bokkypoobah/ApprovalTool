@@ -916,32 +916,91 @@
             const owners = Object.keys(ownersMap);
             const contracts = Object.keys(contractsMap);
             const spenders = Object.keys(spendersMap);
+            console.log("owners.length: " + owners.length);
+            console.log("contracts.length: " + contracts.length);
+            console.log("spenders.length: " + spenders.length);
             // console.log("owners: " + JSON.stringify(owners));
             // console.log("contracts: " + JSON.stringify(contracts));
             // console.log("spenders: " + JSON.stringify(spenders));
+
+            const accounts = {};
+            for (const account of owners) {
+              accounts[account] = { source: "owner" };
+            }
+            for (const account of contracts) {
+              if (!(account in accounts)) {
+                accounts[account] = { source: "contracts" };
+              }
+            }
+            for (const account of spenders) {
+              if (!(account in accounts)) {
+                accounts[account] = { source: "spenders" };
+              }
+            }
+            console.log("accounts: " + JSON.stringify(accounts));
 
             const erc721Helper = new ethers.Contract(ERC721HELPERADDRESS, ERC721HELPERABI, provider);
             const accountsToCheck = [...owners, ...contracts, ...spenders];
             console.log("accountsToCheck: " + JSON.stringify(accountsToCheck));
             for (const account of accountsToCheck) {
-              try {
-                const tokenInfos = await erc721Helper.tokenInfo([account], { gasLimit: 1000000 });
-                for (let i = 0; i < tokenInfos[0].length; i++) {
-                  const mask = tokenInfos[0][i].toNumber();
-                  const symbol = tokenInfos[1][i];
-                  const name = tokenInfos[2][i];
-                  console.log("  " + account + " " + symbol + " " + name + " " + mask);
+              if (account in CUSTOMNAMES) {
+                accounts[account].type = CUSTOMNAMES[account][0];
+                accounts[account].symbol = CUSTOMNAMES[account][1];
+                accounts[account].name = CUSTOMNAMES[account][2];
+              } else {
+                try {
+                  const tokenInfos = await erc721Helper.tokenInfo([account], { gasLimit: 1000000 });
+                  for (let i = 0; i < tokenInfos[0].length; i++) {
+                    const mask = tokenInfos[0][i].toNumber();
+                    const symbol = tokenInfos[1][i];
+                    const name = tokenInfos[2][i];
+                    if ((mask & MASK_ISEOA) == MASK_ISERC721) {
+                      accounts[account].type = "eoa";
+                      // accounts[account] = { type: "eoa", symbol: null, name: null };
+                    } else if ((mask & MASK_ISERC20) == MASK_ISERC20) {
+                      accounts[account].type = "erc20";
+                      accounts[account].symbol = symbol;
+                      accounts[account].name = name;
+                      // accounts[account] = { type: "erc20", symbol, name };
+                    } else if ((mask & MASK_ISERC721) == MASK_ISERC721) {
+                      accounts[account].type = "erc721";
+                      accounts[account].symbol = symbol;
+                      accounts[account].name = name;
+                      // accounts[account] = { type: "erc721", symbol, name };
+                    } else {
+                      const erc165Abi = [ "function supportsInterface(bytes4 interfaceID) external view returns (bool)" ];
+                      const erc165Contract = new ethers.Contract(account, erc165Abi, provider);
+                      try {
+                        const result = await erc165Contract.supportsInterface(ERC1155_INTERFACE);
+                        console.log(account + " " + result);
+                        if (result) {
+                          accounts[account].type = "erc1155";
+                          // accounts[account].symbol = TODO
+                          // accounts[account].name = TODO
+                          // accounts[account] = { type: "erc1155", symbol, name };
+                        } else {
+                          accounts[account].type = "unknown2";
+                          // accounts[account] = { type: "unknown2", symbol, name };
+                        }
+                      } catch (e1) {
+                        accounts[account].type = "unknown1";
+                        // accounts[account] = { type: "unknown1", symbol, name };
+                      }
+                      // console.log("  " + account + " " + symbol + " " + name + " " + mask);
+                    }
+                  }
+                } catch (e) {
+                  console.log("syncNames erc721Helper - ERROR: " + account + ", message: " + e.message);
+                  // results.mask = 0;
+                  // results.symbol = null;
+                  // results.name = null;
+                  accounts[account].type = "unknown0";
                 }
-              } catch (e) {
-                console.log("syncNames erc721Helper - ERROR: " + account + ", message: " + e.message);
-                // results.mask = 0;
-                // results.symbol = null;
-                // results.name = null;
               }
             }
 
 
-
+            console.log("accounts: " + JSON.stringify(accounts, null, 2));
           },
 
           // TODO: Refresh sync

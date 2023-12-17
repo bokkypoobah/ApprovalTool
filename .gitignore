@@ -1,0 +1,5 @@
+.DS_Store
+.project
+.settings
+private
+solidity_files/
