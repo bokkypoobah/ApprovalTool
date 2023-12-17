@@ -439,18 +439,22 @@
                   </font>
                 </template>
                 <template #cell(owner)="data">
-                  <b-link :href="'https://etherscan.io/address/' + data.item.owner" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
-                    {{ nameOrAddress(data.item.owner, 16) }}
-                  </b-link>
+                  <font size="-1">
+                    <b-link :href="'https://etherscan.io/address/' + data.item.owner" target="_blank">
+                      <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.owner)">{{ nameOrAddress(data.item.owner, 24) }}</b-badge>
+                    </b-link>
+                  </font>
                 </template>
                 <template #cell(contract)="data">
-                  <b-link :href="'https://etherscan.io/address/' + data.item.contract" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
-                    {{ nameOrAddress(data.item.contract, 16) }}
-                  </b-link>
+                  <font size="-1">
+                    <b-link :href="'https://etherscan.io/address/' + data.item.contract" target="_blank">
+                      <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)">{{ nameOrAddress(data.item.contract, 32) }}</b-badge>
+                    </b-link>
+                  </font>
                 </template>
                 <template #cell(spender)="data">
-                  <b-link :href="'https://etherscan.io/address/' + data.item.spender" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
-                    {{ nameOrAddress(data.item.spender, 16) }}
+                  <b-link :href="'https://etherscan.io/address/' + data.item.spender" target="_blank">
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.spender)">{{ nameOrAddress(data.item.spender, 32) }}</b-badge>
                   </b-link>
                 </template>
               </b-table>
@@ -1014,8 +1018,8 @@
                 }
               }
             }
-
-
+            localStorage.approvalAccounts = JSON.stringify(accounts);
+            Vue.set(this, 'accounts', accounts);
             console.log("accounts: " + JSON.stringify(accounts, null, 2));
           },
 
@@ -1530,20 +1534,28 @@
           nameOrAddress(addressOrAddressIndex, length = 0) {
             let result = null;
             if (new RegExp('^[0-9,]+$').test(addressOrAddressIndex)) {
-              if (addressOrAddressIndex in this.indexToAddressName) {
-                result = this.indexToAddressName[addressOrAddressIndex];
+              if (addressOrAddressIndex in this.accounts) {
+                result = this.accounts[addressOrAddressIndex] && this.accounts[addressOrAddressIndex].symbol || "error";
               } else {
                 result = this.indexToAddress[addressOrAddressIndex];
               }
             } else {
-              if (addressOrAddressIndex in this.addressToIndex) {
-                result = this.indexToAddressName[this.addressToIndex[addressOrAddressIndex]] || addressOrAddressIndex;
+              if (addressOrAddressIndex in this.accounts) {
+                result = this.accounts[addressOrAddressIndex].name || addressOrAddressIndex;
               } else {
                 result = addressOrAddressIndex;
               }
             }
             if (result && length > 0) {
               result = result.substring(0, length);
+            }
+            return result;
+          },
+          addressDescription(address) {
+            if (address in this.accounts) {
+              result = "type=" + this.accounts[address].type + "; symbol=" + this.accounts[address].symbol + "; name=" + this.accounts[address].name + "; source=" + this.accounts[address].source + "; address=" + address;
+            } else {
+              result = address;
             }
             return result;
           },
@@ -1702,6 +1714,11 @@
           if ('approvalEvents' in localStorage) {
             const tempEvents = JSON.parse(localStorage.approvalEvents);
             this.events = tempEvents;
+          }
+          if ('approvalAccounts' in localStorage) {
+            const tempAccounts = JSON.parse(localStorage.approvalAccounts);
+            this.accounts = tempAccounts;
+            console.log("accounts: " + JSON.stringify(this.accounts, null, 2));
           }
           (async() => {
             const db = new Dexie(this.db.name);
