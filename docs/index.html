@@ -440,26 +440,26 @@
                 <template #cell(owner)="data">
                   <font size="-1">
                     <b-link :href="'https://etherscan.io/address/' + data.item.owner" target="_blank">
-                      <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.owner)">{{ nameOrAddress(data.item.owner, 28) }}</b-badge>
+                      <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.owner)" class="px-0">{{ nameOrAddress(data.item.owner, 28) }}</b-badge>
                     </b-link>
                   </font>
                 </template>
                 <template #cell(type)="data">
-                  <b-badge pill variant="transparent">{{ accounts[data.item.contract].type }}</b-badge>
+                  <b-badge pill variant="transparent" class="px-0">{{ accounts[data.item.contract].type }}</b-badge>
                 </template>
                 <template #cell(contract)="data">
                   <font size="-1">
                     <b-link :href="'https://etherscan.io/address/' + data.item.contract" target="_blank">
-                      <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)">{{ nameOrAddress(data.item.contract, 28) }}</b-badge>
+                      <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)" class="px-0">{{ nameOrAddress(data.item.contract, 28) }}</b-badge>
                     </b-link>
                   </font>
                 </template>
                 <template #cell(eventName)="data">
-                  <b-badge pill variant="transparent">{{ data.item.eventName }}</b-badge>
+                  <b-badge pill variant="transparent" class="px-0">{{ data.item.eventName }}</b-badge>
                 </template>
                 <template #cell(spender)="data">
                   <b-link :href="'https://etherscan.io/address/' + data.item.spender" target="_blank">
-                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.spender)">{{ nameOrAddress(data.item.spender, 28) }}</b-badge>
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.spender)" class="px-0">{{ nameOrAddress(data.item.spender, 28) }}</b-badge>
                   </b-link>
                 </template>
               </b-table>
