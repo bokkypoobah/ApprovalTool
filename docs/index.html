@@ -1560,10 +1560,11 @@
           },
           addressDescription(address) {
             if (address in this.accounts) {
-              result = "type=" + this.accounts[address].type + "; symbol=" + this.accounts[address].symbol + "; name=" + this.accounts[address].name + "; source=" + this.accounts[address].source + "; address=" + address;
+              result = "type=" + this.accounts[address].type + "; symbol=" + this.accounts[address].symbol + "; name=" + this.accounts[address].name;
               if (this.accounts[address].decimals) {
                 result = result + "; decimals=" + this.accounts[address].decimals;
               }
+              result = result + "; source=" + this.accounts[address].source + "; address=" + address;
             } else {
               result = address;
             }
