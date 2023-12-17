@@ -416,7 +416,39 @@
                 </b-card-body>
               </b-card>
 
-              <b-table v-if="!settings.showInfo" small fixed striped responsive hover :fields="activityFields" :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve contract events" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="!settings.showInfo && approvals" small fixed striped responsive hover :fields="approvalFields" :items="approvals" show-empty empty-html="Click Check above to retrieve ERC-20, ERC-721 and ERC-1155 Approval and ApprovalForAll events" head-variant="light" class="mx-0 my-1">
+                <template #cell(number)="data">
+                  {{ parseInt(data.index) + ((settings.activityTable.currentPage - 1) * settings.activityTable.pageSize) + 1 }}
+                </template>
+                <template #cell(timestamp)="data">
+                  <font size="-1">
+                    <!-- <b-link @click="showModalTx(data.item[4]);" v-b-popover.hover.bottom="'Click for details'" target="_blank"> -->
+                    <!-- {{ formatTimestamp(data.item[0]) }} -->
+                    <b-link :href="'https://etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
+                      {{ data.item.blockNumber }}
+                    </b-link>
+                    <font size="-1">
+                      <b-badge pill variant="transparent" v-b-popover.hover="'Transaction Index'">{{ data.item.txIndex }}</b-badge>
+                      .
+                      <b-badge pill variant="transparent" v-b-popover.hover="'Log Index'">{{ data.item.logIndex }}</b-badge>
+                    </font>
+                  </font>
+                </template>
+                <template #cell(owner)="data">
+                  <b-link :href="'https://etherscan.io/address/' + data.item.owner" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
+                    {{ ensOrAddress(data.item.owner, 16) }}
+                  </b-link>
+                </template>
+                <template #cell(contract)="data">
+                  <b-link :href="'https://etherscan.io/address/' + data.item.contract" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
+                    {{ ensOrAddress(data.item.contract, 16) }}
+                  </b-link>
+                </template>
+                <template #cell(spender)="data">
+                  <b-link :href="'https://etherscan.io/address/' + data.item.spender" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
+                    {{ ensOrAddress(data.item.spender, 16) }}
+                  </b-link>
+                </template>
               </b-table>
 
 
@@ -1365,7 +1397,7 @@
             halt: false,
           },
 
-          approvals: {},
+          approvals: [],
 
           syncStates: {},
           blockTimestamps: {},
@@ -1452,6 +1484,17 @@
             { value: 2500, text: '2.5k' },
             { value: 10000, text: '10k' },
           ],
+
+          approvalFields: [
+            { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
+            { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
+            { key: 'owner', label: 'Owner', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'eventName', label: 'Event Name', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'spender', label: 'Spender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'value', label: 'Value', /*sortable: true,*/ thStyle: 'width: 20%;', thClass: 'text-right', tdClass: 'text-right' },
+          ],
+
           punksFields: [
             { key: 'punkId', label: 'PunkId', sortable: false, thStyle: 'width: 15%;', thClass: 'text-right', tdClass: 'text-right' },
             { key: 'image', label: 'Image', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
