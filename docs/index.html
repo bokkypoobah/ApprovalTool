@@ -926,9 +926,24 @@
           },
 
           async syncNames(db, provider) {
+            const owners = {};
+            const contracts = {};
+            const spenders = {};
+            // console.log("syncNames: " + JSON.stringify(event));
             for (const event of this.events) {
-              console.log("syncNames: " + JSON.stringify(event));
+              if (!(event.owner in owners)) {
+                owners[event.owner] = true;
+              }
+              if (!(event.contract in contracts)) {
+                contracts[event.contract] = true;
+              }
+              if (!(event.spender in spenders)) {
+                spenders[event.spender] = true;
+              }
             }
+            console.log("owners: " + JSON.stringify(Object.keys(owners)));
+            console.log("contracts: " + JSON.stringify(Object.keys(contracts)));
+            console.log("spenders: " + JSON.stringify(Object.keys(spenders)));
 
           },
 
