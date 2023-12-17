@@ -1156,8 +1156,8 @@
                 account.approvals[event.owner][event.spender] = event.value;
                 // console.log(eventIndex + " account AFTER: " + JSON.stringify(account));
               } else if (account.type == "erc721") {
-                console.log(eventIndex + " account BEFORE: " + JSON.stringify(account));
-                console.log(eventIndex + " " + JSON.stringify(event));
+                // console.log(eventIndex + " account BEFORE: " + JSON.stringify(account));
+                // console.log(eventIndex + " " + JSON.stringify(event));
                 if (event.eventName == "Approval") {
                   if (!('approvals' in account)) {
                     account.approvals = {};
@@ -1176,9 +1176,18 @@
                   }
                   account.approvalsForAll[event.owner][event.spender] = event.value;
                   // console.log(eventIndex + " account AFTER: " + JSON.stringify(account));
-
                 }
               } else if (account.type == "erc1155") {
+                // console.log(eventIndex + " account BEFORE: " + JSON.stringify(account));
+                // console.log(eventIndex + " " + JSON.stringify(event));
+                if (!('approvalsForAll' in account)) {
+                  account.approvalsForAll = {};
+                }
+                if (!(event.owner in account.approvalsForAll)) {
+                  account.approvalsForAll[event.owner] = {};
+                }
+                account.approvalsForAll[event.owner][event.spender] = event.value;
+                // console.log(eventIndex + " account AFTER: " + JSON.stringify(account));
               }
             }
             console.log("accounts: " + JSON.stringify(this.accounts, null, 2));
