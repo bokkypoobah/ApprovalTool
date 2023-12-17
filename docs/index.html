@@ -452,7 +452,7 @@
                   </font>
                 </template>
                 <template #cell(type)="data">
-                  <b-badge pill variant="transparent" class="px-0">{{ accounts[data.item.contract].type }}</b-badge>
+                  <b-badge pill variant="transparent" class="px-0">{{ accounts[data.item.contract] && ('type' in accounts[data.item.contract]) && accounts[data.item.contract].type || "(unknown)" }}</b-badge>
                 </template>
                 <template #cell(contract)="data">
                   <font size="-1">
@@ -994,7 +994,7 @@
                       try {
                         accounts[account].decimals = await erc20Contract.decimals();
                       } catch (e1) {
-                        accounts[account].decimals = 18;
+                        accounts[account].decimals = 0;
                       }
                       // accounts[account] = { type: "erc20", symbol, name };
                     } else if ((mask & MASK_ISERC721) == MASK_ISERC721) {
