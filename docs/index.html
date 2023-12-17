@@ -1181,6 +1181,8 @@
               }
             }
             console.log("accounts: " + JSON.stringify(this.accounts, null, 2));
+            localStorage.approvalAccounts = JSON.stringify(this.accounts);
+            // Vue.set(this, 'accounts', accounts);
           },
 
           async processDataOld(db) {
