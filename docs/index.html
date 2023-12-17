@@ -55,9 +55,9 @@
             <em v-b-popover.hover.bottom="'gm gm gm'">approvalTool</em>
           </b-navbar-brand>
           <b-navbar-nav class="ml-auto">
-            <!-- <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings(); loadCurrentData();" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'Main'">Main</b-nav-item> -->
-            <!-- <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings(); loadCurrentData();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'Events'">Events</b-nav-item> -->
-            <!-- <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings(); loadCurrentData();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'Status'">Status</b-nav-item> -->
+            <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings();" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'Approvals'">Approvals</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'Events'">Events</b-nav-item>
+            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'Accounts'">Accounts</b-nav-item>
             <!-- <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings()" :active="settings.tabIndex == 1002" active-class="active" v-b-popover.hover="'View Owners'">Owners</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 3; saveSettings()" :active="settings.tabIndex == 1003" active-class="active" v-b-popover.hover="'Configure Settings'">Config</b-nav-item> -->
             <b-avatar v-if="coinbase && coinbase != nameOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + nameOrAddress(coinbase, 100)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
@@ -328,7 +328,7 @@
                 </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
-                <div class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.eventsTable.sortOption" @change="saveSettings" :options="eventsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 110" class="mt-0 pl-1">
@@ -347,10 +347,10 @@
                     </b-link>
                   </font>
                 </div>
-                <div class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.eventsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedEvents.length" :per-page="settings.eventsTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
-                <div class="mt-0 pl-1">
+                <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.eventsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
                 </div>
               </div>
@@ -413,7 +413,11 @@
                 </b-card-body>
               </b-card>
 
-              <b-table v-if="!settings.showInfo && events" small fixed striped responsive hover :fields="eventsFields" :items="pagedFilteredSortedEvents" show-empty empty-html="Click Check above to retrieve ERC-20, ERC-721 and ERC-1155 Approval and ApprovalForAll events" head-variant="light" class="mx-0 my-1">
+              <b-card-text v-if="settings.tabIndex == 0 && !settings.showInfo" class="mt-5">
+                Work in progress. See <b-link size="sm" @click="settings.tabIndex = 1; saveSettings();" v-b-popover.hover="'Events'">Events</b-link>
+              </b-card-text>
+
+              <b-table v-if="settings.tabIndex == 1 && !settings.showInfo && events" small fixed striped responsive hover :fields="eventsFields" :items="pagedFilteredSortedEvents" show-empty empty-html="Click Check above to retrieve ERC-20, ERC-721 and ERC-1155 Approval and ApprovalForAll events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   {{ parseInt(data.index) + ((settings.eventsTable.currentPage - 1) * settings.eventsTable.pageSize) + 1 }}
                 </template>
@@ -447,6 +451,10 @@
                   </b-link>
                 </template>
               </b-table>
+
+              <b-card-text v-if="settings.tabIndex == 2 && !settings.showInfo" class="mt-5">
+                Work in progress. See <b-link size="sm" @click="settings.tabIndex = 1; saveSettings();" v-b-popover.hover="'Events'">Events</b-link>
+              </b-card-text>
 
               <b-row v-if="false" class="m-0 p-0">
                 <b-col class="m-0 p-0">
