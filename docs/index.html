@@ -445,16 +445,21 @@
                     </b-link>
                   </font>
                 </template>
+                <template #cell(type)="data">
+                  <font size="-1">
+                    <b-badge pill variant="transparent">{{ accounts[data.item.contract].type }}</b-badge>
+                  </font>
+                </template>
                 <template #cell(contract)="data">
                   <font size="-1">
                     <b-link :href="'https://etherscan.io/address/' + data.item.contract" target="_blank">
-                      <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)">{{ nameOrAddress(data.item.contract, 32) }}</b-badge>
+                      <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)">{{ nameOrAddress(data.item.contract, 24) }}</b-badge>
                     </b-link>
                   </font>
                 </template>
                 <template #cell(spender)="data">
                   <b-link :href="'https://etherscan.io/address/' + data.item.spender" target="_blank">
-                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.spender)">{{ nameOrAddress(data.item.spender, 32) }}</b-badge>
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.spender)">{{ nameOrAddress(data.item.spender, 24) }}</b-badge>
                   </b-link>
                 </template>
               </b-table>
@@ -644,6 +649,7 @@
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 15%;', tdClass: 'text-truncate' },
             { key: 'owner', label: 'Owner', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'eventName', label: 'Event Name', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'spender', label: 'Spender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
