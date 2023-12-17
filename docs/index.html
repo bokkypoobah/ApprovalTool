@@ -360,7 +360,69 @@
             </b-card-text>
 
             <b-card-text class="m-0 p-0">
-              <b-row class="m-0 p-0">
+              <!-- :INFO -->
+              <b-card v-if="settings.showInfo || coinbase == null" no-body class="my-1 p-1">
+                <b-card-body class="mt-1 p-1">
+                  <h4>Welcome</h4>
+                  <!-- This dapp retrieves historical log events from the <b-link href="https://cryptopunks.app/" target="_blank">CryptoPunks</b-link> contracts on the Ethereum mainnet, collates the data, and provides an interface for users to query the data.
+                  This dapp currently takes about 10 minutes to retrieve the data initially, and about a minute to sync subsequently. -->
+                  <!-- <h5 class="mt-4">How This Works</h5>
+                  <ul>
+                    <li>Event logs are retrieved via your browser's web3 connection for the CryptoPunks <b-link href="https://etherscan.io/address/0x6Ba6f2207e343923BA692e5Cae646Fb0F566DB8D#code" target="_blank">V1</b-link> and <b-link href="https://etherscan.io/address/0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB#code" target="_blank">V2</b-link>, and Wrapped CryptoPunks <b-link href="https://etherscan.io/address/0x282BDD42f4eb70e7A9D9F40c8fEA0825B7f68C5D#code" target="_blank">V1</b-link> and <b-link href="https://etherscan.io/address/0xb7F7F6C52F2e2fdb1963Eab30438024864c313F6#code" target="_blank">V2</b-link> contracts</li>
+                    <li>Block timestamps are retrieved from the <b-link href="https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks" target="_blank">https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks</b-link> subgraph API endpoint</li>
+                    <li>Exchange rates are retrieved from <b-link href="https://min-api.cryptocompare.com" target="_blank">https://min-api.cryptocompare.com</b-link>. Get your API key here and enter it in the Config page (some free initial queries without the API key)</li>
+                    <li>The resulting data is collated and presented in this dapp</li>
+                  </ul> -->
+                  <!-- <h5 class="mt-3">Requirements</h5>
+                  <ul>
+                    <li>This dapp runs in web3 enabled desktop browsers connected to the Ethereum mainnet</li>
+                  </ul> -->
+                  <!-- <h5 class="mt-3">References</h5>
+                  <ul>
+                    <li>Dapp: <b-link href="https://bokkypoobah.github.io/CryptoPunksData/" target="_blank">https://bokkypoobah.github.io/CryptoPunksData/</b-link></li>
+                    <li>GitHub: <b-link href="https://github.com/bokkypoobah/CryptoPunksData" target="_blank">https://github.com/bokkypoobah/CryptoPunksData</b-link></li>
+                    <li>Main Dapp Source Code: <b-link href="https://github.com/bokkypoobah/CryptoPunksData/blob/master/docs/index.html" target="_blank">https://github.com/bokkypoobah/CryptoPunksData/blob/master/docs/index.html</b-link></li>
+                  </ul> -->
+                  <!-- <h5 class="mt-3">Running Locally</h5>
+                  <ul>
+                    <li>In a folder on your computer, <b>git clone <b-link href="https://github.com/bokkypoobah/CryptoPunksData" target="_blank">https://github.com/bokkypoobah/CryptoPunksData</b-link></b></li>
+                    <li>Run a tool like <b-link href="https://www.npmjs.com/package/anywhere" target="_blank">anywhere</b-link> in the <b>./docs</b> subdirectory of the folder created above</li>
+                  </ul> -->
+                  <!-- <h5 class="mt-3">This Dapp Design</h5>
+                  <ul>
+                    <li>Addresses and transaction hashes are stored as integer indices into lookup tables to save on memory and computations</li>
+                    <li>Arrays are used instead of Maps in some sections to save on memory and computations</li>
+                    <li><b-link href="https://github.com/bokkypoobah/CryptoPunksData/tree/master/docs/images/punks" target="_blank">10k 24x24 punk images</b-link> were split from the original <b-link href="https://raw.githubusercontent.com/larvalabs/cryptopunks/master/punks.png" target="_blank">punks.png</b-link> using the <b-link href="https://github.com/bokkypoobah/aenus/blob/main/scripts/01_splitImage.js" target="_blank">01_splitImage.js</b-link> script</li>
+                    <li><b-link href="https://raw.githubusercontent.com/bokkypoobah/CryptoPunksData/master/docs/punkAttributes.js" target="_blank">10k punk attributes</b-link> were extracted from the <i>CryptopunksData</i> contract at <b-link href="https://etherscan.io/address/0x16F5A35647D6F03D5D3da7b35409D65ba03aF3B2#code" target="_blank">0x16F5A35647D6F03D5D3da7b35409D65ba03aF3B2</b-link> using the <b-link href="https://github.com/bokkypoobah/aenus/blob/main/scripts/02_scrapeCryptoPunksAttributes.js" target="_blank">02_scrapeCryptoPunksAttributes.js</b-link> script</li>
+                  </ul> -->
+                  <!-- <h5 class="mt-3">Some Info</h5>
+                  <ul>
+                    <li>Three v1s were claimed with invalid ids <b-link href="https://etherscan.io/tx/0x39d77a95637640b6291bea0b015be4f6578c95f9a57af6a9399dabd70b56d50c" target="_blank">9845944</b-link>, <b-link href="https://etherscan.io/tx/0xdc37a82d43eb253077abd4618683efea615fc8573bfc669568fab04098ab24b1" target="_blank">76623</b-link> and <b-link href="https://etherscan.io/tx/0x7da83b5002251ca83537aef8833f443263a9109a1ccca502b0b03a0529813aa2" target="_blank">0xffff...ffff</b-link>. This resulted in 3 unassigned v1s 1416, 1838 and 1841</li>
+                    <li>LarvaLabs airdropped these 3 unassigned v2s <b-link href="https://cryptopunks.app/cryptopunks/details/1416" target="_blank">1416</b-link>, <b-link href="https://cryptopunks.app/cryptopunks/details/1838" target="_blank">1838</b-link> and <b-link href="https://cryptopunks.app/cryptopunks/details/1841" target="_blank">1841</b-link> to <b-link href="https://etherscan.io/address/0x5b098b00621eda6a96b7a476220661ad265f083f" target="_blank">0x5b098b...</b-link></li>
+                    <li>Two v2s <b-link href="https://etherscan.io/tx/0xce9bdec865497ba6d3c7e26bdfac54d4270285361a0f65ff09f042997b318b38" target="_blank">2838</b-link> and <b-link href="https://etherscan.io/tx/0x2c7a8584e8c3d5c14232881f2e7aef4cbacfe1cb729b67b129f84b0384018330" target="_blank">5449</b-link> have been incorrectly transferred to the v2 CryptoPunk contract</li>
+                  </ul> -->
+                  <!-- <h5 class="mt-3">Troubleshooting</h5>
+                  <ul>
+                    <li>If this dapp is not receiving the latest Mainnet data, reset your MetaMask web3 connection using <b>Settings</b> -> <b>Advanced</b> -> <b>Clear activity and nonce data</b></li>
+                  </ul> -->
+                  <!-- <h5 class="mt-3">CryptoPunks History</h5>
+                  <ul>
+                    <li>The v1 contract was deployed to <b-link href="https://etherscan.io/address/0x6Ba6f2207e343923BA692e5Cae646Fb0F566DB8D#code" target="_blank">0x6Ba6f2207e343923BA692e5Cae646Fb0F566DB8D</b-link> at Jun-09-2017 12:22:50 AM +UTC</li>
+                    <li><b-link href="https://www.reddit.com/r/ethereum/comments/6g8cma/cryptopunks_an_experiment_in_digital_collectibles/" target="_blank">CryptoPunks: An experiment in digital collectibles on Ethereum</b-link> announced on Reddit at Jun-09-2017 01:19:08 AM UTC</li>
+                    <li>Due to a <b-link href="https://twitter.com/cryptopunksnfts/status/876106428200738816" target="_blank">bug in v1 contract</b-link>, <b-link href="https://twitter.com/cryptopunksnfts/status/878353034194984961" target="_blank">v2 was deployed</b-link> to <b-link href="https://etherscan.io/address/0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB#code" target="_blank">0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB</b-link> at Jun-22-2017 07:40:00 PM +UTC</li>
+                    <li>The ERC-721 wrapper for the v2 contract was deployed to <b-link href="https://etherscan.io/address/0xb7F7F6C52F2e2fdb1963Eab30438024864c313F6#code" target="_blank">0xb7F7F6C52F2e2fdb1963Eab30438024864c313F6</b-link> at Sep-08-2020 03:11:25 PM +UTC</li>
+                    <li>The ERC-721 wrapper for the v1 contract was deployed to <b-link href="https://etherscan.io/address/0x282BDD42f4eb70e7A9D9F40c8fEA0825B7f68C5D#code" target="_blank">0x282BDD42f4eb70e7A9D9F40c8fEA0825B7f68C5D</b-link> at Jan-17-2022 10:15:07 AM +UTC</li>
+                  </ul> -->
+                </b-card-body>
+              </b-card>
+
+              <b-table v-if="!settings.showInfo" small fixed striped responsive hover :fields="activityFields" :items="pagedFilteredSortedActivity" show-empty empty-html="Click Sync above to retrieve contract events" head-variant="light" class="mx-0 my-1">
+              </b-table>
+
+
+
+
+              <b-row v-if="false" class="m-0 p-0">
                 <b-col v-if="settings.showFilter" cols="2" class="m-0 p-0 border-0">
                   <!-- :SIDEBAR -->
                   <b-card no-header no-body class="m-0 p-0 border-0">
@@ -393,61 +455,6 @@
                 </b-col>
 
                 <b-col class="m-0 p-0">
-                  <!-- :INFO -->
-                  <b-card v-if="settings.showInfo || coinbase == null" no-body class="my-1 p-1">
-                    <b-card-body class="mt-1 p-1">
-                      <h4>Welcome</h4>
-                      <!-- This dapp retrieves historical log events from the <b-link href="https://cryptopunks.app/" target="_blank">CryptoPunks</b-link> contracts on the Ethereum mainnet, collates the data, and provides an interface for users to query the data.
-                      This dapp currently takes about 10 minutes to retrieve the data initially, and about a minute to sync subsequently. -->
-                      <!-- <h5 class="mt-4">How This Works</h5>
-                      <ul>
-                        <li>Event logs are retrieved via your browser's web3 connection for the CryptoPunks <b-link href="https://etherscan.io/address/0x6Ba6f2207e343923BA692e5Cae646Fb0F566DB8D#code" target="_blank">V1</b-link> and <b-link href="https://etherscan.io/address/0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB#code" target="_blank">V2</b-link>, and Wrapped CryptoPunks <b-link href="https://etherscan.io/address/0x282BDD42f4eb70e7A9D9F40c8fEA0825B7f68C5D#code" target="_blank">V1</b-link> and <b-link href="https://etherscan.io/address/0xb7F7F6C52F2e2fdb1963Eab30438024864c313F6#code" target="_blank">V2</b-link> contracts</li>
-                        <li>Block timestamps are retrieved from the <b-link href="https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks" target="_blank">https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks</b-link> subgraph API endpoint</li>
-                        <li>Exchange rates are retrieved from <b-link href="https://min-api.cryptocompare.com" target="_blank">https://min-api.cryptocompare.com</b-link>. Get your API key here and enter it in the Config page (some free initial queries without the API key)</li>
-                        <li>The resulting data is collated and presented in this dapp</li>
-                      </ul> -->
-                      <!-- <h5 class="mt-3">Requirements</h5>
-                      <ul>
-                        <li>This dapp runs in web3 enabled desktop browsers connected to the Ethereum mainnet</li>
-                      </ul> -->
-                      <!-- <h5 class="mt-3">References</h5>
-                      <ul>
-                        <li>Dapp: <b-link href="https://bokkypoobah.github.io/CryptoPunksData/" target="_blank">https://bokkypoobah.github.io/CryptoPunksData/</b-link></li>
-                        <li>GitHub: <b-link href="https://github.com/bokkypoobah/CryptoPunksData" target="_blank">https://github.com/bokkypoobah/CryptoPunksData</b-link></li>
-                        <li>Main Dapp Source Code: <b-link href="https://github.com/bokkypoobah/CryptoPunksData/blob/master/docs/index.html" target="_blank">https://github.com/bokkypoobah/CryptoPunksData/blob/master/docs/index.html</b-link></li>
-                      </ul> -->
-                      <!-- <h5 class="mt-3">Running Locally</h5>
-                      <ul>
-                        <li>In a folder on your computer, <b>git clone <b-link href="https://github.com/bokkypoobah/CryptoPunksData" target="_blank">https://github.com/bokkypoobah/CryptoPunksData</b-link></b></li>
-                        <li>Run a tool like <b-link href="https://www.npmjs.com/package/anywhere" target="_blank">anywhere</b-link> in the <b>./docs</b> subdirectory of the folder created above</li>
-                      </ul> -->
-                      <!-- <h5 class="mt-3">This Dapp Design</h5>
-                      <ul>
-                        <li>Addresses and transaction hashes are stored as integer indices into lookup tables to save on memory and computations</li>
-                        <li>Arrays are used instead of Maps in some sections to save on memory and computations</li>
-                        <li><b-link href="https://github.com/bokkypoobah/CryptoPunksData/tree/master/docs/images/punks" target="_blank">10k 24x24 punk images</b-link> were split from the original <b-link href="https://raw.githubusercontent.com/larvalabs/cryptopunks/master/punks.png" target="_blank">punks.png</b-link> using the <b-link href="https://github.com/bokkypoobah/aenus/blob/main/scripts/01_splitImage.js" target="_blank">01_splitImage.js</b-link> script</li>
-                        <li><b-link href="https://raw.githubusercontent.com/bokkypoobah/CryptoPunksData/master/docs/punkAttributes.js" target="_blank">10k punk attributes</b-link> were extracted from the <i>CryptopunksData</i> contract at <b-link href="https://etherscan.io/address/0x16F5A35647D6F03D5D3da7b35409D65ba03aF3B2#code" target="_blank">0x16F5A35647D6F03D5D3da7b35409D65ba03aF3B2</b-link> using the <b-link href="https://github.com/bokkypoobah/aenus/blob/main/scripts/02_scrapeCryptoPunksAttributes.js" target="_blank">02_scrapeCryptoPunksAttributes.js</b-link> script</li>
-                      </ul> -->
-                      <!-- <h5 class="mt-3">Some Info</h5>
-                      <ul>
-                        <li>Three v1s were claimed with invalid ids <b-link href="https://etherscan.io/tx/0x39d77a95637640b6291bea0b015be4f6578c95f9a57af6a9399dabd70b56d50c" target="_blank">9845944</b-link>, <b-link href="https://etherscan.io/tx/0xdc37a82d43eb253077abd4618683efea615fc8573bfc669568fab04098ab24b1" target="_blank">76623</b-link> and <b-link href="https://etherscan.io/tx/0x7da83b5002251ca83537aef8833f443263a9109a1ccca502b0b03a0529813aa2" target="_blank">0xffff...ffff</b-link>. This resulted in 3 unassigned v1s 1416, 1838 and 1841</li>
-                        <li>LarvaLabs airdropped these 3 unassigned v2s <b-link href="https://cryptopunks.app/cryptopunks/details/1416" target="_blank">1416</b-link>, <b-link href="https://cryptopunks.app/cryptopunks/details/1838" target="_blank">1838</b-link> and <b-link href="https://cryptopunks.app/cryptopunks/details/1841" target="_blank">1841</b-link> to <b-link href="https://etherscan.io/address/0x5b098b00621eda6a96b7a476220661ad265f083f" target="_blank">0x5b098b...</b-link></li>
-                        <li>Two v2s <b-link href="https://etherscan.io/tx/0xce9bdec865497ba6d3c7e26bdfac54d4270285361a0f65ff09f042997b318b38" target="_blank">2838</b-link> and <b-link href="https://etherscan.io/tx/0x2c7a8584e8c3d5c14232881f2e7aef4cbacfe1cb729b67b129f84b0384018330" target="_blank">5449</b-link> have been incorrectly transferred to the v2 CryptoPunk contract</li>
-                      </ul> -->
-                      <!-- <h5 class="mt-3">Troubleshooting</h5>
-                      <ul>
-                        <li>If this dapp is not receiving the latest Mainnet data, reset your MetaMask web3 connection using <b>Settings</b> -> <b>Advanced</b> -> <b>Clear activity and nonce data</b></li>
-                      </ul> -->
-                      <!-- <h5 class="mt-3">CryptoPunks History</h5>
-                      <ul>
-                        <li>The v1 contract was deployed to <b-link href="https://etherscan.io/address/0x6Ba6f2207e343923BA692e5Cae646Fb0F566DB8D#code" target="_blank">0x6Ba6f2207e343923BA692e5Cae646Fb0F566DB8D</b-link> at Jun-09-2017 12:22:50 AM +UTC</li>
-                        <li><b-link href="https://www.reddit.com/r/ethereum/comments/6g8cma/cryptopunks_an_experiment_in_digital_collectibles/" target="_blank">CryptoPunks: An experiment in digital collectibles on Ethereum</b-link> announced on Reddit at Jun-09-2017 01:19:08 AM UTC</li>
-                        <li>Due to a <b-link href="https://twitter.com/cryptopunksnfts/status/876106428200738816" target="_blank">bug in v1 contract</b-link>, <b-link href="https://twitter.com/cryptopunksnfts/status/878353034194984961" target="_blank">v2 was deployed</b-link> to <b-link href="https://etherscan.io/address/0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB#code" target="_blank">0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB</b-link> at Jun-22-2017 07:40:00 PM +UTC</li>
-                        <li>The ERC-721 wrapper for the v2 contract was deployed to <b-link href="https://etherscan.io/address/0xb7F7F6C52F2e2fdb1963Eab30438024864c313F6#code" target="_blank">0xb7F7F6C52F2e2fdb1963Eab30438024864c313F6</b-link> at Sep-08-2020 03:11:25 PM +UTC</li>
-                        <li>The ERC-721 wrapper for the v1 contract was deployed to <b-link href="https://etherscan.io/address/0x282BDD42f4eb70e7A9D9F40c8fEA0825B7f68C5D#code" target="_blank">0x282BDD42f4eb70e7A9D9F40c8fEA0825B7f68C5D</b-link> at Jan-17-2022 10:15:07 AM +UTC</li>
-                      </ul> -->
-                    </b-card-body>
-                  </b-card>
 
                   <!-- <b-card no-body class="my-1 p-1">
                     <b-card-body class="mt-1 p-1">
@@ -2173,14 +2180,14 @@
                 null
               ],
             });
-            const owners = {};
-            const contracts = {};
-            const spenders = {};
+            // const owners = {};
+            // const contracts = {};
+            // const spenders = {};
             const approvals = [];
             for (const log of approvalLogs) {
-              if (!(log.address in contracts)) {
-                contracts[log.address] = true;
-              }
+              // if (!(log.address in contracts)) {
+              //   contracts[log.address] = true;
+              // }
               const topic0 = log.topics[0];
               const eventName = topic0 == '0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31' ? 'ApprovalForAll': 'Approval';
               let owner = null;
@@ -2203,6 +2210,7 @@
                 approvals.push({
                   blockNumber: log.blockNumber,
                   txIndex: log.transactionIndex,
+                  txHash: log.transactionHash,
                   logIndex: log.logIndex,
                   contract: log.address,
                   eventName,
