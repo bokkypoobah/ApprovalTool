@@ -286,6 +286,11 @@
                 <div v-if="false" class="mt-0">
                   <b-button size="sm" :pressed.sync="settings.showFilter" @click="saveSettings" variant="link" v-b-popover.hover.bottom="'Show filter'"><span v-if="settings.showFilter"><b-icon-layout-sidebar-inset shift-v="+1" font-scale="1.0"></b-icon-layout-sidebar-inset></span><span v-else><b-icon-layout-sidebar shift-v="+1" font-scale="1.0"></b-icon-layout-sidebar></span></b-button>
                 </div>
+                <div v-if="settings.tabIndex == 1" class="mt-0">
+                  <b-form-checkbox v-model.trim="settings.includeFluff" @input="saveSettings">
+                    Fluff
+                  </b-form-checkbox>
+                </div>
                 <div v-if="false" class="mt-0 pr-1" style="max-width: 11.0rem;">
                   <b-form-input type="text" size="sm" v-model.trim="settings.filterByIds" @change="saveSettings" debounce="600" v-b-popover.hover.bottom="'Filter by punk id(s) or first 3 (or more) characters of attribute names, e.g., `1 5-10 alien ape`. Replace spaces with `-`, e.g., `male-4`, `clown-nose` or `3d-gl`'" placeholder="🔍 id1 id2-id3 attrib1 ..."></b-form-input>
                 </div>
@@ -341,7 +346,7 @@
                   <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(totalEvents) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredEvents.length) }}</font>
+                  <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredEvents.length) + '/' + commify0(events.length)}}</font>
                 </div>
                 <div v-if="settings.tabIndex == 112 && blockNumber && timestamp" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'latest block'">
@@ -555,6 +560,7 @@
             cryptoCompareAPIKey: null,
             reportingCurrency: "USD",
             reportingDateTime: 0,
+            includeFluff: true,
             eventsTable: {
               filter: null,
               currentPage: 1,
@@ -567,7 +573,7 @@
               pageSize: 100,
               sortOption: 'symbolasc',
             },
-            version: 3,
+            version: 4,
           },
 
           sync: {
@@ -732,7 +738,11 @@
           },
 
           filteredEvents() {
-            return this.events;
+            const results = [];
+            for (const event of this.events) {
+              results.push(event);
+            }
+            return results;
           },
           filteredSortedEvents() {
             let results = this.filteredEvents;
