@@ -472,7 +472,7 @@
                       <b-badge pill variant="transparent" v-b-popover.hover="formatDecimals(data.item.value, data.item.decimals)" class="px-0">&infin;</b-badge>
                     </span>
                     <span v-else>
-                      ERC-20: {{ data.item.value.toString() }}
+                      <b-badge pill variant="transparent" class="px-0">{{ formatDecimals(data.item.value, data.item.decimals) }}</b-badge>
                     </span>
                   </span>
                   <span v-else-if="data.item.approvalType == 'Approval'">
@@ -533,7 +533,7 @@
                       <b-badge pill variant="transparent" v-b-popover.hover="formatDecimals(data.item.value, data.item.decimals)" class="px-0">&infin;</b-badge>
                     </span>
                     <span v-else>
-                      {{ formatDecimals(data.item.value, data.item.decimals) }}
+                      <b-badge pill variant="transparent" class="px-0">{{ formatDecimals(data.item.value, data.item.decimals) }}</b-badge>
                     </span>
                   </span>
                   <span v-else-if="data.item.eventName == 'Approval'">
