@@ -760,20 +760,25 @@
 
           filteredApprovals() {
             const results = [];
-            for (const event of this.events) {
-              let include = true;
-              if (!this.settings.includeFluff) {
-                const contractType = this.accounts[event.contract] && this.accounts[event.contract].type || null;
-                // console.log("contractType: " + contractType);
-                if (contractType == "erc721" && event.spender == ADDRESS0) {
-                  include = false;
-                }
-              }
-              if (include) {
-                const timestamp = this.blockTimestamps[event.blockNumber] || "(unknown)";
-                results.push({ ...event, timestamp });
-              }
+            for (const [address, accountData] of Object.entries(this.accounts)) {
+              console.log(address + " => " + JSON.stringify(accountData));
+              results.push({ contract: address, symbol: accountData.symbol });
             }
+
+            // for (const event of this.events) {
+            //   let include = true;
+            //   if (!this.settings.includeFluff) {
+            //     const contractType = this.accounts[event.contract] && this.accounts[event.contract].type || null;
+            //     // console.log("contractType: " + contractType);
+            //     if (contractType == "erc721" && event.spender == ADDRESS0) {
+            //       include = false;
+            //     }
+            //   }
+            //   if (include) {
+            //     const timestamp = this.blockTimestamps[event.blockNumber] || "(unknown)";
+            //     results.push({ ...event, timestamp });
+            //   }
+            // }
             return results;
           },
           filteredSortedApprovals() {
