@@ -75,11 +75,32 @@
             </b-card-text>
           </b-card>
 
-          <!-- :APPROVAL -->
+          <!-- :MODALAPPROVAL -->
           <b-modal id="modal-approval" hide-footer size="lg">
             <template #modal-title>
               <font size="-1">{{ modalApproval.item.approvalType }}</font>
             </template>
+            <b-form-group label-cols-lg="2" label="Contract" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+              <b-form-group v-if="modalApproval.item && modalApproval.item.contract" label="Address:" label-for="approval-address" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <font size="-1">
+                  <b-button size="sm" variant="link" id="approval-address" :href="'https://etherscan.io/address/' + modalApproval.item.contract + '#code'" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalApproval.item.contract }}</b-button>
+                </font>
+              </b-form-group>
+              <b-form-group v-if="modalApproval.item && modalApproval.item.symbol" label="Symbol:" label-for="approval-symbol" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" readonly id="approval-symbol" :value="modalApproval.item.symbol" class="w-25"></b-form-input>
+              </b-form-group>
+              <b-form-group v-if="modalApproval.item && modalApproval.item.name" label="Name:" label-for="approval-name" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" readonly id="approval-name" :value="modalApproval.item.name" class="w-100"></b-form-input>
+              </b-form-group>
+              <b-form-group v-if="modalApproval.item && modalApproval.item.type" label="Type:" label-for="approval-type" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" readonly id="approval-type" :value="modalApproval.item.type" class="w-25"></b-form-input>
+              </b-form-group>
+              <!-- <b-form-group v-if="modalApproval.item && modalApproval.item.contract" label="Address:" label-for="approval-address" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <font size="-1">
+                  <b-button size="sm" variant="link" id="approval-address" :href="'https://etherscan.io/address/' + modalApproval.item.contract + '#code'" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalApproval.item.contract }}</b-button>
+                </font>
+              </b-form-group> -->
+            </b-form-group>
           </b-modal>
 
           <!-- :MODALPUNK -->
