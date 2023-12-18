@@ -437,7 +437,9 @@
 
               <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" small fixed striped responsive hover :fields="approvalsFields" :items="pagedFilteredSortedApprovals" show-empty empty-html="Click Check above to retrieve ERC-20, ERC-721 and ERC-1155 Approval and ApprovalForAll events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
-                  {{ parseInt(data.index) + ((settings.approvalsTable.currentPage - 1) * settings.approvalsTable.pageSize) + 1 }}
+                  <font size="-1">
+                    {{ parseInt(data.index) + ((settings.approvalsTable.currentPage - 1) * settings.approvalsTable.pageSize) + 1 }}
+                  </font>
                 </template>
                 <template #cell(type)="data">
                   <b-badge pill variant="transparent" class="px-0">{{ data.item.type }}</b-badge>
@@ -467,7 +469,7 @@
                   </b-link> -->
                   <span v-if="data.item.type == 'erc20'">
                     <span v-if="data.item.value.toString().length > 30">
-                      <b-badge pill variant="transparent" v-b-popover.hover="data.item.value.toString()" class="px-0">&infin;</b-badge>
+                      <b-badge pill variant="transparent" v-b-popover.hover="formatDecimals(data.item.value, data.item.decimals)" class="px-0">&infin;</b-badge>
                     </span>
                     <span v-else>
                       ERC-20: {{ data.item.value.toString() }}
@@ -486,7 +488,9 @@
 
               <b-table v-if="settings.tabIndex == 1 && !settings.showInfo && events" small fixed striped responsive hover :fields="eventsFields" :items="pagedFilteredSortedEvents" show-empty empty-html="Click Check above to retrieve ERC-20, ERC-721 and ERC-1155 Approval and ApprovalForAll events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
-                  {{ parseInt(data.index) + ((settings.eventsTable.currentPage - 1) * settings.eventsTable.pageSize) + 1 }}
+                  <font size="-1">
+                    {{ parseInt(data.index) + ((settings.eventsTable.currentPage - 1) * settings.eventsTable.pageSize) + 1 }}
+                  </font>
                 </template>
                 <template #cell(timestamp)="data">
                   <font size="-1">
