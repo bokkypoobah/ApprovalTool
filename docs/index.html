@@ -358,6 +358,9 @@
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.eventsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedEvents.length" :per-page="settings.eventsTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
+                <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.approvalsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
+                </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.eventsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
                 </div>
@@ -421,9 +424,11 @@
                 </b-card-body>
               </b-card>
 
-              <b-card-text v-if="settings.tabIndex == 0 && !settings.showInfo" class="mt-5">
-                Work in progress. See <b-link size="sm" @click="settings.tabIndex = 1; saveSettings();" v-b-popover.hover="'Events'">Events</b-link>
-              </b-card-text>
+              <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" small fixed striped responsive hover :items="pagedFilteredSortedApprovals" show-empty empty-html="Click Check above to retrieve ERC-20, ERC-721 and ERC-1155 Approval and ApprovalForAll events" head-variant="light" class="mx-0 my-1">
+                <template #cell(number)="data">
+                  {{ parseInt(data.index) + ((settings.approvalsTable.currentPage - 1) * settings.approvalsTable.pageSize) + 1 }}
+                </template>
+              </b-table>
 
               <b-table v-if="settings.tabIndex == 1 && !settings.showInfo && events" small fixed striped responsive hover :fields="eventsFields" :items="pagedFilteredSortedEvents" show-empty empty-html="Click Check above to retrieve ERC-20, ERC-721 and ERC-1155 Approval and ApprovalForAll events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
@@ -561,6 +566,12 @@
             reportingCurrency: "USD",
             reportingDateTime: 0,
             includeFluff: true,
+            approvalsTable: {
+              filter: null,
+              currentPage: 1,
+              pageSize: 100,
+              sortOption: 'symbolasc',
+            },
             eventsTable: {
               filter: null,
               currentPage: 1,
@@ -573,7 +584,7 @@
               pageSize: 100,
               sortOption: 'symbolasc',
             },
-            version: 4,
+            version: 5,
           },
 
           sync: {
@@ -635,6 +646,10 @@
             txFee: null,
             txFeeInReportingCurrency: null,
           },
+          approvalsSortOptions: [
+            { value: 'symbolasc', text: '▲ Symbol' },
+            { value: 'symboldsc', text: '▼ Symbol' },
+          ],
           eventsSortOptions: [
             { value: 'txorderasc', text: '▲ TxOrder' },
             { value: 'txorderdsc', text: '▼ TxOrder' },
@@ -735,6 +750,58 @@
               }
             }
             return totalCount;
+          },
+
+          filteredApprovals() {
+            const results = [];
+            for (const event of this.events) {
+              let include = true;
+              if (!this.settings.includeFluff) {
+                const contractType = this.accounts[event.contract] && this.accounts[event.contract].type || null;
+                // console.log("contractType: " + contractType);
+                if (contractType == "erc721" && event.spender == ADDRESS0) {
+                  include = false;
+                }
+              }
+              if (include) {
+                const timestamp = this.blockTimestamps[event.blockNumber] || "(unknown)";
+                results.push({ ...event, timestamp });
+              }
+            }
+            return results;
+          },
+          filteredSortedApprovals() {
+            let results = this.filteredApprovals;
+            if (this.settings.eventsTable.sortOption == 'symbolasc') {
+              // results.sort((a, b) => {
+              //   if (a.blockNumber == b.blockNumber) {
+              //     if (a.txIndex == b.txIndex) {
+              //       return a.logIndex - b.logIndex;
+              //     } else {
+              //       return a.txIndex - b.txIndex;
+              //     }
+              //   } else {
+              //     return a.blockNumber - b.blockNumber;
+              //   }
+              // });
+            } else if (this.settings.eventsTable.sortOption == 'symboldsc') {
+              // results.sort((a, b) => {
+              //   if (a.blockNumber == b.blockNumber) {
+              //     if (a.txIndex == b.txIndex) {
+              //       return b.logIndex - a.logIndex;
+              //     } else {
+              //       return b.txIndex - a.txIndex;
+              //     }
+              //   } else {
+              //     return b.blockNumber - a.blockNumber;
+              //   }
+              // });
+            }
+            return results;
+          },
+          pagedFilteredSortedApprovals() {
+            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedApprovals - results[0..9]: " + JSON.stringify(this.filteredSortedApprovals.slice(0, 10), null, 2));
+            return this.filteredSortedApprovals.slice((this.settings.approvalsTable.currentPage - 1) * this.settings.approvalsTable.pageSize, this.settings.approvalsTable.currentPage * this.settings.approvalsTable.pageSize);
           },
 
           filteredEvents() {
