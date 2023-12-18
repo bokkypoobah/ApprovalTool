@@ -90,10 +90,13 @@
                 <b-form-input type="text" size="sm" readonly id="approval-symbol" :value="modalApproval.item.symbol" class="w-25"></b-form-input>
               </b-form-group>
               <b-form-group v-if="modalApproval.item && modalApproval.item.name" label="Name:" label-for="approval-name" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <b-form-input type="text" size="sm" readonly id="approval-name" :value="modalApproval.item.name" class="w-100"></b-form-input>
+                <b-form-input type="text" size="sm" readonly id="approval-name" :value="modalApproval.item.name" class="w-75"></b-form-input>
               </b-form-group>
               <b-form-group v-if="modalApproval.item && modalApproval.item.type" label="Type:" label-for="approval-type" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <b-form-input type="text" size="sm" readonly id="approval-type" :value="modalApproval.item.type" class="w-25"></b-form-input>
+              </b-form-group>
+              <b-form-group v-if="modalApproval.item && modalApproval.item.decimals" label="Type:" label-for="approval-decimals" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" readonly id="approval-decimals" :value="modalApproval.item.decimals" class="w-25"></b-form-input>
               </b-form-group>
               <!-- <b-form-group v-if="modalApproval.item && modalApproval.item.contract" label="Address:" label-for="approval-address" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
@@ -841,11 +844,11 @@
               if (approvals) {
                 if (type == "erc721") {
                   for (const [value, spender] of Object.entries(approvals)) {
-                      results.push({ contract, type, approvalType: "Approval", symbol, name, source, owner, spender, value });
+                    results.push({ contract, type, approvalType: "Approval", symbol, name, source, owner, spender, value });
                   }
                 } else if (type == "erc20") {
                   for (const [spender, value] of Object.entries(approvals)) {
-                      results.push({ contract, type, approvalType: "Approval", symbol, name, source, owner, spender, value });
+                    results.push({ contract, type, approvalType: "Approval", symbol, name, source, owner, spender, value, decimals: accountData.decimals });
                   }
                 }
               }
@@ -1168,6 +1171,7 @@
                 accounts[account].type = CUSTOMNAMES[account][0];
                 accounts[account].symbol = CUSTOMNAMES[account][1];
                 accounts[account].name = CUSTOMNAMES[account][2];
+                accounts[account].decimals = CUSTOMNAMES[account].length >= 4 ? CUSTOMNAMES[account][3] : undefined;
               } else {
                 try {
                   const tokenInfos = await erc721Helper.tokenInfo([account], { gasLimit: 1000000 });
