@@ -463,13 +463,34 @@
                 </template>
                 <template #cell(owner)="data">
                   <b-link :href="'https://etherscan.io/address/' + data.item.owner" target="_blank">
-                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.owner)" class="px-0">{{ nameOrAddress(data.item.owner, 28) }}</b-badge>
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.owner)" class="px-0">{{ nameOrAddress(data.item.owner, 24) }}</b-badge>
                   </b-link>
                 </template>
                 <template #cell(spender)="data">
                   <b-link :href="'https://etherscan.io/address/' + data.item.spender" target="_blank">
-                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.spender)" class="px-0">{{ nameOrAddress(data.item.spender, 28) }}</b-badge>
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.spender)" class="px-0">{{ nameOrAddress(data.item.spender, 24) }}</b-badge>
                   </b-link>
+                </template>
+                <template #cell(approved)="data">
+                  <!-- <b-link :href="'https://etherscan.io/address/' + data.item.spender" target="_blank">
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.spender)" class="px-0">{{ nameOrAddress(data.item.spender, 28) }}</b-badge>
+                  </b-link> -->
+                  <span v-if="data.item.type == 'erc20'">
+                    <span v-if="data.item.value.toString().length > 30">
+                      <b-badge pill variant="transparent" v-b-popover.hover="data.item.value.toString()" class="px-0">&infin;</b-badge>
+                    </span>
+                    <span v-else>
+                      ERC-20: {{ data.item.value.toString() }}
+                    </span>
+                  </span>
+                  <span v-else-if="data.item.approvalType == 'Approval'">
+                    <b-link :href="'https://opensea.io/assets/ethereum/' + data.item.contract + '/' + data.item.value" target="_blank">
+                      <b-badge pill variant="transparent" v-b-popover.hover="'View in opensea.io'" class="px-0">{{ '#' + commify0(data.item.value) }}</b-badge>
+                    </b-link>
+                  </span>
+                  <span v-else>
+                    <b-badge pill variant="transparent" class="px-0">{{ data.item.value ? "true" : "false" }}</b-badge>
+                  </span>
                 </template>
               </b-table>
 
@@ -715,7 +736,7 @@
             { key: 'approvalType', label: 'Approval Type', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'owner', label: 'Owner', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'spender', label: 'Spender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'value', label: 'Approved', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'approved', label: 'Approved', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
           eventsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
