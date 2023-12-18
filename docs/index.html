@@ -761,14 +761,15 @@
           filteredApprovals() {
             const results = [];
             for (const [address, accountData] of Object.entries(this.accounts)) {
-              console.log(address + " => " + JSON.stringify(accountData));
-              results.push({
-                contract: address,
-                type: accountData.type,
-                symbol: accountData.symbol,
-                name: accountData.name,
-                source: accountData.source,
-              });
+              const [contract, type, symbol, name, source, owner] = [address, accountData.type, accountData.symbol, accountData.name, accountData.source, this.coinbase];
+              // console.log(address + " => " + JSON.stringify(accountData));
+              // results.push({
+              //   contract: address,
+              //   type: accountData.type,
+              //   symbol: accountData.symbol,
+              //   name: accountData.name,
+              //   source: accountData.source,
+              // });
               const approvals = 'approvals' in accountData && this.coinbase in accountData.approvals && accountData.approvals[this.coinbase] || null;
               if (approvals) {
                 console.log("  approvals[coinbase]: " + JSON.stringify(approvals));
@@ -776,6 +777,11 @@
               const approvalsForAll = 'approvalsForAll' in accountData && this.coinbase in accountData.approvalsForAll && accountData.approvalsForAll[this.coinbase] || null;
               if (approvalsForAll) {
                 console.log("  approvalsForAll: " + JSON.stringify(approvalsForAll));
+                for (const [spender, value] of Object.entries(approvalsForAll)) {
+                  console.log("    " + spender + " => " + value);
+                  results.push({ contract, type, eventType: "ApprovalForAll", symbol, name, source, owner, spender, value });
+                  // });
+                }
               }
             }
 
