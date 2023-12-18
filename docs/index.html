@@ -789,40 +789,6 @@
 
         // --- COMPUTED ---
         computed: {
-          status() {
-            const results = [];
-            let totalCount = 0;
-            for (const contract of this.contracts) {
-              const syncState = this.syncStates[contract.address] || {};
-              if ('count' in syncState) {
-                totalCount += syncState.count;
-              }
-              results.push({
-                name: contract.name,
-                address: contract.address,
-                firstEventBlockNumber: syncState.firstEventBlockNumber || null,
-                latestEventBlockNumber: syncState.latestEventBlockNumber || null,
-                latestBlockNumber: syncState.latestBlockNumber || null,
-                count: syncState.count || null,
-                lastCount: syncState.lastCount || null,
-                syncing: syncState.syncing || null,
-                '_rowVariant': syncState.syncing ? 'success' : 'light',
-              });
-            }
-            results.push({ name: "Total", address: null, count: totalCount });
-            return results;
-          },
-          totalEvents() {
-            let totalCount = 0;
-            for (const contract of this.contracts) {
-              const syncState = this.syncStates[contract.address] || {};
-              if ('count' in syncState) {
-                totalCount += syncState.count;
-              }
-            }
-            return totalCount;
-          },
-
           approvals() {
             const results = [];
             for (const [address, accountData] of Object.entries(this.accounts)) {
