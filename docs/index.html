@@ -346,10 +346,10 @@
                   <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(totalEvents) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.bottom="'# approvals'">{{ commify0(filteredApprovals.length) }}</font>
+                  <font size="-2" v-b-popover.hover.bottom="'# approvals'">{{ commify0(filteredApprovals.length) + '/' + commify0(approvals.length) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredEvents.length) + '/' + commify0(events.length)}}</font>
+                  <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredEvents.length) + '/' + commify0(events.length) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 112 && blockNumber && timestamp" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'latest block'">
@@ -758,47 +758,33 @@
             return totalCount;
           },
 
-          filteredApprovals() {
+          approvals() {
             const results = [];
             for (const [address, accountData] of Object.entries(this.accounts)) {
               const [contract, type, symbol, name, source, owner] = [address, accountData.type, accountData.symbol, accountData.name, accountData.source, this.coinbase];
-              // console.log(address + " => " + JSON.stringify(accountData));
-              // results.push({
-              //   contract: address,
-              //   type: accountData.type,
-              //   symbol: accountData.symbol,
-              //   name: accountData.name,
-              //   source: accountData.source,
-              // });
               const approvals = 'approvals' in accountData && this.coinbase in accountData.approvals && accountData.approvals[this.coinbase] || null;
               if (approvals) {
-                console.log("  approvals[coinbase]: " + JSON.stringify(approvals));
+                if (type == "erc721") {
+                  for (const [value, spender] of Object.entries(approvals)) {
+                      results.push({ contract, type, approvalType: "Approval", symbol, name, source, owner, spender, value });
+                  }
+                } else if (type == "erc20") {
+                  for (const [spender, value] of Object.entries(approvals)) {
+                      results.push({ contract, type, approvalType: "Approval", symbol, name, source, owner, spender, value });
+                  }
+                }
               }
               const approvalsForAll = 'approvalsForAll' in accountData && this.coinbase in accountData.approvalsForAll && accountData.approvalsForAll[this.coinbase] || null;
               if (approvalsForAll) {
-                console.log("  approvalsForAll: " + JSON.stringify(approvalsForAll));
                 for (const [spender, value] of Object.entries(approvalsForAll)) {
-                  console.log("    " + spender + " => " + value);
                   results.push({ contract, type, approvalType: "ApprovalForAll", symbol, name, source, owner, spender, value });
-                  // });
                 }
               }
             }
-
-            // for (const event of this.events) {
-            //   let include = true;
-            //   if (!this.settings.includeFluff) {
-            //     const contractType = this.accounts[event.contract] && this.accounts[event.contract].type || null;
-            //     // console.log("contractType: " + contractType);
-            //     if (contractType == "erc721" && event.spender == ADDRESS0) {
-            //       include = false;
-            //     }
-            //   }
-            //   if (include) {
-            //     const timestamp = this.blockTimestamps[event.blockNumber] || "(unknown)";
-            //     results.push({ ...event, timestamp });
-            //   }
-            // }
+            return results;
+          },
+          filteredApprovals() {
+            let results = this.approvals;
             return results;
           },
           filteredSortedApprovals() {
