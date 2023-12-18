@@ -769,6 +769,14 @@
                 name: accountData.name,
                 source: accountData.source,
               });
+              const approvals = 'approvals' in accountData && this.coinbase in accountData.approvals && accountData.approvals[this.coinbase] || null;
+              if (approvals) {
+                console.log("  approvals[coinbase]: " + JSON.stringify(approvals));
+              }
+              const approvalsForAll = 'approvalsForAll' in accountData && this.coinbase in accountData.approvalsForAll && accountData.approvalsForAll[this.coinbase] || null;
+              if (approvalsForAll) {
+                console.log("  approvalsForAll: " + JSON.stringify(approvalsForAll));
+              }
             }
 
             // for (const event of this.events) {
