@@ -449,6 +449,18 @@
                 <template #cell(number)="data">
                   {{ parseInt(data.index) + ((settings.approvalsTable.currentPage - 1) * settings.approvalsTable.pageSize) + 1 }}
                 </template>
+                <template #cell(type)="data">
+                  <b-badge pill variant="transparent" class="px-0">{{ data.item.type }}</b-badge>
+                </template>
+                <template #cell(symbol)="data">
+                  <b-badge pill variant="transparent" class="px-0">{{ data.item.symbol }}</b-badge>
+                </template>
+                <template #cell(name)="data">
+                  <b-badge pill variant="transparent" class="px-0">{{ data.item.name }}</b-badge>
+                </template>
+                <template #cell(approvalType)="data">
+                  <b-badge pill variant="transparent" class="px-0">{{ data.item.approvalType }}</b-badge>
+                </template>
                 <template #cell(owner)="data">
                   <b-link :href="'https://etherscan.io/address/' + data.item.owner" target="_blank">
                     <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.owner)" class="px-0">{{ nameOrAddress(data.item.owner, 28) }}</b-badge>
