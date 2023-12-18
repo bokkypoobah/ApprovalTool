@@ -1225,9 +1225,10 @@
 
           async processData(db) {
             console.log(moment().format("HH:mm:ss") + " processData BEGIN");
+            const accounts = this.accounts;
             for (const [eventIndex, event] of this.events.entries()) {
               const contract = event.contract;
-              const account = this.accounts[contract];
+              const account = accounts[contract];
               if (account.type == "erc20") {
                 if (!('approvals' in account)) {
                   account.approvals = {};
@@ -1263,9 +1264,10 @@
                 }
                 account.approvalsForAll[event.owner][event.spender] = event.value;
               }
+              Vue.set(this.accounts, contract, account);
             }
-            console.log("accounts: " + JSON.stringify(this.accounts, null, 2));
-            localStorage.approvalAccounts = JSON.stringify(this.accounts);
+            console.log("accounts: " + JSON.stringify(accounts, null, 2));
+            localStorage.approvalAccounts = JSON.stringify(accounts);
             // Vue.set(this, 'accounts', accounts);
           },
 

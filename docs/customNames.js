@@ -14,6 +14,7 @@ const CUSTOMNAMES = {
   "0xA42f6cADa809Bcf417DeefbdD69C5C5A909249C0": ["erc721exchange", "NFT20CasUpgreadableV2", "NFT20:NFT20CasUpgreadableV2"],
   "0xB32979486938AA9694BFC898f35DBED459F44424": ["erc1155", "NYAN", "Nyan Cat"],
   "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2": ["erc20", "WETH", "Wrapped Ether"],
+  "0xd07dc4262BCDbf85190C01c996b4C06a461d2430": ["erc1155", "RARI", "Rarible:RARI Token 3"],
   "0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401": ["erc1155", "NameWrapper", "ENS:NameWrapper"],
 };
 
