@@ -779,7 +779,7 @@
                 console.log("  approvalsForAll: " + JSON.stringify(approvalsForAll));
                 for (const [spender, value] of Object.entries(approvalsForAll)) {
                   console.log("    " + spender + " => " + value);
-                  results.push({ contract, type, eventType: "ApprovalForAll", symbol, name, source, owner, spender, value });
+                  results.push({ contract, type, approvalType: "ApprovalForAll", symbol, name, source, owner, spender, value });
                   // });
                 }
               }
