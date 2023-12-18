@@ -5,9 +5,13 @@ To be run from GitHub pages at [https://bokkypoobah.github.io/ApprovalTool/](htt
 
 ### Sample Screens
 
-WIP
+#### Sample Approvals Screen
 
-<kbd><img src="images/SampleScreen_20231217.png" /></kbd>
+<kbd><img src="images/SampleScreen_Approvals_20231119.png" /></kbd>
+
+#### Sample Events Screen
+
+<kbd><img src="images/SampleScreen_Events_20231119.png" /></kbd>
 
 <br />
 

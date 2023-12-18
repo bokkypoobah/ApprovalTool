@@ -75,6 +75,13 @@
             </b-card-text>
           </b-card>
 
+          <!-- :APPROVAL -->
+          <b-modal id="modal-approval" hide-footer size="lg">
+            <template #modal-title>
+              <font size="-1">{{ modalApproval.item.approvalType }}</font>
+            </template>
+          </b-modal>
+
           <!-- :MODALPUNK -->
           <b-modal id="modal-punk" hide-footer size="lg">
             <template #modal-title>
@@ -435,7 +442,7 @@
                 </b-card-body>
               </b-card>
 
-              <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" small fixed striped responsive hover :fields="approvalsFields" :items="pagedFilteredSortedApprovals" show-empty empty-html="Click Check above to retrieve ERC-20, ERC-721 and ERC-1155 Approval and ApprovalForAll events" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" small fixed striped responsive hover selectable select-mode="single" @row-selected='approvalsRowSelected' :fields="approvalsFields" :items="pagedFilteredSortedApprovals" show-empty empty-html="Click Check above to retrieve ERC-20, ERC-721 and ERC-1155 Approval and ApprovalForAll events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
                     {{ parseInt(data.index) + ((settings.approvalsTable.currentPage - 1) * settings.approvalsTable.pageSize) + 1 }}
@@ -693,6 +700,11 @@
           tokens: {},
           offers: { "1": {}, "2": {} },
           v2Bids: {},
+
+          modalApproval: {
+              item: null,
+          },
+
           modalPunk: {
             punkId: null,
             v1: {
@@ -950,6 +962,21 @@
                 return word.charAt(0).toUpperCase() + word.substring(1).toLowerCase();
               }
             }).join(' ');
+          },
+
+          approvalsRowSelected(item) {
+            console.log("approvalsRowSelected: " + JSON.stringify(item));
+            // this.settings.selectedFunctionSelector = item.length > 0 ? item[0] : null;
+            if (item && item.length > 0) {
+              this.modalApproval.item = item[0];
+              this.$bvModal.show('modal-approval');
+            //   this.settings.selectedFunctionSelector = this.settings.selectedFunctionSelector != null ? null : item[0].functionSelector;
+            //
+            //   // this.selectedPool = this.selectedPool != null ? null : item[0].address;
+            //   // for (const setName of ['validTokenIdsInPool', 'validTokenIdsOwned']) {
+            //   //   Vue.set(this.selectedTokens, setName, {});
+            //   // }
+            }
           },
 
           showModalPunk(punkId) {
