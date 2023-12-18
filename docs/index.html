@@ -435,9 +435,29 @@
                 </b-card-body>
               </b-card>
 
-              <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" small fixed striped responsive hover :items="pagedFilteredSortedApprovals" show-empty empty-html="Click Check above to retrieve ERC-20, ERC-721 and ERC-1155 Approval and ApprovalForAll events" head-variant="light" class="mx-0 my-1">
+              <!-- approvalsFields: [
+                { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
+                { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-left' },
+                { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
+                { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
+                { key: 'approvalType', label: 'Approval Type', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
+                { key: 'owner', label: 'Owner', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+                { key: 'spender', label: 'Spender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+                { key: 'value', label: 'Approved', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
+              ], -->
+              <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" small fixed striped responsive hover :fields="approvalsFields" :items="pagedFilteredSortedApprovals" show-empty empty-html="Click Check above to retrieve ERC-20, ERC-721 and ERC-1155 Approval and ApprovalForAll events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   {{ parseInt(data.index) + ((settings.approvalsTable.currentPage - 1) * settings.approvalsTable.pageSize) + 1 }}
+                </template>
+                <template #cell(owner)="data">
+                  <b-link :href="'https://etherscan.io/address/' + data.item.owner" target="_blank">
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.owner)" class="px-0">{{ nameOrAddress(data.item.owner, 28) }}</b-badge>
+                  </b-link>
+                </template>
+                <template #cell(spender)="data">
+                  <b-link :href="'https://etherscan.io/address/' + data.item.spender" target="_blank">
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.spender)" class="px-0">{{ nameOrAddress(data.item.spender, 28) }}</b-badge>
+                  </b-link>
                 </template>
               </b-table>
 
@@ -461,11 +481,9 @@
                   </font>
                 </template>
                 <template #cell(owner)="data">
-                  <font size="-1">
-                    <b-link :href="'https://etherscan.io/address/' + data.item.owner" target="_blank">
-                      <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.owner)" class="px-0">{{ nameOrAddress(data.item.owner, 28) }}</b-badge>
-                    </b-link>
-                  </font>
+                  <b-link :href="'https://etherscan.io/address/' + data.item.owner" target="_blank">
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.owner)" class="px-0">{{ nameOrAddress(data.item.owner, 28) }}</b-badge>
+                  </b-link>
                 </template>
                 <template #cell(type)="data">
                   <b-badge pill variant="transparent" class="px-0">{{ accounts[data.item.contract] && ('type' in accounts[data.item.contract]) && accounts[data.item.contract].type || "(unknown)" }}</b-badge>
@@ -677,18 +695,26 @@
             { value: 2500, text: '2.5k' },
             { value: 10000, text: '10k' },
           ],
-
+          approvalsFields: [
+            { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
+            { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'approvalType', label: 'Approval Type', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'owner', label: 'Owner', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'spender', label: 'Spender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'value', label: 'Approved', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
+          ],
           eventsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
             { key: 'timestamp', label: 'When', sortable: false, thStyle: 'width: 10%;', tdClass: 'text-truncate' },
-            { key: 'owner', label: 'Owner', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'owner', label: 'Owner', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'eventName', label: 'Event', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
-            { key: 'spender', label: 'Spender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'spender', label: 'Spender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'value', label: 'Value', /*sortable: true,*/ thStyle: 'width: 20%;', thClass: 'text-right', tdClass: 'text-right' },
           ],
-
           functionCallParametersFields: [
             { key: 'parameter', label: 'Parameter', sortable: false, thStyle: 'width: 40%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
@@ -799,7 +825,6 @@
                     include = false;
                   }
                 } else if (approval.type == "erc721" && approval.approvalType == "Approval") {
-                  console.log(JSON.stringify(approval));
                   if (approval.spender == ADDRESS0) {
                     include = false;
                   }
@@ -985,7 +1010,7 @@
             //   await this.syncExchangeRates(db);
             // }
             // if (devMode) {
-              await this.processData(db);
+              await this.processData(db, provider);
             // }
             // if (!devMode) {
               // await this.loadCurrentData();
@@ -1251,7 +1276,7 @@
             Vue.set(this, 'blockTimestamps', blockTimestamps);
           },
 
-          async processData(db) {
+          async processData(db, provider) {
             console.log(moment().format("HH:mm:ss") + " processData BEGIN");
             const accounts = this.accounts;
             for (const [eventIndex, event] of this.events.entries()) {
@@ -1265,7 +1290,11 @@
                 if (!(event.owner in account.approvals)) {
                   account.approvals[event.owner] = {};
                 }
-                account.approvals[event.owner][event.spender] = event.value;
+                // Get current ERC-20 allowance as this amount is reduced by `transferFrom(...)` calls
+                // account.approvals[event.owner][event.spender] = event.value;
+                const erc20Contract = new ethers.Contract(contract, ERC20ABI, provider);
+                const newValue = await erc20Contract.allowance(event.owner, event.spender);
+                account.approvals[event.owner][event.spender] = newValue.toString();
               } else if (account.type == "erc721") {
                 if (event.eventName == "Approval") {
                   if (!('approvals' in account)) {
