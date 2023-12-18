@@ -435,16 +435,6 @@
                 </b-card-body>
               </b-card>
 
-              <!-- approvalsFields: [
-                { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-                { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'approvalType', label: 'Approval Type', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'owner', label: 'Owner', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'spender', label: 'Spender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
-                { key: 'value', label: 'Approved', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
-              ], -->
               <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" small fixed striped responsive hover :fields="approvalsFields" :items="pagedFilteredSortedApprovals" show-empty empty-html="Click Check above to retrieve ERC-20, ERC-721 and ERC-1155 Approval and ApprovalForAll events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   {{ parseInt(data.index) + ((settings.approvalsTable.currentPage - 1) * settings.approvalsTable.pageSize) + 1 }}
@@ -500,17 +490,15 @@
                 </template>
                 <template #cell(timestamp)="data">
                   <font size="-1">
-                    <!-- <b-link @click="showModalTx(data.item[4]);" v-b-popover.hover.bottom="'Click for details'" target="_blank"> -->
-                    <!-- {{ formatTimestamp(data.item[0]) }} -->
-                    <b-link :href="'https://etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'View in etherscan.io'" target="_blank">
+                    <b-link :href="'https://etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
                       {{ formatTimestamp(data.item.timestamp) }}
                     </b-link>
-                    <br />
+                    <!-- <br />
                     <font size="-1">
                       <b-badge pill variant="transparent" v-b-popover.hover="'Block Number'" class="px-0">{{ commify0(data.item.blockNumber) }}</b-badge>
                       <b-badge pill variant="transparent" v-b-popover.hover="'Transaction Index'" class="px-0">{{ data.item.txIndex }}</b-badge>
                       <b-badge pill variant="transparent" v-b-popover.hover="'Log Index'" class="px-0">{{ data.item.logIndex }}</b-badge>
-                    </font>
+                    </font> -->
                   </font>
                 </template>
                 <template #cell(owner)="data">
@@ -519,7 +507,7 @@
                   </b-link>
                 </template>
                 <template #cell(type)="data">
-                  <b-badge pill variant="transparent" class="px-0">{{ accounts[data.item.contract] && ('type' in accounts[data.item.contract]) && accounts[data.item.contract].type || "(unknown)" }}</b-badge>
+                  <b-badge pill variant="transparent" class="px-0">{{ data.item.type }}</b-badge>
                 </template>
                 <template #cell(contract)="data">
                   <b-link :href="'https://etherscan.io/address/' + data.item.contract" target="_blank">
@@ -533,6 +521,25 @@
                   <b-link :href="'https://etherscan.io/address/' + data.item.spender" target="_blank">
                     <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.spender)" class="px-0">{{ nameOrAddress(data.item.spender, 28) }}</b-badge>
                   </b-link>
+                </template>
+                <template #cell(approved)="data">
+                  <!-- {{ data.item }} -->
+                  <span v-if="data.item.type == 'erc20'">
+                    <span v-if="data.item.value.toString().length > 30">
+                      <b-badge pill variant="transparent" v-b-popover.hover="formatDecimals(data.item.value, data.item.decimals)" class="px-0">&infin;</b-badge>
+                    </span>
+                    <span v-else>
+                      {{ formatDecimals(data.item.value, data.item.decimals) }}
+                    </span>
+                  </span>
+                  <span v-else-if="data.item.eventName == 'Approval'">
+                    <b-link :href="'https://opensea.io/assets/ethereum/' + data.item.contract + '/' + data.item.value" target="_blank">
+                      <b-badge pill variant="transparent" v-b-popover.hover="'View in opensea.io'" class="px-0">{{ '#' + commify0(data.item.value) }}</b-badge>
+                    </b-link>
+                  </span>
+                  <span v-else>
+                    <b-badge pill variant="transparent" class="px-0">{{ data.item.value ? "true" : "false" }}</b-badge>
+                  </span>
                 </template>
               </b-table>
 
@@ -746,7 +753,7 @@
             { key: 'contract', label: 'Contract', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'eventName', label: 'Event', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'spender', label: 'Spender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'value', label: 'Value', /*sortable: true,*/ thStyle: 'width: 20%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'approved', label: 'Approved', /*sortable: true,*/ thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
           functionCallParametersFields: [
             { key: 'parameter', label: 'Parameter', sortable: false, thStyle: 'width: 40%;', thClass: 'text-left', tdClass: 'text-left' },
@@ -877,8 +884,9 @@
             const results = [];
             for (const event of this.events) {
               let include = true;
+              const contractType = this.accounts[event.contract] && this.accounts[event.contract].type || null;
+              const decimals = contractType == "erc20" ? this.accounts[event.contract].decimals : undefined;
               if (!this.settings.includeFluff) {
-                const contractType = this.accounts[event.contract] && this.accounts[event.contract].type || null;
                 // console.log("contractType: " + contractType);
                 if (contractType == "erc721" && event.spender == ADDRESS0) {
                   include = false;
@@ -886,7 +894,7 @@
               }
               if (include) {
                 const timestamp = this.blockTimestamps[event.blockNumber] || "(unknown)";
-                results.push({ ...event, timestamp });
+                results.push({ ...event, type: contractType, decimals, timestamp });
               }
             }
             return results;
@@ -1504,6 +1512,9 @@
             } catch (err) {
             }
             return e.toFixed(precision);
+          },
+          formatDecimals(e, decimals = 18) {
+            return e ? ethers.utils.formatUnits(e, decimals) : null;
           },
           formatGas(e, precision = 9) {
             try {
