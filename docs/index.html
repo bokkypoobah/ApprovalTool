@@ -762,7 +762,13 @@
             const results = [];
             for (const [address, accountData] of Object.entries(this.accounts)) {
               console.log(address + " => " + JSON.stringify(accountData));
-              results.push({ contract: address, symbol: accountData.symbol });
+              results.push({
+                contract: address,
+                type: accountData.type,
+                symbol: accountData.symbol,
+                name: accountData.name,
+                source: accountData.source,
+              });
             }
 
             // for (const event of this.events) {
