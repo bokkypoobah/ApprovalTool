@@ -793,8 +793,24 @@
             let results = [];
             for (const approval of this.approvals) {
               let include = true;
+              if (!this.settings.approvalsTable.includeInactive) {
+                if (approval.type == "erc20") {
+                  if (approval.value.toString() == "0") {
+                    include = false;
+                  }
+                } else if (approval.type == "erc721" && approval.approvalType == "Approval") {
+                  console.log(JSON.stringify(approval));
+                  if (approval.spender == ADDRESS0) {
+                    include = false;
+                  }
+                } else {
+                  if (approval.value.toString() == "0") {
+                    include = false;
+                  }
+                }
+              }
               if (include) {
-                results.push(approval);                
+                results.push(approval);
               }
             }
             return results;
