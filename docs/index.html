@@ -78,7 +78,7 @@
           <!-- :MODALAPPROVAL -->
           <b-modal id="modal-approval" hide-footer size="lg">
             <template #modal-title>
-              <font size="-1">{{ modalApproval.item.approvalType }}</font>
+              View or Update {{ modalApproval.item.type.toUpperCase() }} {{ modalApproval.item.approvalType }}
             </template>
             <b-form-group label-cols-lg="2" label="Contract" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
               <b-form-group v-if="modalApproval.item && modalApproval.item.contract" label="Address:" label-for="approval-address" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -105,6 +105,9 @@
               </b-form-group> -->
             </b-form-group>
             <b-form-group label-cols-lg="2" label="Approval" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+              <b-form-group v-if="modalApproval.item && modalApproval.item.approvalType" label="Type:" label-for="approval-type" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" readonly id="approval-type" :value="modalApproval.item.approvalType" class="w-25"></b-form-input>
+              </b-form-group>
               <b-form-group v-if="modalApproval.item && modalApproval.item.owner" label="Owner:" label-for="approval-owner" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
                   <b-button size="sm" variant="link" id="approval-owner" :href="'https://etherscan.io/address/' + modalApproval.item.owner" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ nameOrAddress(modalApproval.item.owner, 42) }}</b-button>
@@ -115,6 +118,11 @@
                   <b-button size="sm" variant="link" id="approval-spender" :href="'https://etherscan.io/address/' + modalApproval.item.spender" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ nameOrAddress(modalApproval.item.spender, 42) }}</b-button>
                 </font>
               </b-form-group>
+              <b-form-group v-if="modalApproval.item && modalApproval.item.type == 'erc20'" label="Tokens:" label-for="approval-tokens" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" readonly id="approval-tokens" :value="modalApproval.item.value" class="w-100"></b-form-input>
+              </b-form-group>
+            </b-form-group>
+            <b-form-group label-cols-lg="2" label="Update" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
             </b-form-group>
           </b-modal>
 
