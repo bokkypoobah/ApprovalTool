@@ -17,7 +17,7 @@ Lightweigh web3 dapp tool to manage your approvals for ERC-20, ERC-721 and ERC-1
 
 ### Running This Dapp
 
-* Run directly from [https://bokkypoobah.github.io/ApprovalTool/](https://bokkypoobah.github.io/ApprovalTool/)
+* Run directly from this repository's GitHub Pages [https://bokkypoobah.github.io/ApprovalTool/](https://bokkypoobah.github.io/ApprovalTool/)
 * Fork [https://github.com/bokkypoobah/ApprovalTool](https://github.com/bokkypoobah/ApprovalTool) and set up your own GitHub Pages
 * Clone [https://github.com/bokkypoobah/ApprovalTool](https://github.com/bokkypoobah/ApprovalTool) on your local computer and run using, e.g., [anywhere](https://www.npmjs.com/package/anywhere) in the ./docs folder
 
