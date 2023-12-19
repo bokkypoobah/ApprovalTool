@@ -278,7 +278,7 @@
                 </b-card-body>
               </b-card>
 
-              <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" ref="approvalsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='approvalsRowSelected' :fields="approvalsFields" :items="pagedFilteredSortedApprovals" show-empty empty-html="Click Check above to retrieve ERC-20, ERC-721 and ERC-1155 Approval and ApprovalForAll events. Then please refresh this page" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" ref="approvalsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='approvalsRowSelected' :fields="approvalsFields" :items="pagedFilteredSortedApprovals" show-empty empty-html="Click Check above to retrieve ERC-20, ERC-721 and ERC-1155 Approval and ApprovalForAll events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
                     {{ parseInt(data.index) + ((settings.approvalsTable.currentPage - 1) * settings.approvalsTable.pageSize) + 1 }}
@@ -329,7 +329,7 @@
                 </template>
               </b-table>
 
-              <b-table v-if="settings.tabIndex == 1 && !settings.showInfo && events" small fixed striped responsive hover :fields="eventsFields" :items="pagedFilteredSortedEvents" show-empty empty-html="Click Check above to retrieve ERC-20, ERC-721 and ERC-1155 Approval and ApprovalForAll events. Then please refresh this page" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="settings.tabIndex == 1 && !settings.showInfo && events" small fixed striped responsive hover :fields="eventsFields" :items="pagedFilteredSortedEvents" show-empty empty-html="Click Check above to retrieve ERC-20, ERC-721 and ERC-1155 Approval and ApprovalForAll events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
                     {{ parseInt(data.index) + ((settings.eventsTable.currentPage - 1) * settings.eventsTable.pageSize) + 1 }}
@@ -447,6 +447,7 @@
           coinbase: null,
           blockNumber: null,
           timestamp: null,
+          forceRefresh: 0,
 
           settings: {
             tabIndex: 0,
@@ -538,7 +539,8 @@
         // --- COMPUTED ---
         computed: {
           approvals() {
-            const results = [];
+            // TODO: Fix janky workaround
+            let results = this.forceRefresh % 2 == 0 ? [] : [];
             for (const [address, accountData] of Object.entries(this.accounts)) {
               const [contract, type, symbol, name, source, owner] = [address, accountData.type, accountData.symbol, accountData.name, accountData.source, this.coinbase];
               const approvals = 'approvals' in accountData && this.coinbase in accountData.approvals && accountData.approvals[this.coinbase] || null;
@@ -832,6 +834,7 @@
 
           async syncBlockTimestamps() {
             console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps BEGIN");
+            console.log(moment().format("HH:mm:ss") + " blockTimestamps: " + JSON.stringify(this.blockTimestamps));
             const blockNumbersMap = {};
             for (const event of this.events) {
               if (!(event.blockNumber in blockNumbersMap)) {
@@ -1083,6 +1086,7 @@
             localStorage.approvalAccounts = JSON.stringify(accounts);
             Vue.set(this, 'accounts', accounts);
             // TODO: UI not updating
+            this.forceRefresh++;
             console.log(moment().format("HH:mm:ss") + " processData END");
           },
 
