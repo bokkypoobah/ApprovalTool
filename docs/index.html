@@ -368,7 +368,7 @@
 
                   <h5 class="mt-4">How This Works</h5>
                   <ul>
-                    <li>This tool scans for <b-link href="https://eips.ethereum.org/EIPS/eip-20" target="_blank">ERC-20</b-link>, <b-link href="https://eips.ethereum.org/EIPS/eip-721" target="_blank">ERC-721</b-link> and <b-link href="https://eips.ethereum.org/EIPS/eip-1155" target="_blank">ERC-1155</b-link> <b>Approval</b> and <b>ApprovalForAll</b> log events from the owner's account. This is done using the <b>getFilter(...)</b> web3 call</li>
+                    <li>This tool scans for <b-link href="https://eips.ethereum.org/EIPS/eip-20" target="_blank">ERC-20</b-link>, <b-link href="https://eips.ethereum.org/EIPS/eip-721" target="_blank">ERC-721</b-link> and <b-link href="https://eips.ethereum.org/EIPS/eip-1155" target="_blank">ERC-1155</b-link> <b>Approval</b> and <b>ApprovalForAll</b> log events from the owner's account. This is done using the <b-link href="https://docs.ethers.org/v5/api/providers/provider/#Provider-getLogs" target="_blank">getLogs(filter)</b-link> web3 call</li>
                     <li>These event logs are then processed to determine the approval states for the various ERC-20, ERC-721 and ERC-1155 contracts</li>
                     <li>This tool retrieves block timestamps from <b-link href="https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks" target="_blank">https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks</b-link></li>
                   </ul>
