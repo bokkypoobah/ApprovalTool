@@ -146,9 +146,6 @@
             <!-- :TOOLBAR -->
             <b-card-text v-if="coinbase" class="m-0 p-0">
               <div class="d-flex flex-wrap m-0 p-0">
-                <div v-if="false" class="mt-0">
-                  <b-button size="sm" :pressed.sync="settings.showFilter" @click="saveSettings" variant="link" v-b-popover.hover.bottom="'Show filter'"><span v-if="settings.showFilter"><b-icon-layout-sidebar-inset shift-v="+1" font-scale="1.0"></b-icon-layout-sidebar-inset></span><span v-else><b-icon-layout-sidebar shift-v="+1" font-scale="1.0"></b-icon-layout-sidebar></span></b-button>
-                </div>
                 <div v-if="settings.tabIndex == 0" class="mt-1 pr-1">
                   <b-form-checkbox size="sm" v-model.trim="settings.approvalsTable.includeInactive" @input="saveSettings" v-b-popover.hover.bottom="'Include inactive approvals'">
                     Inactive
@@ -158,23 +155,6 @@
                   <b-form-checkbox size="sm" v-model.trim="settings.includeFluff" @input="saveSettings" v-b-popover.hover.bottom="'Include unimportant events like ERC-721 Approval to Null:0x0000...0000'">
                     Fluff
                   </b-form-checkbox>
-                </div>
-                <div v-if="false" class="mt-0 pr-1" style="max-width: 11.0rem;">
-                  <b-form-input type="text" size="sm" v-model.trim="settings.filterByIds" @change="saveSettings" debounce="600" v-b-popover.hover.bottom="'Filter by punk id(s) or first 3 (or more) characters of attribute names, e.g., `1 5-10 alien ape`. Replace spaces with `-`, e.g., `male-4`, `clown-nose` or `3d-gl`'" placeholder="🔍 id1 id2-id3 attrib1 ..."></b-form-input>
-                </div>
-                <div v-if="false" class="mt-0 pr-1" style="max-width: 11.0rem;">
-                  <b-form-input type="text" size="sm" v-model.trim="settings.filterByOwners" @change="saveSettings" debounce="600" v-b-popover.hover.bottom="'Filter owner addresses and names by space separated regex. Some custom names `larvalabs`, `yugalabs`, `dead:`'" placeholder="🔍 0x12ab... name1 ..."></b-form-input>
-                </div>
-                <div v-if="settings.tabIndex == 1001" class="mt-0 pr-1">
-                  <b-form-checkbox-group size="sm" @input="saveSettings" v-model="settings.selectedContracts" :options="contractOptions" buttons button-variant="outline-primary" v-b-popover.hover.bottom="'Filter by [Wrapped] CryptoPunks V1 & V2'"></b-form-checkbox-group>
-                </div>
-                <div v-if="Object.keys(settings.filters).length > 0 || settings.filterByIds || settings.filterByOwners" class="mt-0 pr-1">
-                  <b-button size="sm" @click="resetFilters();" variant="link" class="m-0 p-0" v-b-popover.hover.bottom="'Reset filters'">
-                    <b-iconstack shift-v="-4" font-scale="1">
-                      <b-icon stacked icon="funnel-fill" variant="info" scale="1"></b-icon>
-                      <b-icon stacked icon="x" variant="danger" scale="1.3"></b-icon>
-                    </b-iconstack>
-                  </b-button>
                 </div>
                 <div class="mt-0 flex-grow-1">
                 </div>
@@ -203,15 +183,6 @@
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.eventsTable.sortOption" @change="saveSettings" :options="eventsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
-                </div>
-                <div v-if="settings.tabIndex == 110" class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.bottom="'# events'">{{ filteredSortedEvents.length + '/' + Object.keys(txs).length }}</font>
-                </div>
-                <div v-if="settings.tabIndex == 111" class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.bottom="'# events'">{{ events.length + '/' + totalEvents }}</font>
-                </div>
-                <div v-if="settings.tabIndex == 112 && totalEvents" class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(totalEvents) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'# approvals'">{{ commify0(filteredApprovals.length) + '/' + commify0(approvals.length) }}</font>
@@ -478,12 +449,7 @@
 
           settings: {
             tabIndex: 0,
-            showFilter: false,
             showInfo: false,
-            filterByIds: null,
-            filterByOwners: null,
-            filters: {},
-            selectedContracts: [],
             reportingDateTime: 0,
             includeFluff: true,
             approvalsTable: {
@@ -499,12 +465,6 @@
               pageSize: 100,
               sortOption: 'txorderdsc',
             },
-            accountsTable: {
-              filter: null,
-              currentPage: 1,
-              pageSize: 100,
-              sortOption: 'symbolasc',
-            },
             version: 7,
           },
           sync: {
@@ -515,11 +475,7 @@
           },
           events: [],
           accounts: {},
-
           blockTimestamps: {},
-          exchangeRates: {},
-
-          txs: [],
           modalApproval: {
             item: null,
             tokens: null, // ERC-20 Approval
