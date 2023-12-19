@@ -780,18 +780,18 @@
             const latestBlockNumber = block && block.number || null;
             console.log(moment().format("HH:mm:ss") + " syncIt - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
 
-            if (!devMode) {
+            // if (!devMode) {
               await this.syncApprovalEvents(provider, latestBlockNumber);
-            }
+            // }
             if (!devMode) {
               await this.syncBlockTimestamps();
             }
-            // if (!devMode) {
+            if (!devMode) {
               await this.syncAccounts(provider);
-            // }
-            // if (devMode) {
+            }
+            if (!devMode) {
               await this.processData(provider);
-            // }
+            }
             this.sync.section = null;
             this.sync.halt = false;
           },
