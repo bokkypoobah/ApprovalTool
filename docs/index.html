@@ -1278,16 +1278,13 @@
             }
           }
           if ('approvalEvents' in localStorage) {
-            const tempEvents = JSON.parse(localStorage.approvalEvents);
-            this.events = tempEvents;
+            this.events = JSON.parse(localStorage.approvalEvents);
           }
           if ('approvalAccounts' in localStorage) {
-            const tempAccounts = JSON.parse(localStorage.approvalAccounts);
-            this.accounts = tempAccounts;
+            this.accounts = JSON.parse(localStorage.approvalAccounts);
           }
           if ('approvalBlockTimestamps' in localStorage) {
-            const tempBlockTimestamps = JSON.parse(localStorage.approvalBlockTimestamps);
-            this.blockTimestamps = tempBlockTimestamps;
+            this.blockTimestamps = JSON.parse(localStorage.approvalBlockTimestamps);
           }
         },
       })
