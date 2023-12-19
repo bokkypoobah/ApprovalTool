@@ -145,13 +145,23 @@
             <!-- :TOOLBAR -->
             <b-card-text v-if="coinbase" class="m-0 p-0">
               <div class="d-flex flex-wrap m-0 p-0">
+                <div class="mt-1 pr-1">
+                  <b-form-checkbox size="sm" v-model.trim="settings.searchCoinbase" @input="saveSettings" v-b-popover.hover.bottom="'Search for Approvals by your web3 connected account'">
+                    Coinbase
+                  </b-form-checkbox>
+                </div>
+
+                <div v-if="!settings.searchCoinbase" class="mt-0 pr-1" style="max-width: 20.0rem;">
+                  <b-form-input type="text" size="sm" v-model.trim="settings.searchAccounts" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Search by list of accounts'" placeholder="0x12...34 0x23...45"></b-form-input>
+                </div>
+
                 <div v-if="settings.tabIndex == 0" class="mt-1 pr-1">
                   <b-form-checkbox size="sm" v-model.trim="settings.approvalsTable.includeInactive" @input="saveSettings" v-b-popover.hover.bottom="'Include inactive approvals'">
                     Inactive
                   </b-form-checkbox>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-1 pr-1">
-                  <b-form-checkbox size="sm" v-model.trim="settings.includeFluff" @input="saveSettings" v-b-popover.hover.bottom="'Include unimportant events like ERC-721 Approval to Null:0x0000...0000'">
+                  <b-form-checkbox size="sm" v-model.trim="settings.eventsTable.includeFluff" @input="saveSettings" v-b-popover.hover.bottom="'Include unimportant events like ERC-721 Approval to Null:0x0000...0000'">
                     Fluff
                   </b-form-checkbox>
                 </div>
@@ -453,21 +463,23 @@
             tabIndex: 0,
             showInfo: false,
             reportingDateTime: 0,
-            includeFluff: true,
+            searchCoinbase: true,
+            searchAccounts: null,
             approvalsTable: {
               filter: null,
               includeInactive: false,
               currentPage: 1,
               pageSize: 100,
-              sortOption: 'nameasc',
+              sortOption: 'typenameasc',
             },
             eventsTable: {
+              includeFluff: false,
               filter: null,
               currentPage: 1,
               pageSize: 100,
               sortOption: 'txorderdsc',
             },
-            version: 8,
+            version: 9,
           },
           sync: {
             section: null,
@@ -653,7 +665,7 @@
               let include = true;
               const contractType = this.accounts[event.contract] && this.accounts[event.contract].type || null;
               const decimals = contractType == "erc20" ? this.accounts[event.contract].decimals : undefined;
-              if (!this.settings.includeFluff) {
+              if (!this.settings.eventsTable.includeFluff) {
                 // console.log("contractType: " + contractType);
                 if (contractType == "erc721" && event.spender == ADDRESS0) {
                   include = false;
