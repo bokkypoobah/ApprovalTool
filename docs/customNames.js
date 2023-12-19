@@ -9,13 +9,19 @@ const CUSTOMNAMES = {
   "0x4feE7B061C97C9c496b01DbcE9CDb10c02f0a0Be": ["nfttransfer", "TransferProxy", "Rarible:TransferProxy"],
   "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85": ["erc721", "ENS", "Ethereum Name Service"],
   "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45": ["erc20exchange", "SwapRouter02", "UniswapV3:SwapRouter02"],
+  "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D": ["erc20exchange", "UniswapV2Router02", "UniswapV2:Router02"],
   "0x941A6d105802CCCaa06DE58a13a6F49ebDCD481C": ["erc721exchange", "NFTXMarketplace0xZap", "NFTX:Marketplace0xZap"],
   "0x9996FCFa25B234e80BcF876d83d2e7F338F9BDA5": ["erc721exchange", "EnsSubdomainStorefront_v2", "ENSVision:EnsSubdomainStorefront_v2"],
   "0xA42f6cADa809Bcf417DeefbdD69C5C5A909249C0": ["erc721exchange", "NFT20CasUpgreadableV2", "NFT20:NFT20CasUpgreadableV2"],
   "0xB32979486938AA9694BFC898f35DBED459F44424": ["erc1155", "NYAN", "Nyan Cat"],
+  "0xbbc53022Af15Bb973AD906577c84784c47C14371": ["nftexchange", "NFTXMarketplace0xZap", "NFTX:NFTXMarketplace0xZap"],
   "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2": ["erc20", "WETH", "Wrapped Ether", 18],
+  "0xC2C747E0F7004F9E8817Db2ca4997657a7746928": ["erc721", "HM", "Hashmask"],
   "0xd07dc4262BCDbf85190C01c996b4C06a461d2430": ["erc1155", "RARI", "Rarible:RARI Token 3"],
   "0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401": ["erc1155", "NameWrapper", "ENS:NameWrapper"],
+  "0xE5c783EE536cf5E63E792988335c4255169be4E1": ["erc721exchange", "WyvernTokenTransferProxy", "OpenSea:WyvernTokenTransferProxy"],
+  "0xf42aa99F011A1fA7CDA90E5E98b277E306BcA83e": ["erc721exchange", "TransferManagerERC721", "LooksRare:TransferManagerERC721"],
+  "0xF849de01B080aDC3A814FaBE1E2087475cF2E354": ["erc721exchange", "ERC721Delegate", "X2Y2:ERC721Delegate"],
 };
 
 const CUSTOMNAMESOLD = {

@@ -158,13 +158,13 @@
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div v-if="!sync.section" class="mt-0 pr-1">
-                  <b-button size="sm" @click="checkIt(false)" variant="primary" v-b-popover.hover.bottom="'Check approvals. Please refresh after this processing completes'">Check</b-button>
+                  <b-button size="sm" @click="syncIt(false)" variant="primary" v-b-popover.hover.bottom="'Sync blockchain approval events'">Sync</b-button>
                 </div>
                 <div v-if="!sync.section" class="mt-0 pr-1">
-                  <b-button size="sm" @click="checkIt(true)" variant="outline-primary" v-b-popover.hover.bottom="'This will do dev things'">Dev</b-button>
+                  <b-button size="sm" @click="syncIt(true)" variant="outline-primary" v-b-popover.hover.bottom="'This will do dev things'">Dev</b-button>
                 </div>
                 <div v-if="sync.section" class="mt-1 p-0" style="width: 350px;">
-                  <b-progress height="1.5rem" :max="sync.total" show-progress :animated="!sync.section" :variant="sync.section ? 'success' : 'secondary'" v-b-popover.hover.bottom="'{processed blocked number}/{latest block number}. Click the button on the right to stop this process. This process can be continued later'">
+                  <b-progress height="1.5rem" :max="sync.total" show-progress :animated="!sync.section" :variant="sync.section ? 'success' : 'secondary'" v-b-popover.hover.bottom="'Click the button on the right to stop this process'">
                     <b-progress-bar :value="sync.completed">
                       {{ sync.total == null || sync.total == 0 ? (sync.completed + ' ' + sync.section) : (sync.completed + '/' + sync.total + ' ' + ((sync.completed / sync.total) * 100).toFixed(0) + '% ' + sync.section) }}
                     </b-progress-bar>
@@ -749,7 +749,7 @@
             }
           },
 
-          async checkIt(devMode) {
+          async syncIt(devMode) {
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
             this.coinbase = await signer.getAddress();
@@ -758,7 +758,7 @@
             localStorage.approvalToolChainId = network.chainId;
             const block = await provider.getBlock();
             const latestBlockNumber = block && block.number || null;
-            console.log(moment().format("HH:mm:ss") + " checkIt - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
+            console.log(moment().format("HH:mm:ss") + " syncIt - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
 
             if (!devMode) {
               await this.syncApprovalEvents(provider, latestBlockNumber);
@@ -834,7 +834,6 @@
 
           async syncBlockTimestamps() {
             console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps BEGIN");
-            console.log(moment().format("HH:mm:ss") + " blockTimestamps: " + JSON.stringify(this.blockTimestamps));
             const blockNumbersMap = {};
             for (const event of this.events) {
               if (!(event.blockNumber in blockNumbersMap)) {
