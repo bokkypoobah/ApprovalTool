@@ -78,7 +78,7 @@
           <!-- :MODALAPPROVAL -->
           <b-modal id="modal-approval" hide-footer size="lg">
             <template #modal-title>
-              View or Update {{ modalApproval.item.type.toUpperCase() }} {{ modalApproval.item.approvalType }}
+              View/Update {{ modalApproval.item.type.toUpperCase() }} {{ modalApproval.item.approvalType }}
             </template>
             <b-form-group label-cols-lg="2" label="Contract" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
               <b-form-group v-if="modalApproval.item && modalApproval.item.contract" label="Address:" label-for="approval-address" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -123,6 +123,13 @@
               </b-form-group>
             </b-form-group>
             <b-form-group label-cols-lg="2" label="Update" label-size="md" label-class="font-weight-bold pt-0" class="mt-3 mb-0">
+              <b-form-group v-if="modalApproval.item && modalApproval.item.type == 'erc20'" label="Tokens:" label-for="approval-update-tokens" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <b-form-input type="text" size="sm" id="approval-update-tokens" v-model="modalApproval.tokens" class="w-100" :placeholder="'Number with ' + modalApproval.item.decimals + ' decimal places, e.g., 0'"></b-form-input>
+              </b-form-group>
+              <b-form-group v-if="modalApproval.item && modalApproval.item.type == 'erc20'" label="" label-for="approval-update-submit" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
+                <!-- <b-form-input type="text" size="sm" id="approval-update-submit" v-model="modalApproval.tokens" class="w-100" :placeholder="'Number with ' + modalApproval.item.decimals + ' decimal places, e.g., 0'"></b-form-input> -->
+                <b-button size="sm" :disabled="!modalApproval.tokens" @click="updateApproval()" variant="warning">Update</b-button>
+              </b-form-group>
             </b-form-group>
           </b-modal>
 
@@ -746,7 +753,8 @@
           v2Bids: {},
 
           modalApproval: {
-              item: null,
+            item: null,
+            tokens: null,
           },
 
           modalPunk: {
@@ -1020,6 +1028,25 @@
             //   // for (const setName of ['validTokenIdsInPool', 'validTokenIdsOwned']) {
             //   //   Vue.set(this.selectedTokens, setName, {});
             //   // }
+            }
+          },
+
+          async updateApproval() {
+            console.log(moment().format("HH:mm:ss") + " updateApproval: " + JSON.stringify(this.modalApproval));
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const signer = provider.getSigner();
+            const contract = new ethers.Contract(this.modalApproval.item.contract, ERC20ABI, provider);
+            const contractWithSigner = contract.connect(provider.getSigner());
+            try {
+              const spender = this.modalApproval.item.spender;
+              console.log(moment().format("HH:mm:ss") + " updateApproval - spender: " + spender);
+              const value = ethers.utils.parseUnits(this.modalApproval.tokens, this.modalApproval.item.decimals);
+              console.log(moment().format("HH:mm:ss") + " updateApproval - value: " + value);
+
+              const tx = await contractWithSigner.approve(this.modalApproval.item.spender, ethers.utils.parseUnits(this.modalApproval.tokens, this.modalApproval.item.decimals));
+              console.log("tx: " + JSON.stringify(tx));
+            } catch (e) {
+              console.log("updateApproval error: " + JSON.stringify(e));
             }
           },
 
