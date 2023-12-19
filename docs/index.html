@@ -1142,20 +1142,12 @@
               return moment.unix(unixtime).fromNow();
             }
           },
-          nameOrAddress(addressOrAddressIndex, length = 0) {
+          nameOrAddress(address, length = 0) {
             let result = null;
-            if (new RegExp('^[0-9,]+$').test(addressOrAddressIndex)) {
-              if (addressOrAddressIndex in this.accounts) {
-                result = this.accounts[addressOrAddressIndex] && this.accounts[addressOrAddressIndex].symbol || "error";
-              } else {
-                result = this.indexToAddress[addressOrAddressIndex];
-              }
+            if (address in this.accounts) {
+              result = this.accounts[address].name || address;
             } else {
-              if (addressOrAddressIndex in this.accounts) {
-                result = this.accounts[addressOrAddressIndex].name || addressOrAddressIndex;
-              } else {
-                result = addressOrAddressIndex;
-              }
+              result = address;
             }
             if (result && length > 0) {
               result = result.substring(0, length);
