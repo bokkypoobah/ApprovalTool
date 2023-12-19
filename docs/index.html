@@ -368,7 +368,7 @@
 
                   <h5 class="mt-4">How This Works</h5>
                   <ul>
-                    <li>This tool scans for ERC-20, ERC-721 and ERC-1155 <b>Approval</b> and <b>ApprovalForAll</b> log events with the first parameter being the owner account being searched for. This is done using the <b>getFilter(...)</b> web3 call</li>
+                    <li>This tool scans for ERC-20, ERC-721 and ERC-1155 <b>Approval</b> and <b>ApprovalForAll</b> log events from the owner's account. This is done using the <b>getFilter(...)</b> web3 call</li>
                     <li>These event logs are then processed to determine the approval states for the various ERC-20, ERC-721 and ERC-1155 contracts</li>
                     <li>This tool retrieves block timestamps from <b-link href="https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks" target="_blank">https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks</b-link></li>
                   </ul>
@@ -406,6 +406,7 @@
                   <h5 class="mt-3">Troubleshooting</h5>
                   <ul>
                     <li>If this dapp is not receiving the latest Mainnet data, reset your MetaMask web3 connection using <b>Settings</b> -> <b>Advanced</b> -> <b>Clear activity and nonce data</b></li>
+                    <li>Reset this dapp data by removing LocalStorage entries with the keys beginning with <b>approval</b></li>
                   </ul>
                   <!-- <h5 class="mt-3">CryptoPunks History</h5>
                   <ul>

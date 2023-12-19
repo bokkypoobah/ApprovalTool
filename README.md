@@ -10,7 +10,7 @@ URL: [https://bokkypoobah.github.io/ApprovalTool/](https://bokkypoobah.github.io
 
 ### How This Works
 
-* This tool scans for ERC-20, ERC-721 and ERC-1155 *Approval* and *ApprovalForAll* log events with the first parameter being the owner account being searched for. This is done using the `getFilter(...)` web3 call.
+* This tool scans for ERC-20, ERC-721 and ERC-1155 *Approval* and *ApprovalForAll* log events from the owners account. This is done using the `getFilter(...)` web3 call.
 * These event logs are then processed to determine the approval states for the various ERC-20, ERC-721 and ERC-1155 contracts
 * This tool retrieves block timestamps from [https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks](https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks)
 
