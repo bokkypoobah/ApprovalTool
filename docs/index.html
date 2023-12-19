@@ -1083,13 +1083,20 @@
               const contract = new ethers.Contract(this.modalApproval.item.contract, ERC721ABI, provider);
               const contractWithSigner = contract.connect(provider.getSigner());
               try {
-                console.log("approved: " + this.modalApproval.approved);
                 const tx = await contractWithSigner.setApprovalForAll(this.modalApproval.item.spender, this.modalApproval.approved);
                 console.log("tx: " + JSON.stringify(tx));
               } catch (e) {
                 console.log("updateApproval ERC-721 setApprovalForAll(...) error: " + JSON.stringify(e));
               }
             } else if (this.modalApproval.item.type == 'erc1155' && this.modalApproval.item.approvalType == 'ApprovalForAll') {
+              const contract = new ethers.Contract(this.modalApproval.item.contract, ERC1155ABI, provider);
+              const contractWithSigner = contract.connect(provider.getSigner());
+              try {
+                const tx = await contractWithSigner.setApprovalForAll(this.modalApproval.item.spender, this.modalApproval.approved);
+                console.log("tx: " + JSON.stringify(tx));
+              } catch (e) {
+                console.log("updateApproval ERC-1155 setApprovalForAll(...) error: " + JSON.stringify(e));
+              }
             }
           },
 
