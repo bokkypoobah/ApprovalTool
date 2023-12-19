@@ -806,10 +806,13 @@
             // ERC-1155 ApprovalForAll (index_topic_1 address account, index_topic_2 address operator, bool approved)
             // 0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
             console.log(moment().format("HH:mm:ss") + " syncApprovalEvents BEGIN");
+
+            console.log(moment().format("HH:mm:ss") + " syncApprovalEvents - searchCoinbase: " + this.settings.searchCoinbase + ", searchAccounts: " + this.settings.searchAccounts);
             this.sync.completed = 0;
             this.sync.total = 0;
             this.sync.section = 'Approval Events';
-            const accounts = [this.coinbase];
+            const accounts = this.settings.searchCoinbase ? [ this.coinbase ] : this.settings.searchAccounts.split(/[, \t\n]+/).filter(name => (name.length == 42 && name.substring(0, 2) == '0x'));
+            console.log(moment().format("HH:mm:ss") + " syncApprovalEvents - accounts: " + JSON.stringify(accounts));
             const accountsAs32Bytes = accounts.map(e => '0x000000000000000000000000' + e.substring(2, 42).toLowerCase());
             const approvalLogs = await provider.getLogs({
               address: null,
