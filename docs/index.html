@@ -370,7 +370,6 @@
                   </b-link>
                 </template>
                 <template #cell(approved)="data">
-                  <!-- {{ data.item }} -->
                   <span v-if="data.item.type == 'erc20'">
                     <span v-if="data.item.value.toString().length > 30">
                       <b-badge pill variant="transparent" v-b-popover.hover="formatDecimals(data.item.value, data.item.decimals)" class="px-0">&infin;</b-badge>
@@ -776,6 +775,7 @@
           },
 
           async syncApprovalEvents(provider, latestBlockNumber) {
+            console.log(moment().format("HH:mm:ss") + " syncApprovalEvents BEGIN");
             // ERC-20 Approval (index_topic_1 address owner, index_topic_2 address spender, uint256 value)
             // 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925
             // ERC-721 Approval (index_topic_1 address owner, index_topic_2 address approved, index_topic_3 uint256 tokenId)
@@ -823,9 +823,11 @@
             }
             localStorage.approvalEvents = JSON.stringify(events);
             Vue.set(this, 'events', events);
+            console.log(moment().format("HH:mm:ss") + " syncApprovalEvents BEGIN");
           },
 
           async syncNames(provider) {
+            console.log(moment().format("HH:mm:ss") + " syncNames BEGIN");
             const ownersMap = {};
             const contractsMap = {};
             const spendersMap = {};
@@ -913,6 +915,7 @@
             }
             localStorage.approvalAccounts = JSON.stringify(accounts);
             Vue.set(this, 'accounts', accounts);
+            console.log(moment().format("HH:mm:ss") + " syncNames END");
           },
 
           // // TODO: Refresh sync
@@ -979,7 +982,7 @@
           // },
 
           async syncBlockTimestamps() {
-            console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps");
+            console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps BEGIN");
             const blockNumbersMap = {};
             for (const event of this.events) {
               if (!(event.blockNumber in blockNumbersMap)) {
@@ -1017,6 +1020,7 @@
             }
             localStorage.approvalBlockTimestamps = JSON.stringify(blockTimestamps);
             Vue.set(this, 'blockTimestamps', blockTimestamps);
+            console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps END");
           },
 
           async processData(provider) {
@@ -1071,6 +1075,7 @@
             localStorage.approvalAccounts = JSON.stringify(accounts);
             Vue.set(this, 'accounts', accounts);
             // TODO: UI not updating
+            console.log(moment().format("HH:mm:ss") + " processData END");
           },
 
           saveSettings() {
