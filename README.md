@@ -13,6 +13,22 @@ To be run from GitHub pages at [https://bokkypoobah.github.io/ApprovalTool/](htt
 
 <kbd><img src="images/SampleScreen_Events_20231119.png" /></kbd>
 
+#### Sample ERC-20 Approval Screen
+
+<kbd><img src="images/SampleScreen_UpdateERC20_20231119.png" /></kbd>
+
+#### Sample ERC-721 Approval Screen
+
+<kbd><img src="images/SampleScreen_UpdateERC721Approval_20231119.png" /></kbd>
+
+#### Sample ERC-721 ApprovalForAll Screen
+
+<kbd><img src="images/SampleScreen_UpdateERC721ApprovalForAll_20231119.png" /></kbd>
+
+#### Sample ERC-1155 ApprovalForAll Screen
+
+<kbd><img src="images/SampleScreen_UpdateERC1155ApprovalForAll_20231119.png" /></kbd>
+
 <br />
 
 <br />
