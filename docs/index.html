@@ -459,7 +459,7 @@
               includeInactive: false,
               currentPage: 1,
               pageSize: 100,
-              sortOption: 'symbolasc',
+              sortOption: 'nameasc',
             },
             eventsTable: {
               filter: null,
@@ -467,7 +467,7 @@
               pageSize: 100,
               sortOption: 'txorderdsc',
             },
-            version: 7,
+            version: 8,
           },
           sync: {
             section: null,
@@ -486,10 +486,10 @@
             approved: false, // ERC-721 & ERC-1155 ApprovalForAll
           },
           approvalsSortOptions: [
-            { value: 'symbolasc', text: '▲ Symbol, ▲ Name' },
-            { value: 'symboldsc', text: '▼ Symbol, ▼ Name' },
-            { value: 'typesymbolasc', text: '▲ Type, ▲ Symbol, ▲ Name' },
-            { value: 'typesymboldsc', text: '▼ Type, ▼ Symbol, ▼ Name' },
+            { value: 'nameasc', text: '▲ Name' },
+            { value: 'namedsc', text: '▼ Name' },
+            { value: 'typenameasc', text: '▲ Type, ▲ Name' },
+            { value: 'typenamedsc', text: '▼ Type, ▼ Name' },
           ],
           eventsSortOptions: [
             { value: 'txorderasc', text: '▲ TxOrder' },
@@ -591,41 +591,49 @@
           },
           filteredSortedApprovals() {
             let results = this.filteredApprovals;
-            if (this.settings.approvalsTable.sortOption == 'symbolasc') {
+
+            // approvalsSortOptions: [
+            //   { value: 'nameasc', text: '▲ Name' },
+            //   { value: 'namedsc', text: '▼ Name' },
+            //   { value: 'typenameasc', text: '▲ Type, ▲ Name' },
+            //   { value: 'typenamedsc', text: '▼ Type, ▼ Name' },
+            // ],
+
+            if (this.settings.approvalsTable.sortOption == 'nameasc') {
               results.sort((a, b) => {
-                if (('' + a.symbol).localeCompare(b.symbol) == 0) {
+                if (('' + a.name).localeCompare(b.name) == 0) {
+                  return ('' + b.approvalType).localeCompare(a.approvalType);
+                } else {
                   return ('' + a.name).localeCompare(b.name);
-                } else {
-                  return ('' + a.symbol).localeCompare(b.symbol);
                 }
               });
-            } else if (this.settings.approvalsTable.sortOption == 'symboldsc') {
+            } else if (this.settings.approvalsTable.sortOption == 'namedsc') {
               results.sort((a, b) => {
-                if (('' + a.symbol).localeCompare(b.symbol) == 0) {
-                  return ('' + b.name).localeCompare(a.name);
+                if (('' + a.name).localeCompare(b.name) == 0) {
+                  return ('' + a.approvalType).localeCompare(b.approvalType);
                 } else {
-                  return ('' + b.symbol).localeCompare(a.symbol);
+                  return ('' + b.name).localeCompare(a.name);
                 }
               });
-            } else if (this.settings.approvalsTable.sortOption == 'typesymbolasc') {
+            } else if (this.settings.approvalsTable.sortOption == 'typenameasc') {
               results.sort((a, b) => {
                 if (a.type == b.type) {
-                  if (('' + a.symbol).localeCompare(b.symbol) == 0) {
-                    return ('' + a.name).localeCompare(b.name);
+                  if (('' + a.name).localeCompare(b.name) == 0) {
+                    return ('' + b.approvalType).localeCompare(a.approvalType);
                   } else {
-                    return ('' + a.symbol).localeCompare(b.symbol);
+                    return ('' + a.name).localeCompare(b.name);
                   }
                 } else {
                   return parseInt(a.type.substring(3)) - parseInt(b.type.substring(3));
                 }
               });
-            } else if (this.settings.approvalsTable.sortOption == 'typesymboldsc') {
+            } else if (this.settings.approvalsTable.sortOption == 'typenamedsc') {
               results.sort((a, b) => {
                 if (a.type == b.type) {
-                  if (('' + a.symbol).localeCompare(b.symbol) == 0) {
-                    return ('' + b.name).localeCompare(a.name);
+                  if (('' + a.name).localeCompare(b.name) == 0) {
+                    return ('' + a.approvalType).localeCompare(b.approvalType);
                   } else {
-                    return ('' + b.symbol).localeCompare(a.symbol);
+                    return ('' + b.name).localeCompare(a.name);
                   }
                 } else {
                   return parseInt(b.type.substring(3)) - parseInt(a.type.substring(3));
