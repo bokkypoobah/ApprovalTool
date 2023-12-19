@@ -2,6 +2,8 @@
 
 **approvalTool** is a lightweigh web3 dapp tool to manage your approvals for ERC-20, ERC-721 and ERC-1155 token contracts.
 
+URL: [https://bokkypoobah.github.io/ApprovalTool/](https://bokkypoobah.github.io/ApprovalTool/)
+
 <br />
 
 ---
