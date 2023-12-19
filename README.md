@@ -1,5 +1,6 @@
-# ApprovalTool
-Lightweigh web3 dapp tool to manage your approvals for ERC-20, ERC-721 and ERC-1155 contracts.
+# approvalTool
+
+**approvalTool** is a lightweigh web3 dapp tool to manage your approvals for ERC-20, ERC-721 and ERC-1155 token contracts.
 
 <br />
 
@@ -8,8 +9,16 @@ Lightweigh web3 dapp tool to manage your approvals for ERC-20, ERC-721 and ERC-1
 ### How This Works
 
 * This tool scans for ERC-20, ERC-721 and ERC-1155 *Approval* and *ApprovalForAll* log events with the first parameter being the owner account being searched for. This is done using the `getFilter(...)` web3 call.
-* These event logs are process to determine the approval states for the various ERC-20, ERC-721 and ERC-1155 contracts
-* Aside from the web3 call to retrieve log events, this tool retrieves block timestamps from [https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks](https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks)
+* These event logs are then processed to determine the approval states for the various ERC-20, ERC-721 and ERC-1155 contracts
+* This tool retrieves block timestamps from [https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks](https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks)
+
+<br />
+
+---
+
+### Requirements
+
+* This dapp runs in web3 enabled desktop browsers connected to the Ethereum mainnet
 
 <br />
 
