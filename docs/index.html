@@ -596,8 +596,6 @@
             filterByOwners: null,
             filters: {},
             selectedContracts: [],
-            cryptoCompareAPIKey: null,
-            reportingCurrency: "USD",
             reportingDateTime: 0,
             includeFluff: true,
             approvalsTable: {
@@ -619,16 +617,14 @@
               pageSize: 100,
               sortOption: 'symbolasc',
             },
-            version: 6,
+            version: 7,
           },
-
           sync: {
             section: null,
             total: null,
             completed: null,
             halt: false,
           },
-
           events: [],
           accounts: {},
 
@@ -748,17 +744,6 @@
             { value: 0, text: 'Local Time' },
             { value: 1, text: 'UTC Time' },
           ],
-          db: {
-            name: "approvaltooldata088f",
-            version: 1,
-            schemaDefinition: {
-              cache: '&objectName',
-              events: '[blockNumber+logIndex],[blockNumber+contract],contract',
-              syncStates: '&contract',
-              txs: '[blockNumber+txIndex],txHash',
-            },
-            updated: null,
-          },
         },
 
         // --- COMPUTED ---
@@ -964,8 +949,6 @@
           // },
 
           async checkIt(devMode) {
-            const db = new Dexie(this.db.name);
-            db.version(this.db.version).stores(this.db.schemaDefinition);
             const provider = new ethers.providers.Web3Provider(window.ethereum);
             const signer = provider.getSigner();
             this.coinbase = await signer.getAddress();
@@ -980,13 +963,13 @@
               await this.syncApprovalEvents(provider, latestBlockNumber);
             }
             if (!devMode) {
-              await this.syncNames(db, provider);
+              await this.syncNames(provider);
             }
             if (!devMode) {
-              await this.syncBlockTimestamps(db);
+              await this.syncBlockTimestamps();
             }
             // if (devMode) {
-              await this.processData(db, provider);
+              await this.processData(provider);
             // }
             this.sync.section = null;
             this.sync.halt = false;
@@ -1042,7 +1025,7 @@
             Vue.set(this, 'events', events);
           },
 
-          async syncNames(db, provider) {
+          async syncNames(provider) {
             const ownersMap = {};
             const contractsMap = {};
             const spendersMap = {};
@@ -1133,7 +1116,7 @@
           },
 
           // // TODO: Refresh sync
-          // async syncENSNames(newAddressIndexes, db, provider) {
+          // async syncENSNames(newAddressIndexes, provider) {
           //   const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
           //   let indexToAddress = [];
           //   let addressToIndex = {};
@@ -1195,7 +1178,7 @@
           //   console.log(moment().format("HH:mm:ss") + " syncENSNames END");
           // },
 
-          async syncBlockTimestamps(db) {
+          async syncBlockTimestamps() {
             console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps");
             const blockNumbersMap = {};
             for (const event of this.events) {
@@ -1204,7 +1187,6 @@
               }
             }
             const blockNumbers = Object.keys(blockNumbersMap);
-            // console.log("blockNumbers: " + JSON.stringify(blockNumbers));
             this.sync.completed = 0;
             this.sync.total = blockNumbers.length;
             this.sync.section = 'Block Timestamps';
@@ -1237,7 +1219,7 @@
             Vue.set(this, 'blockTimestamps', blockTimestamps);
           },
 
-          async processData(db, provider) {
+          async processData(provider) {
             console.log(moment().format("HH:mm:ss") + " processData BEGIN");
             const accounts = this.accounts;
             for (const [eventIndex, event] of this.events.entries()) {
