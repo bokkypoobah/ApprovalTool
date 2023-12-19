@@ -26,11 +26,20 @@ URL: [https://bokkypoobah.github.io/ApprovalTool/](https://bokkypoobah.github.io
 
 ---
 
-### Running This Dapp
+### References
 
-* Run directly from this repository's GitHub Pages [https://bokkypoobah.github.io/ApprovalTool/](https://bokkypoobah.github.io/ApprovalTool/)
-* Fork [https://github.com/bokkypoobah/ApprovalTool](https://github.com/bokkypoobah/ApprovalTool) and set up your own GitHub Pages
-* Clone [https://github.com/bokkypoobah/ApprovalTool](https://github.com/bokkypoobah/ApprovalTool) on your local computer and run using, e.g., [anywhere](https://www.npmjs.com/package/anywhere) in the ./docs folder
+* Dapp: [https://bokkypoobah.github.io/ApprovalTool/](https://bokkypoobah.github.io/ApprovalTool/)
+* GitHub: [https://github.com/bokkypoobah/ApprovalTool](https://github.com/bokkypoobah/ApprovalTool)
+* Main Dapp Source Code: [https://github.com/bokkypoobah/ApprovalTool/blob/main/docs/index.html](https://github.com/bokkypoobah/ApprovalTool/blob/main/docs/index.html)
+
+<br />
+
+---
+
+### Running Locally
+
+* In a folder on your computer, **git clone [https://github.com/bokkypoobah/ApprovalTool](https://github.com/bokkypoobah/ApprovalTool)**
+* Run a tool like [anywhere](https://www.npmjs.com/package/anywhere) in the ./docs subdirectory of the folder created above
 
 <br />
 
