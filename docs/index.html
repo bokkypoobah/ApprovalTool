@@ -306,7 +306,7 @@
                 </template>
                 <template #cell(name)="data">
                   <b-link :href="'https://etherscan.io/address/' + data.item.contract" target="_blank">
-                    <b-badge pill variant="transparent" class="px-0">{{ data.item.name }}</b-badge>
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.contract)" class="px-0">{{ data.item.name }}</b-badge>
                   </b-link>
                 </template>
                 <template #cell(approvalType)="data">
@@ -807,12 +807,12 @@
             const latestBlockNumber = block && block.number || null;
             console.log(moment().format("HH:mm:ss") + " syncIt - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
 
-            // if (!devMode) {
-              await this.syncApprovalEvents(provider, latestBlockNumber);
-            // }
             if (!devMode) {
-              await this.syncBlockTimestamps();
+              await this.syncApprovalEvents(provider, latestBlockNumber);
             }
+            // if (!devMode) {
+              await this.syncBlockTimestamps();
+            // }
             if (!devMode) {
               await this.syncAccounts(provider);
             }
