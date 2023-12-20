@@ -876,7 +876,7 @@
             }
             localStorage.approvalEvents = JSON.stringify(events);
             Vue.set(this, 'events', events);
-            console.log(moment().format("HH:mm:ss") + " syncApprovalEvents BEGIN");
+            console.log(moment().format("HH:mm:ss") + " syncApprovalEvents END");
           },
 
           async syncBlockTimestamps() {
