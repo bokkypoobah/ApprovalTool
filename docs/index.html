@@ -98,7 +98,7 @@
               </b-form-group>
               <b-form-group v-if="modalApproval.item.owner" label="Owner:" label-for="approval-owner" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="link" id="approval-owner" :href="'https://etherscan.io/address/' + modalApproval.item.owner" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ nameOrAddress(modalApproval.item.owner, 42) }}</b-button>
+                  <b-button size="sm" variant="link" id="approval-owner" :href="'https://etherscan.io/address/' + modalApproval.item.owner" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalApproval.item.owner == coinbase ? "(Coinbase)" : nameOrAddress(modalApproval.item.owner, 42) }}</b-button>
                 </font>
               </b-form-group>
               <b-form-group v-if="modalApproval.item.spender" label="Spender:" label-for="approval-spender" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -130,13 +130,13 @@
                 <b-form-select size="sm" id="approval-update-approved" v-model="modalApproval.approved" :options="falseTrueOptions" class="w-25"></b-form-select>
               </b-form-group>
               <b-form-group v-if="modalApproval.item.type == 'erc20'" label="" label-for="approval-update-submit1" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <b-button size="sm" :disabled="!modalApproval.tokens" id="approval-update-submit1" @click="updateApproval()" variant="warning">Update</b-button>
+                <b-button size="sm" :disabled="!modalApproval.tokens || modalApproval.item.owner != coinbase" id="approval-update-submit1" @click="updateApproval()" variant="warning">Update</b-button>
               </b-form-group>
               <b-form-group v-if="modalApproval.item.type == 'erc721' && modalApproval.item.approvalType == 'Approval'" label="" label-for="approval-update-submit2" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <b-button size="sm" :disabled="!modalApproval.spender || !modalApproval.tokenId" id="approval-update-submit2" @click="updateApproval()" variant="warning">Update</b-button>
+                <b-button size="sm" :disabled="!modalApproval.spender || !modalApproval.tokenId || modalApproval.item.owner != coinbase" id="approval-update-submit2" @click="updateApproval()" variant="warning">Update</b-button>
               </b-form-group>
               <b-form-group v-if="modalApproval.item.approvalType == 'ApprovalForAll'" label="" label-for="approval-update-submit3" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
-                <b-button size="sm" id="approval-update-submit3" @click="updateApproval()" variant="warning">Update</b-button>
+                <b-button size="sm" :disabled="modalApproval.item.owner != coinbase" id="approval-update-submit3" @click="updateApproval()" variant="warning">Update</b-button>
               </b-form-group>
             </b-form-group>
           </b-modal>
@@ -308,7 +308,7 @@
                 </template>
                 <template #cell(owner)="data">
                   <b-link :href="'https://etherscan.io/address/' + data.item.owner" target="_blank">
-                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.owner)" class="px-0">{{ nameOrAddress(data.item.owner, 24) }}</b-badge>
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.owner)" class="px-0">{{ data.item.owner == coinbase ? "(Coinbase)" : nameOrAddress(data.item.owner, 24) }}</b-badge>
                   </b-link>
                 </template>
                 <template #cell(spender)="data">
