@@ -1,6 +1,6 @@
 # approvalTool
 
-**approvalTool** is a lightweigh web3 dapp tool to manage your approvals for ERC-20, ERC-721 and ERC-1155 token contracts.
+A lightweigh web3 dapp tool to manage your approvals for ERC-20, ERC-721 and ERC-1155 token contracts.
 
 URL: [https://bokkypoobah.github.io/ApprovalTool/](https://bokkypoobah.github.io/ApprovalTool/)
 
@@ -41,6 +41,17 @@ URL: [https://bokkypoobah.github.io/ApprovalTool/](https://bokkypoobah.github.io
 
 * In a folder on your computer, **git clone [https://github.com/bokkypoobah/ApprovalTool](https://github.com/bokkypoobah/ApprovalTool)**
 * Run a tool like [anywhere](https://www.npmjs.com/package/anywhere) in the ./docs subdirectory of the folder created above
+
+<br />
+
+---
+
+### Design
+
+* This dapp is designed to have minimal external dependencies - all code is statically served from GitHub
+* No backend servers are necessary, only a web3 connection
+* Block timestamps are retrieved from TheGraph for speed - this can be replaced with slower calls to **getBlock({blockNumber}).timestamp**
+
 
 <br />
 
