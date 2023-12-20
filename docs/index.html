@@ -617,7 +617,11 @@
             if (this.settings.approvalsTable.sortOption == 'nameasc') {
               results.sort((a, b) => {
                 if (('' + a.name).localeCompare(b.name) == 0) {
-                  return ('' + b.approvalType).localeCompare(a.approvalType);
+                  if (('' + b.approvalType).localeCompare(a.approvalType) == 0) {
+                    return ('' + a.owner).localeCompare(b.owner);
+                  } else {
+                    return ('' + b.approvalType).localeCompare(a.approvalType);
+                  }
                 } else {
                   return ('' + a.name).localeCompare(b.name);
                 }
@@ -625,7 +629,11 @@
             } else if (this.settings.approvalsTable.sortOption == 'namedsc') {
               results.sort((a, b) => {
                 if (('' + a.name).localeCompare(b.name) == 0) {
-                  return ('' + a.approvalType).localeCompare(b.approvalType);
+                  if (('' + a.approvalType).localeCompare(b.approvalType) == 0) {
+                    return ('' + b.owner).localeCompare(a.owner);
+                  } else {
+                    return ('' + a.approvalType).localeCompare(b.approvalType);
+                  }
                 } else {
                   return ('' + b.name).localeCompare(a.name);
                 }
@@ -634,7 +642,11 @@
               results.sort((a, b) => {
                 if (a.type == b.type) {
                   if (('' + a.name).localeCompare(b.name) == 0) {
-                    return ('' + b.approvalType).localeCompare(a.approvalType);
+                    if (('' + b.approvalType).localeCompare(a.approvalType) == 0) {
+                      return ('' + a.owner).localeCompare(b.owner);
+                    } else {
+                      return ('' + b.approvalType).localeCompare(a.approvalType);
+                    }
                   } else {
                     return ('' + a.name).localeCompare(b.name);
                   }
@@ -646,7 +658,11 @@
               results.sort((a, b) => {
                 if (a.type == b.type) {
                   if (('' + a.name).localeCompare(b.name) == 0) {
-                    return ('' + a.approvalType).localeCompare(b.approvalType);
+                    if (('' + a.approvalType).localeCompare(b.approvalType) == 0) {
+                      return ('' + b.owner).localeCompare(a.owner);
+                    } else {
+                      return ('' + a.approvalType).localeCompare(b.approvalType);
+                    }
                   } else {
                     return ('' + b.name).localeCompare(a.name);
                   }
