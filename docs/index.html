@@ -557,23 +557,25 @@
             // TODO: Fix janky workaround
             let results = this.forceRefresh % 2 == 0 ? [] : [];
             for (const [address, accountData] of Object.entries(this.accounts)) {
-              const [contract, type, symbol, name, source, owner] = [address, accountData.type, accountData.symbol, accountData.name, accountData.source, this.coinbase];
-              const approvals = 'approvals' in accountData && this.coinbase in accountData.approvals && accountData.approvals[this.coinbase] || null;
-              if (approvals) {
-                if (type == "erc721") {
-                  for (const [value, spender] of Object.entries(approvals)) {
-                    results.push({ contract, type, approvalType: "Approval", symbol, name, source, owner, spender, value });
-                  }
-                } else if (type == "erc20") {
-                  for (const [spender, value] of Object.entries(approvals)) {
-                    results.push({ contract, type, approvalType: "Approval", symbol, name, source, owner, spender, value, decimals: accountData.decimals });
+              const [contract, type, symbol, name, source] = [address, accountData.type, accountData.symbol, accountData.name, accountData.source];
+              for (let owner of this.accountsToSearch) {
+                const approvals = 'approvals' in accountData && owner in accountData.approvals && accountData.approvals[owner] || null;
+                if (approvals) {
+                  if (type == "erc721") {
+                    for (const [value, spender] of Object.entries(approvals)) {
+                      results.push({ contract, type, approvalType: "Approval", symbol, name, source, owner, spender, value });
+                    }
+                  } else if (type == "erc20") {
+                    for (const [spender, value] of Object.entries(approvals)) {
+                      results.push({ contract, type, approvalType: "Approval", symbol, name, source, owner, spender, value, decimals: accountData.decimals });
+                    }
                   }
                 }
-              }
-              const approvalsForAll = 'approvalsForAll' in accountData && this.coinbase in accountData.approvalsForAll && accountData.approvalsForAll[this.coinbase] || null;
-              if (approvalsForAll) {
-                for (const [spender, value] of Object.entries(approvalsForAll)) {
-                  results.push({ contract, type, approvalType: "ApprovalForAll", symbol, name, source, owner, spender, value });
+                const approvalsForAll = 'approvalsForAll' in accountData && owner in accountData.approvalsForAll && accountData.approvalsForAll[owner] || null;
+                if (approvalsForAll) {
+                  for (const [spender, value] of Object.entries(approvalsForAll)) {
+                    results.push({ contract, type, approvalType: "ApprovalForAll", symbol, name, source, owner, spender, value });
+                  }
                 }
               }
             }
