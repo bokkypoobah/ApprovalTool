@@ -168,10 +168,10 @@
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div v-if="!sync.section" class="mt-0 pr-1">
-                  <b-button size="sm" @click="syncIt(false)" variant="primary" v-b-popover.hover.bottom="'Sync blockchain approval events'">Sync</b-button>
+                  <b-button size="sm" :disabled="accountsToSearch.length == 0" @click="syncIt(false)" variant="primary" v-b-popover.hover.bottom="'Sync blockchain approval events'">Sync</b-button>
                 </div>
                 <div v-if="!sync.section" class="mt-0 pr-1">
-                  <b-button size="sm" @click="syncIt(true)" variant="outline-primary" v-b-popover.hover.bottom="'This will do dev things'">Dev</b-button>
+                  <b-button size="sm" :disabled="accountsToSearch.length == 0" @click="syncIt(true)" variant="outline-primary" v-b-popover.hover.bottom="'This will do dev things'">Dev</b-button>
                 </div>
                 <div v-if="sync.section" class="mt-1 p-0" style="width: 350px;">
                   <b-progress height="1.5rem" :max="sync.total" show-progress :animated="!sync.section" :variant="sync.section ? 'success' : 'secondary'" v-b-popover.hover.bottom="'Click the button on the right to stop this process'">
@@ -550,6 +550,9 @@
 
         // --- COMPUTED ---
         computed: {
+          accountsToSearch() {
+            return this.settings.searchCoinbase ? [ this.coinbase ] : this.settings.searchAccounts.split(/[, \t\n]+/).filter(name => name.match(/0x[0-9a-fA-F]{40}/));
+          },
           approvals() {
             // TODO: Fix janky workaround
             let results = this.forceRefresh % 2 == 0 ? [] : [];
@@ -806,14 +809,11 @@
             // ERC-1155 ApprovalForAll (index_topic_1 address account, index_topic_2 address operator, bool approved)
             // 0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
             console.log(moment().format("HH:mm:ss") + " syncApprovalEvents BEGIN");
-
-            console.log(moment().format("HH:mm:ss") + " syncApprovalEvents - searchCoinbase: " + this.settings.searchCoinbase + ", searchAccounts: " + this.settings.searchAccounts);
             this.sync.completed = 0;
             this.sync.total = 0;
             this.sync.section = 'Approval Events';
-            const accounts = this.settings.searchCoinbase ? [ this.coinbase ] : this.settings.searchAccounts.split(/[, \t\n]+/).filter(name => (name.length == 42 && name.substring(0, 2) == '0x'));
-            console.log(moment().format("HH:mm:ss") + " syncApprovalEvents - accounts: " + JSON.stringify(accounts));
-            const accountsAs32Bytes = accounts.map(e => '0x000000000000000000000000' + e.substring(2, 42).toLowerCase());
+            console.log(moment().format("HH:mm:ss") + " syncApprovalEvents - accountsToSearch: " + JSON.stringify(this.accountsToSearch));
+            const accountsAs32Bytes = this.accountsToSearch.map(e => '0x000000000000000000000000' + e.substring(2, 42).toLowerCase());
             const approvalLogs = await provider.getLogs({
               address: null,
               fromBlock: 0,
