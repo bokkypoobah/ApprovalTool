@@ -98,7 +98,7 @@
               </b-form-group>
               <b-form-group v-if="modalApproval.item.owner" label="Owner:" label-for="approval-owner" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
                 <font size="-1">
-                  <b-button size="sm" variant="link" id="approval-owner" :href="'https://etherscan.io/address/' + modalApproval.item.owner" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalApproval.item.owner == coinbase ? "(Coinbase)" : nameOrAddress(modalApproval.item.owner, 42) }}</b-button>
+                  <b-button size="sm" variant="link" id="approval-owner" :href="'https://etherscan.io/address/' + modalApproval.item.owner" v-b-popover.hover.bottom="'Click to view in etherscan.io'" target="_blank">{{ modalApproval.item.owner == coinbase ? "(Attached)" : nameOrAddress(modalApproval.item.owner, 42) }}</b-button>
                 </font>
               </b-form-group>
               <b-form-group v-if="modalApproval.item.spender" label="Spender:" label-for="approval-spender" label-size="sm" label-cols-sm="2" label-align-sm="right" class="mx-0 my-1 p-0">
@@ -146,12 +146,12 @@
             <b-card-text v-if="coinbase" class="m-0 p-0">
               <div class="d-flex flex-wrap m-0 p-0">
                 <div class="mt-1 pr-1">
-                  <b-form-checkbox size="sm" v-model.trim="settings.searchCoinbase" @input="saveSettings" v-b-popover.hover.bottom="'Search for Approvals by your web3 connected account'">
-                    Coinbase
+                  <b-form-checkbox size="sm" v-model.trim="settings.searchAttachedAccount" @input="saveSettings" v-b-popover.hover.bottom="'Search for approval events emitted by your attached web3 account'">
+                    Attached
                   </b-form-checkbox>
                 </div>
-                <div v-if="!settings.searchCoinbase" class="mt-0 pr-1" style="min-width: 25.0rem; max-width: 25.0rem;">
-                  <b-form-textarea type="text" size="sm" v-model.trim="settings.searchAccounts" @change="saveSettings" debounce="600" rows="3" max-rows="10" v-b-popover.hover.top="'List of owner addresses'" :placeholder="'0x12...34\n0x23...45 0x34...56'"></b-form-textarea>
+                <div v-if="!settings.searchAttachedAccount" class="mt-0 pr-1" style="min-width: 25.0rem; max-width: 25.0rem;">
+                  <b-form-textarea type="text" size="sm" v-model.trim="settings.searchAccounts" @change="saveSettings" debounce="600" rows="3" max-rows="10" v-b-popover.hover.top="'Search for approval events emitted this list of owner addresses'" :placeholder="'0x12...34\n0x23...45 0x34...56'"></b-form-textarea>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-1 pr-1">
                   <b-form-checkbox size="sm" v-model.trim="settings.approvalsTable.includeInactive" @input="saveSettings" v-b-popover.hover.bottom="'Include inactive approvals'">
@@ -312,7 +312,7 @@
                 </template>
                 <template #cell(owner)="data">
                   <b-link :href="'https://etherscan.io/address/' + data.item.owner" target="_blank">
-                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.owner)" class="px-0">{{ data.item.owner == coinbase ? "(Coinbase)" : nameOrAddress(data.item.owner, 24) }}</b-badge>
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.owner)" class="px-0">{{ data.item.owner == coinbase ? "(Attached)" : nameOrAddress(data.item.owner, 24) }}</b-badge>
                   </b-link>
                 </template>
                 <template #cell(spender)="data">
@@ -364,7 +364,7 @@
                 </template>
                 <template #cell(owner)="data">
                   <b-link :href="'https://etherscan.io/address/' + data.item.owner" target="_blank">
-                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.owner)" class="px-0">{{ data.item.owner == coinbase ? "(Coinbase)" : nameOrAddress(data.item.owner, 28) }}</b-badge>
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.owner)" class="px-0">{{ data.item.owner == coinbase ? "(Attached)" : nameOrAddress(data.item.owner, 28) }}</b-badge>
                   </b-link>
                 </template>
                 <template #cell(type)="data">
@@ -467,7 +467,7 @@
             tabIndex: 0,
             showInfo: false,
             reportingDateTime: 0,
-            searchCoinbase: true,
+            searchAttachedAccount: true,
             searchAccounts: null,
             approvalsTable: {
               filter: null,
@@ -483,7 +483,7 @@
               pageSize: 100,
               sortOption: 'txorderdsc',
             },
-            version: 9,
+            version: 10,
           },
           sync: {
             section: null,
@@ -555,7 +555,7 @@
         // --- COMPUTED ---
         computed: {
           accountsToSearch() {
-            return this.settings.searchCoinbase ? [ this.coinbase ] : this.settings.searchAccounts.split(/[, \t\n]+/).filter(name => name.match(/0x[0-9a-fA-F]{40}/));
+            return this.settings.searchAttachedAccount ? [ this.coinbase ] : (this.settings.searchAccounts && this.settings.searchAccounts.split(/[, \t\n]+/).filter(name => name.match(/0x[0-9a-fA-F]{40}/)) || []);
           },
           approvals() {
             // TODO: Fix janky workaround
