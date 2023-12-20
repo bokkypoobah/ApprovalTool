@@ -1223,16 +1223,17 @@
               if (this.settings.eventsTable.currentPage > 1) {
                 this.settings.eventsTable.currentPage = 1;
               }
+              // Restore other settings for the same version
+              if ('approvalEvents' in localStorage) {
+                this.events = JSON.parse(localStorage.approvalEvents);
+              }
+              if ('approvalAccounts' in localStorage) {
+                this.accounts = JSON.parse(localStorage.approvalAccounts);
+              }
+              if ('approvalBlockTimestamps' in localStorage) {
+                this.blockTimestamps = JSON.parse(localStorage.approvalBlockTimestamps);
+              }
             }
-          }
-          if ('approvalEvents' in localStorage) {
-            this.events = JSON.parse(localStorage.approvalEvents);
-          }
-          if ('approvalAccounts' in localStorage) {
-            this.accounts = JSON.parse(localStorage.approvalAccounts);
-          }
-          if ('approvalBlockTimestamps' in localStorage) {
-            this.blockTimestamps = JSON.parse(localStorage.approvalBlockTimestamps);
           }
         },
       })
