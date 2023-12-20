@@ -880,12 +880,12 @@
           },
 
           async syncBlockTimestamps() {
-            // TODO: Incremental sync
             // TODO: use getBlock(blockNumber).timestamp to reduce dependency
             console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps BEGIN");
+            const blockTimestamps = this.blockTimestamps;
             const blockNumbersMap = {};
             for (const event of this.events) {
-              if (!(event.blockNumber in blockNumbersMap)) {
+              if (!(event.blockNumber in blockTimestamps) && !(event.blockNumber in blockNumbersMap)) {
                 blockNumbersMap[event.blockNumber] = true;
               }
             }
@@ -894,7 +894,6 @@
             this.sync.total = blockNumbers.length;
             this.sync.section = 'Block Timestamps';
             const BATCHSIZE = 1000;
-            const blockTimestamps = {};
             for (let i = 0; i < blockNumbers.length; i += BATCHSIZE) {
               const batch = blockNumbers.slice(i, parseInt(i) + BATCHSIZE);
               const data = await fetch(BLOCKTIMESTAMPSUBGRAPHURL, {
