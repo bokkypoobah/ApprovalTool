@@ -13,7 +13,7 @@ URL: [https://bokkypoobah.github.io/ApprovalTool/](https://bokkypoobah.github.io
 * This tool scans for [ERC-20](https://eips.ethereum.org/EIPS/eip-20#events), [ERC-721](https://eips.ethereum.org/EIPS/eip-721#specification) and [ERC-1155](https://eips.ethereum.org/EIPS/eip-1155#specification) *Approval* and *ApprovalForAll* log events from the owner's account. This is done using the [getLogs(filter)](https://docs.ethers.org/v5/api/providers/provider/#Provider-getLogs) web3 call.
 * These event logs are then processed to determine the approval states for the various ERC-20, ERC-721 and ERC-1155 contracts
 * The latest ERC-20 approval amounts are retrieved using the ERC-20 `allowance(...)` function
-* This tool retrieves block timestamps from [https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks](https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks)
+* ~~This tool retrieves block timestamps from [https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks](https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks)~~
 
 <br />
 
