@@ -151,7 +151,7 @@
                   </b-form-checkbox>
                 </div>
                 <div v-if="!settings.searchCoinbase" class="mt-0 pr-1" style="min-width: 25.0rem; max-width: 25.0rem;">
-                  <b-form-textarea type="text" size="sm" v-model.trim="settings.searchAccounts" @change="saveSettings" debounce="600" rows="1" max-rows="10" v-b-popover.hover.top="'Search by list of owner addresses, space separated'" placeholder="0x12...34 0x23...45"></b-form-textarea>
+                  <b-form-textarea type="text" size="sm" v-model.trim="settings.searchAccounts" @change="saveSettings" debounce="600" rows="3" max-rows="100" v-b-popover.hover.top="'List of owner addresses'" :placeholder="'0x12...34\n0x23...45 0x34...56'"></b-form-textarea>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-1 pr-1">
                   <b-form-checkbox size="sm" v-model.trim="settings.approvalsTable.includeInactive" @input="saveSettings" v-b-popover.hover.bottom="'Include inactive approvals'">
