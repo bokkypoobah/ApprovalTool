@@ -150,11 +150,9 @@
                     Coinbase
                   </b-form-checkbox>
                 </div>
-
-                <div v-if="!settings.searchCoinbase" class="mt-0 pr-1" style="max-width: 30.0rem;">
-                  <b-form-input type="text" size="sm" v-model.trim="settings.searchAccounts" @change="saveSettings" debounce="600" v-b-popover.hover.top="'Search by list of owner addresses, space separated'" placeholder="0x12...34 0x23...45"></b-form-input>
+                <div v-if="!settings.searchCoinbase" class="mt-0 pr-1" style="min-width: 25.0rem; max-width: 25.0rem;">
+                  <b-form-textarea type="text" size="sm" v-model.trim="settings.searchAccounts" @change="saveSettings" debounce="600" rows="1" max-rows="10" v-b-popover.hover.top="'Search by list of owner addresses, space separated'" placeholder="0x12...34 0x23...45"></b-form-textarea>
                 </div>
-
                 <div v-if="settings.tabIndex == 0" class="mt-1 pr-1">
                   <b-form-checkbox size="sm" v-model.trim="settings.approvalsTable.includeInactive" @input="saveSettings" v-b-popover.hover.bottom="'Include inactive approvals'">
                     Inactive
@@ -360,7 +358,7 @@
                 </template>
                 <template #cell(owner)="data">
                   <b-link :href="'https://etherscan.io/address/' + data.item.owner" target="_blank">
-                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.owner)" class="px-0">{{ nameOrAddress(data.item.owner, 28) }}</b-badge>
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.owner)" class="px-0">{{ data.item.owner == coinbase ? "(Coinbase)" : nameOrAddress(data.item.owner, 28) }}</b-badge>
                   </b-link>
                 </template>
                 <template #cell(type)="data">
