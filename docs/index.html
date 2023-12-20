@@ -811,7 +811,7 @@
               await this.syncApprovalEvents(provider, latestBlockNumber);
             }
             // if (!devMode) {
-              await this.syncBlockTimestamps();
+              await this.syncBlockTimestamps(provider);
             // }
             if (!devMode) {
               await this.syncAccounts(provider);
@@ -879,7 +879,7 @@
             console.log(moment().format("HH:mm:ss") + " syncApprovalEvents END");
           },
 
-          async syncBlockTimestamps() {
+          async syncBlockTimestamps(provider) {
             // TODO: use getBlock(blockNumber).timestamp to reduce dependency
             console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps BEGIN");
             const blockTimestamps = this.blockTimestamps;
