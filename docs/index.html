@@ -889,13 +889,13 @@
                 newBlockNumbersMap[event.blockNumber] = true;
               }
             }
-            const newBlockNumbers = Object.keys(newBlockNumbersMap);
+            const blockNumbers = Object.keys(newBlockNumbersMap);
             this.sync.completed = 0;
-            this.sync.total = newBlockNumbers.length;
+            this.sync.total = blockNumbers.length;
             this.sync.section = 'Block Timestamps';
             const BATCHSIZE = 1000;
-            for (let i = 0; i < newBlockNumbers.length; i += BATCHSIZE) {
-              const batch = newBlockNumbers.slice(i, parseInt(i) + BATCHSIZE);
+            for (let i = 0; i < blockNumbers.length; i += BATCHSIZE) {
+              const batch = blockNumbers.slice(i, parseInt(i) + BATCHSIZE);
               const data = await fetch(BLOCKTIMESTAMPSUBGRAPHURL, {
                 method: 'POST',
                 headers: {
@@ -904,7 +904,7 @@
                 },
                 body: JSON.stringify({
                   query: BLOCKTIMESTAMPINQUERY,
-                  variables: { newBlockNumbers: batch.map(e => parseInt(e)) },
+                  variables: { blockNumbers: batch.map(e => parseInt(e)) },
                 })
               }).then(response => response.json())
               .catch(function(e) {
@@ -915,7 +915,7 @@
                 blockTimestamps[timestampItem.number] = parseInt(timestampItem.timestamp);
               }
               this.sync.completed += timestamps.length;
-              console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps " + this.sync.completed + " of " + newBlockNumbers.length);
+              console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps " + this.sync.completed + " of " + blockNumbers.length);
             }
             localStorage.approvalBlockTimestamps = JSON.stringify(blockTimestamps);
             Vue.set(this, 'blockTimestamps', blockTimestamps);
