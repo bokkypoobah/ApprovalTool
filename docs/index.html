@@ -880,6 +880,8 @@
           },
 
           async syncBlockTimestamps() {
+            // TODO: Incremental sync
+            // TODO: use getBlock(blockNumber).timestamp to reduce dependency
             console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps BEGIN");
             const blockNumbersMap = {};
             for (const event of this.events) {
@@ -922,6 +924,7 @@
           },
 
           async syncAccounts(provider) {
+            // TODO: Incremental check
             console.log(moment().format("HH:mm:ss") + " syncAccounts BEGIN");
             const ownersMap = {};
             const contractsMap = {};
@@ -1017,70 +1020,8 @@
             console.log(moment().format("HH:mm:ss") + " syncAccounts END");
           },
 
-          // // TODO: Refresh sync
-          // async syncENSNames(newAddressIndexes, provider) {
-          //   const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
-          //   let indexToAddress = [];
-          //   let addressToIndex = {};
-          //   const indexToAddressDataItems = await db.cache.where("objectName").equals(this.chainId + "_indexToAddress").toArray();
-          //   if (indexToAddressDataItems.length == 1) {
-          //     indexToAddress = indexToAddressDataItems[0].object;
-          //     for (const [index, address] of indexToAddress.entries()) {
-          //       addressToIndex[address] = index;
-          //     }
-          //   }
-          //   const addresses = newAddressIndexes.map(e => indexToAddress[e]);
-          //   this.sync.completed = 0;
-          //   this.sync.total = addresses.length;
-          //   this.sync.section = 'ENS Names';
-          //   const MAXBATCHSIZE = 1000;
-          //   let batchSize = MAXBATCHSIZE;
-          //   let completed = 0;
-          //   let done = false;
-          //   let start = completed;
-          //   do {
-          //     let end = parseInt(start) + batchSize - 1;
-          //     if (end > addresses.length) {
-          //       end = addresses.length;
-          //     }
-          //     try {
-          //       const batch = addresses.slice(start, end + 1);
-          //       const allnames = await ensReverseRecordsContract.getNames(batch);
-          //       for (let j = 0; j < batch.length; j++) {
-          //         const account = batch[j];
-          //         const name = allnames[j];
-          //         // TODO: const normalized = normalize(account);
-          //         if (name.length > 0) {
-          //           // console.log(account + " => " + name);
-          //           Vue.set(this.indexToAddressName, addressToIndex[account], name);
-          //         }
-          //       }
-          //       start = parseInt(end) + 1;
-          //     } catch (e) {
-          //       if (batchSize > 1) {
-          //         batchSize = parseInt(batchSize / 2);
-          //       } else {
-          //         console.log("Skipping #" + start + " " + addresses[start]);
-          //         start = parseInt(start) + 1;
-          //         batchSize = MAXBATCHSIZE;
-          //       }
-          //     }
-          //     this.sync.completed = start;
-          //     done = start > addresses.length;
-          //   } while (!done);
-          //
-          //   for (const [address, name] of Object.entries(CUSTOMNAMES)) {
-          //     Vue.set(this.indexToAddressName, addressToIndex[address], name);
-          //   }
-          //   // console.log("this.indexToAddressName: " + JSON.stringify(this.indexToAddressName, null, 2));
-          //   await db.cache.put({ objectName: CHAINID_MAINNET + "_indexToAddressName", object: this.indexToAddressName }).then (function() {
-          //   }).catch(function(error) {
-          //     console.log("error: " + error);
-          //   });
-          //   console.log(moment().format("HH:mm:ss") + " syncENSNames END");
-          // },
-
           async processData(provider) {
+            // TODO: Move ERC-20 allowance call outside loop
             console.log(moment().format("HH:mm:ss") + " processData BEGIN");
             const accounts = this.accounts;
             for (const [eventIndex, event] of this.events.entries()) {
@@ -1207,32 +1148,6 @@
             }
             return result;
           },
-          // exportAccounts() {
-          //   console.log("exportAccounts");
-          //   const rows = [
-          //       ["No", "Address", "Name", "ENSName", "Group", "Sync", "Include"],
-          //   ];
-          //   let i = 1;
-          //   for (const result of this.filteredSortedAccounts) {
-          //     rows.push([
-          //       i,
-          //       result.address,
-          //       result.name,
-          //       result.ensName,
-          //       result.group,
-          //       result.sync ? "y" : "n",
-          //       result.include ? "y" : "n",
-          //     ]);
-          //     i++;
-          //   }
-          //   let tsvContent = "data:text/tsv;charset=utf-8," + rows.map(e => e.join("\t")).join("\n");
-          //   var encodedUri = encodeURI(tsvContent);
-          //   var link = document.createElement("a");
-          //   link.setAttribute("href", encodedUri);
-          //   link.setAttribute("download", "mynfts_account_export-" + moment().format("YYYY-MM-DD-HH-mm-ss") + ".tsv");
-          //   document.body.appendChild(link); // Required for FF
-          //   link.click(); // This will download the data with the specified file name
-          // },
           copyToClipboard(str) {
             navigator.clipboard.writeText(str);
           },
