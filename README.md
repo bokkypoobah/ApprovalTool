@@ -1,4 +1,4 @@
-# approvalTool
+# ApprovalTool
 
 A lightweigh web3 dapp tool to manage your approvals for ERC-20, ERC-721 and ERC-1155 token contracts.
 
