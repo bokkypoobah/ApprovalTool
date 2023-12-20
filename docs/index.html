@@ -305,7 +305,9 @@
                   <b-badge pill variant="transparent" class="px-0">{{ data.item.symbol }}</b-badge>
                 </template>
                 <template #cell(name)="data">
-                  <b-badge pill variant="transparent" class="px-0">{{ data.item.name }}</b-badge>
+                  <b-link :href="'https://etherscan.io/address/' + data.item.contract" target="_blank">
+                    <b-badge pill variant="transparent" class="px-0">{{ data.item.name }}</b-badge>
+                  </b-link>
                 </template>
                 <template #cell(approvalType)="data">
                   <b-badge pill variant="transparent" class="px-0">{{ data.item.approvalType }}</b-badge>
