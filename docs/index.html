@@ -159,7 +159,7 @@
                   </b-form-checkbox>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-1 pr-1">
-                  <b-form-checkbox size="sm" v-model.trim="settings.eventsTable.includeFluff" @input="saveSettings" v-b-popover.hover.bottom="'Include unimportant events like ERC-721 Approval to Null:0x0000...0000'">
+                  <b-form-checkbox size="sm" v-model.trim="settings.eventsTable.includeFluff" @input="saveSettings" v-b-popover.hover.bottom="'Include less important events like ERC-721 Approval to Null:0x0000...0000'">
                     Fluff
                   </b-form-checkbox>
                 </div>
