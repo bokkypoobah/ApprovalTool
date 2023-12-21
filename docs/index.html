@@ -806,12 +806,12 @@
             if (!devMode) {
               await this.syncApprovalEvents(provider, latestBlockNumber);
             }
-            // if (!devMode) {
-              await this.syncBlockTimestamps(provider);
-            // }
             if (!devMode) {
-              await this.syncAccounts(provider);
+              await this.syncBlockTimestamps(provider);
             }
+            // if (!devMode) {
+              await this.syncAccounts(provider);
+            // }
             if (!devMode) {
               await this.processData(provider);
             }
@@ -932,15 +932,18 @@
           async syncAccounts(provider) {
             console.log(moment().format("HH:mm:ss") + " syncAccounts BEGIN");
             const accounts = this.accounts;
+            if (!(this.chainId in accounts)) {
+              accounts[this.chainId] = {};
+            }
             const newAccountsMap = {};
             for (const event of this.events) {
-              if (!(event.owner in accounts) && !(event.owner in newAccountsMap)) {
+              if (!(event.owner in accounts[this.chainId]) && !(event.owner in newAccountsMap)) {
                 newAccountsMap[event.owner] = { source: "owner" };
               }
-              if (!(event.owner in accounts) && !(event.contract in newAccountsMap)) {
+              if (!(event.owner in accounts[this.chainId]) && !(event.contract in newAccountsMap)) {
                 newAccountsMap[event.contract] = { source: "contracts" };
               }
-              if (!(event.owner in accounts) && !(event.spender in newAccountsMap)) {
+              if (!(event.owner in accounts[this.chainId]) && !(event.spender in newAccountsMap)) {
                 newAccountsMap[event.spender] = { source: "spenders" };
               }
             }
@@ -999,17 +1002,18 @@
                   accountData.type = "unknown0";
                 }
               }
-              accounts[account] = accountData;
+              accounts[this.chainId][account] = accountData;
               this.sync.completed++;
             }
-            for (const [account, accountData] of Object.entries(accounts)) {
+            for (const [account, accountData] of Object.entries(accounts[this.chainId])) {
               if (!(["erc20", "erc721", "erc1155", "ftexchange", "nftexchange"].includes(accountData.type)) && !(account in CUSTOMNAMES)) {
                 const allnames = await ensReverseRecordsContract.getNames([account]);
                 if (allnames.length >= 0 && allnames[0].length > 0) {
-                  accounts[account].name = allnames[0];
+                  accounts[this.chainId][account].name = allnames[0];
                 }
               }
             }
+            console.log(moment().format("HH:mm:ss") + " syncAccounts - accounts:" + JSON.stringify(accounts));
             localStorage.approvalAccounts = JSON.stringify(accounts);
             Vue.set(this, 'accounts', accounts);
             console.log(moment().format("HH:mm:ss") + " syncAccounts END");
