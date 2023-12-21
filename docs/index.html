@@ -166,10 +166,10 @@
                 <div class="mt-0 flex-grow-1">
                 </div>
                 <div v-if="!sync.section" class="mt-0 pr-1">
-                  <b-button size="sm" :disabled="accountsToSearch.length == 0" @click="syncIt(false)" variant="primary" v-b-popover.hover.bottom="'Sync blockchain approval events'">Sync</b-button>
+                  <b-button size="sm" :disabled="accountsToSearch.length == 0" @click="saveSettings(); syncIt(false);" variant="primary" v-b-popover.hover.bottom="'Sync blockchain approval events'">Sync</b-button>
                 </div>
                 <div v-if="!sync.section" class="mt-0 pr-1">
-                  <b-button size="sm" :disabled="accountsToSearch.length == 0" @click="syncIt(true)" variant="outline-primary" v-b-popover.hover.bottom="'This will do dev things'">Dev</b-button>
+                  <b-button size="sm" :disabled="accountsToSearch.length == 0" @click="saveSettings(); syncIt(true);" variant="outline-primary" v-b-popover.hover.bottom="'This will do dev things'">Dev</b-button>
                 </div>
                 <div v-if="sync.section" class="mt-1 p-0" style="width: 350px;">
                   <b-progress height="1.5rem" :max="sync.total" show-progress :animated="!sync.section" :variant="sync.section ? 'success' : 'secondary'" v-b-popover.hover.bottom="'Click the button on the right to stop this process'">
@@ -809,12 +809,12 @@
             if (!devMode) {
               await this.syncBlockTimestamps(provider);
             }
-            // if (!devMode) {
-              await this.syncAccounts(provider);
-            // }
             if (!devMode) {
-              await this.processData(provider);
+              await this.syncAccounts(provider);
             }
+            // if (!devMode) {
+              await this.processData(provider);
+            // }
             this.sync.section = null;
             this.sync.halt = false;
           },
@@ -1013,7 +1013,6 @@
           },
 
           async processData(provider) {
-            // TODO: Move ERC-20 allowance call outside loop
             console.log(moment().format("HH:mm:ss") + " processData BEGIN");
             const accounts = this.accounts;
             for (const [eventIndex, event] of this.events.entries()) {
@@ -1028,11 +1027,7 @@
                   if (!(event.owner in account.approvals)) {
                     account.approvals[event.owner] = {};
                   }
-                  // Get current ERC-20 allowance as this amount is reduced by `transferFrom(...)` calls
-                  // account.approvals[event.owner][event.spender] = event.value;
-                  const erc20Contract = new ethers.Contract(contract, ERC20ABI, provider);
-                  const newValue = await erc20Contract.allowance(event.owner, event.spender);
-                  account.approvals[event.owner][event.spender] = newValue.toString();
+                  account.approvals[event.owner][event.spender] = event.value;
                 } else if (account.type == "erc721") {
                   if (event.eventName == "Approval") {
                     if (!('approvals' in account)) {
@@ -1063,6 +1058,21 @@
                 Vue.set(this.accounts, contract, account);
               } else {
                 console.log("Account: " + contract + " not found");
+              }
+            }
+            // Get current ERC-20 allowances as these amounts are reduced by `transferFrom(...)` calls
+            for (const [account, accountData] of Object.entries(accounts)) {
+              if (accountData.type == "erc20") {
+                for (const owner of this.accountsToSearch) {
+                  const approvals = 'approvals' in accountData && accountData.approvals && accountData.approvals[owner] || {};
+                  for (const [spender, approved] of Object.entries(approvals)) {
+                    const erc20Contract = new ethers.Contract(account, ERC20ABI, provider);
+                    const newValue = await erc20Contract.allowance(owner, spender);
+                    console.log(account + ", " + owner + ", " + spender + " => " + approved + " to " + newValue.toString());
+                    accountData.approvals[owner][spender] = newValue.toString();
+                    Vue.set(this.accounts, account, accountData);
+                  }
+                }
               }
             }
             console.log("accounts: " + JSON.stringify(accounts, null, 2));
@@ -1231,6 +1241,9 @@
               }
             }
           }
+          // console.log("this.events: " + JSON.stringify(this.events));
+          // console.log("this.accounts: " + JSON.stringify(this.accounts));
+          // console.log("this.blockTimestamps: " + JSON.stringify(this.blockTimestamps));
         },
       })
     </script>
