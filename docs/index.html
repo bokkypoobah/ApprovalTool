@@ -815,12 +815,12 @@
             if (!devMode) {
               await this.syncApprovalEvents(provider, latestBlockNumber);
             }
-            // if (!devMode) {
-              await this.syncBlockTimestamps(provider);
-            // }
             if (!devMode) {
-              await this.syncAccounts(provider);
+              await this.syncBlockTimestamps(provider);
             }
+            // if (!devMode) {
+              await this.syncAccounts(provider);
+            // }
             if (!devMode) {
               await this.processData(provider);
             }
@@ -938,48 +938,31 @@
           async syncAccounts(provider) {
             // TODO: Incremental check
             console.log(moment().format("HH:mm:ss") + " syncAccounts BEGIN");
-            const ownersMap = {};
-            const contractsMap = {};
-            const spendersMap = {};
+            const accounts = this.accounts;
+            const newAccountsMap = {};
             for (const event of this.events) {
-              if (!(event.owner in ownersMap)) {
-                ownersMap[event.owner] = true;
+              if (!(event.owner in accounts) && !(event.owner in newAccountsMap)) {
+                newAccountsMap[event.owner] = { source: "owner" };
               }
-              if (!(event.contract in contractsMap)) {
-                contractsMap[event.contract] = true;
+              if (!(event.owner in accounts) && !(event.contract in newAccountsMap)) {
+                newAccountsMap[event.contract] = { source: "contracts" };
               }
-              if (!(event.spender in spendersMap)) {
-                spendersMap[event.spender] = true;
-              }
-            }
-            const owners = Object.keys(ownersMap);
-            const contracts = Object.keys(contractsMap);
-            const spenders = Object.keys(spendersMap);
-            const accounts = {};
-            for (const account of owners) {
-              accounts[account] = { source: "owner" };
-            }
-            for (const account of contracts) {
-              if (!(account in accounts)) {
-                accounts[account] = { source: "contracts" };
+              if (!(event.owner in accounts) && !(event.spender in newAccountsMap)) {
+                newAccountsMap[event.spender] = { source: "spenders" };
               }
             }
-            for (const account of spenders) {
-              if (!(account in accounts)) {
-                accounts[account] = { source: "spenders" };
-              }
-            }
+            console.log("newAccountsMap: " + JSON.stringify(newAccountsMap, null, 2));
             const erc721Helper = new ethers.Contract(ERC721HELPERADDRESS, ERC721HELPERABI, provider);
-            const accountsToCheck = [...owners, ...contracts, ...spenders];
             this.sync.completed = 0;
-            this.sync.total = accountsToCheck.length;
+            this.sync.total = Object.keys(newAccountsMap).length;
             this.sync.section = 'Addresses';
-            for (const account of accountsToCheck) {
-              if (account in CUSTOMNAMES) {
-                accounts[account].type = CUSTOMNAMES[account][0];
-                accounts[account].symbol = CUSTOMNAMES[account][1];
-                accounts[account].name = CUSTOMNAMES[account][2];
-                accounts[account].decimals = CUSTOMNAMES[account].length >= 4 ? CUSTOMNAMES[account][3] : undefined;
+
+            for (const [account, accountData] of Object.entries(newAccountsMap)) {
+              if ((account in CUSTOMNAMES)) {
+                accountData.type = CUSTOMNAMES[account][0];
+                accountData.symbol = CUSTOMNAMES[account][1];
+                accountData.name = CUSTOMNAMES[account][2];
+                accountData.decimals = CUSTOMNAMES[account].length >= 4 ? CUSTOMNAMES[account][3] : undefined;
               } else {
                 try {
                   const tokenInfos = await erc721Helper.tokenInfo([account], { gasLimit: 1000000 });
@@ -988,45 +971,47 @@
                     const symbol = tokenInfos[1][i];
                     const name = tokenInfos[2][i];
                     if ((mask & MASK_ISEOA) == MASK_ISERC721) {
-                      accounts[account].type = "eoa";
+                      accountData.type = "eoa";
                     } else if ((mask & MASK_ISERC20) == MASK_ISERC20) {
-                      accounts[account].type = "erc20";
-                      accounts[account].symbol = symbol;
-                      accounts[account].name = name;
+                      accountData.type = "erc20";
+                      accountData.symbol = symbol;
+                      accountData.name = name;
                       const erc20Contract = new ethers.Contract(account, ERC20ABI, provider);
                       try {
-                        accounts[account].decimals = await erc20Contract.decimals();
+                        accountData.decimals = await erc20Contract.decimals();
                       } catch (e1) {
-                        accounts[account].decimals = 0;
+                        accountData.decimals = 0;
                       }
                     } else if ((mask & MASK_ISERC721) == MASK_ISERC721) {
-                      accounts[account].type = "erc721";
-                      accounts[account].symbol = symbol;
-                      accounts[account].name = name;
+                      accountData.type = "erc721";
+                      accountData.symbol = symbol;
+                      accountData.name = name;
                     } else {
                       const erc165Abi = [ "function supportsInterface(bytes4 interfaceID) external view returns (bool)" ];
                       const erc165Contract = new ethers.Contract(account, erc165Abi, provider);
                       try {
                         const result = await erc165Contract.supportsInterface(ERC1155_INTERFACE);
-                        console.log(account + " " + result);
+                        // console.log(account + " " + result);
                         if (result) {
-                          accounts[account].type = "erc1155";
+                          accountData.type = "erc1155";
                         } else {
-                          accounts[account].type = "unknown2";
+                          accountData.type = "unknown2";
                         }
                       } catch (e1) {
-                        accounts[account].type = "unknown1";
+                        accountData.type = "unknown1";
                       }
                       // console.log("  " + account + " " + symbol + " " + name + " " + mask);
                     }
                   }
                 } catch (e) {
                   console.log("syncAccounts erc721Helper - ERROR: " + account + ", message: " + e.message);
-                  accounts[account].type = "unknown0";
+                  accountData.type = "unknown0";
                 }
               }
+              // console.log(account + " => " + JSON.stringify(accountData));
               this.sync.completed++;
             }
+            console.log("accounts: " + JSON.stringify(accounts, null, 2));
             localStorage.approvalAccounts = JSON.stringify(accounts);
             Vue.set(this, 'accounts', accounts);
             console.log(moment().format("HH:mm:ss") + " syncAccounts END");
