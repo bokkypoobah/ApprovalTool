@@ -692,14 +692,12 @@
           },
 
           filteredEvents() {
-            // const results = [];
             let results = this.forceRefresh % 2 == 0 ? [] : [];
             for (const event of this.events) {
               let include = true;
               const contractType = this.accounts[event.contract] && this.accounts[event.contract].type || null;
               const decimals = contractType == "erc20" ? this.accounts[event.contract].decimals : undefined;
               if (!this.settings.eventsTable.includeFluff) {
-                // console.log("contractType: " + contractType);
                 if (contractType == "erc721" && event.spender == ADDRESS0) {
                   include = false;
                 }
@@ -937,7 +935,6 @@
           },
 
           async syncAccounts(provider) {
-            // TODO: Incremental check
             console.log(moment().format("HH:mm:ss") + " syncAccounts BEGIN");
             const accounts = this.accounts;
             const newAccountsMap = {};
@@ -952,16 +949,12 @@
                 newAccountsMap[event.spender] = { source: "spenders" };
               }
             }
-            console.log("newAccountsMap: " + JSON.stringify(newAccountsMap, null, 2));
             const erc721Helper = new ethers.Contract(ERC721HELPERADDRESS, ERC721HELPERABI, provider);
             this.sync.completed = 0;
             this.sync.total = Object.keys(newAccountsMap).length;
             this.sync.section = 'Addresses';
 
             for (const [account, accountData] of Object.entries(newAccountsMap)) {
-              // if (["0x03D294E189f1F73540d4B7D29bb85971965374A7", "0x14173a2C8903B53E738C95E601ed89195d863F49", "0xf233d25BF6c1177B918b738ff1009Ed73FDBD4F5"].includes(account)) {
-              //   console.log("CHECKING " + account + " => " + JSON.stringify(accountData));
-              // }
               if ((account in CUSTOMNAMES)) {
                 accountData.type = CUSTOMNAMES[account][0];
                 accountData.symbol = CUSTOMNAMES[account][1];
@@ -970,9 +963,6 @@
               } else {
                 try {
                   const tokenInfos = await erc721Helper.tokenInfo([account], { gasLimit: 1000000 });
-                  // if (["0x03D294E189f1F73540d4B7D29bb85971965374A7", "0x14173a2C8903B53E738C95E601ed89195d863F49", "0xf233d25BF6c1177B918b738ff1009Ed73FDBD4F5"].includes(account)) {
-                  //   console.log("CHECKING 1 " + account + " => " + JSON.stringify(tokenInfos));
-                  // }
                   for (let i = 0; i < tokenInfos[0].length; i++) {
                     const mask = tokenInfos[0][i].toNumber();
                     const symbol = tokenInfos[1][i];
@@ -990,9 +980,6 @@
                         accountData.decimals = 0;
                       }
                     } else if ((mask & MASK_ISERC721) == MASK_ISERC721) {
-                      // if (["0x03D294E189f1F73540d4B7D29bb85971965374A7", "0x14173a2C8903B53E738C95E601ed89195d863F49", "0xf233d25BF6c1177B918b738ff1009Ed73FDBD4F5"].includes(account)) {
-                      //   console.log("CHECKING 2 " + account + " => " + JSON.stringify(tokenInfos));
-                      // }
                       accountData.type = "erc721";
                       accountData.symbol = symbol;
                       accountData.name = name;
@@ -1001,7 +988,6 @@
                       const erc165Contract = new ethers.Contract(account, erc165Abi, provider);
                       try {
                         const result = await erc165Contract.supportsInterface(ERC1155_INTERFACE);
-                        // console.log(account + " " + result);
                         if (result) {
                           accountData.type = "erc1155";
                         } else {
@@ -1019,8 +1005,6 @@
                 }
               }
               accounts[account] = accountData;
-              // Vue.set(this.accounts, account, accountData);
-              // console.log(account + " => " + JSON.stringify(accountData));
               this.sync.completed++;
             }
             // console.log("accounts: " + JSON.stringify(accounts, null, 2));
