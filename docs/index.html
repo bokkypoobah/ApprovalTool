@@ -809,12 +809,12 @@
             if (!devMode) {
               await this.syncBlockTimestamps(provider);
             }
-            // if (!devMode) {
-              await this.syncAccounts(provider);
-            // }
             if (!devMode) {
-              await this.processData(provider);
+              await this.syncAccounts(provider);
             }
+            // if (!devMode) {
+              await this.processData(provider);
+            // }
             this.sync.section = null;
             this.sync.halt = false;
           },
@@ -1024,7 +1024,7 @@
             const accounts = this.accounts;
             for (const [eventIndex, event] of this.events.entries()) {
               const contract = event.contract;
-              const account = accounts[contract];
+              const account = accounts[this.chainId] && accounts[this.chainId][contract] || null;
               // console.log(event.blockNumber + "." + event.txIndex + "." + event.logIndex + " " + JSON.stringify(event) + " " + JSON.stringify(account));
               if (account) {
                 if (account.type == "erc20") {
@@ -1062,13 +1062,13 @@
                   }
                   account.approvalsForAll[event.owner][event.spender] = event.value;
                 }
-                Vue.set(this.accounts, contract, account);
+                Vue.set(this.accounts[this.chainId], contract, account);
               } else {
                 console.log("Account: " + contract + " not found");
               }
             }
             // Get current ERC-20 allowances as these amounts are reduced by `transferFrom(...)` calls
-            for (const [account, accountData] of Object.entries(accounts)) {
+            for (const [account, accountData] of Object.entries(accounts[this.chainId])) {
               if (accountData.type == "erc20") {
                 for (const owner of this.accountsToSearch) {
                   const approvals = 'approvals' in accountData && accountData.approvals && accountData.approvals[owner] || {};
@@ -1077,7 +1077,7 @@
                     const newValue = await erc20Contract.allowance(owner, spender);
                     console.log(account + ", " + owner + ", " + spender + " => " + approved + " to " + newValue.toString());
                     accountData.approvals[owner][spender] = newValue.toString();
-                    Vue.set(this.accounts, account, accountData);
+                    Vue.set(this.accounts[this.chainId], account, accountData);
                   }
                 }
               }
