@@ -619,14 +619,6 @@
           },
           filteredSortedApprovals() {
             let results = this.filteredApprovals;
-
-            // approvalsSortOptions: [
-            //   { value: 'nameasc', text: '▲ Name' },
-            //   { value: 'namedsc', text: '▼ Name' },
-            //   { value: 'typenameasc', text: '▲ Type, ▲ Name' },
-            //   { value: 'typenamedsc', text: '▼ Type, ▼ Name' },
-            // ],
-
             if (this.settings.approvalsTable.sortOption == 'nameasc') {
               results.sort((a, b) => {
                 if (('' + a.name).localeCompare(b.name) == 0) {
@@ -687,7 +679,7 @@
             return results;
           },
           pagedFilteredSortedApprovals() {
-            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedApprovals - results[0..9]: " + JSON.stringify(this.filteredSortedApprovals.slice(0, 10), null, 2));
+            // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedApprovals - results[0..9]: " + JSON.stringify(this.filteredSortedApprovals.slice(0, 10), null, 2));
             return this.filteredSortedApprovals.slice((this.settings.approvalsTable.currentPage - 1) * this.settings.approvalsTable.pageSize, this.settings.approvalsTable.currentPage * this.settings.approvalsTable.pageSize);
           },
 
