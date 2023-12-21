@@ -695,7 +695,7 @@
                 }
               }
               if (include) {
-                const timestamp = this.blockTimestamps[event.blockNumber] || null;
+                const timestamp = this.blockTimestamps[this.chainId] && this.blockTimestamps[this.chainId][event.blockNumber] || null;
                 results.push({ ...event, type: contractType, decimals, timestamp });
               }
             }
@@ -806,15 +806,15 @@
             if (!devMode) {
               await this.syncApprovalEvents(provider, latestBlockNumber);
             }
-            if (!devMode) {
+            // if (!devMode) {
               await this.syncBlockTimestamps(provider);
-            }
+            // }
             if (!devMode) {
               await this.syncAccounts(provider);
             }
-            // if (!devMode) {
+            if (!devMode) {
               await this.processData(provider);
-            // }
+            }
             this.sync.section = null;
             this.sync.halt = false;
           },
@@ -878,9 +878,12 @@
           async syncBlockTimestamps(provider) {
             console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps BEGIN");
             const blockTimestamps = this.blockTimestamps;
+            if (!(this.chainId in blockTimestamps)) {
+              blockTimestamps[this.chainId] = {};
+            }
             const newBlockNumbersMap = {};
             for (const event of this.events) {
-              if (!(event.blockNumber in blockTimestamps) && !(event.blockNumber in newBlockNumbersMap)) {
+              if (!(event.blockNumber in blockTimestamps[this.chainId]) && !(event.blockNumber in newBlockNumbersMap)) {
                 newBlockNumbersMap[event.blockNumber] = true;
               }
             }
@@ -892,7 +895,7 @@
             if (NEWMETHOD) {
               for (let i = 0; i < newBlockNumbers.length && !this.sync.halt; i++) {
                 const block = await provider.getBlock(parseInt(newBlockNumbers[i]));
-                blockTimestamps[newBlockNumbers[i]] = parseInt(block.timestamp);
+                blockTimestamps[this.chainId][newBlockNumbers[i]] = parseInt(block.timestamp);
                 this.sync.completed++;
               }
             } else {
@@ -915,7 +918,7 @@
                 });
                 const timestamps = data.data && data.data.blocks || [];
                 for (const timestampItem of timestamps) {
-                  blockTimestamps[timestampItem.number] = parseInt(timestampItem.timestamp);
+                  blockTimestamps[this.chainId][timestampItem.number] = parseInt(timestampItem.timestamp);
                 }
                 this.sync.completed += timestamps.length;
                 console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps " + this.sync.completed + " of " + newBlockNumbers.length);
