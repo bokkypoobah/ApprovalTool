@@ -354,7 +354,12 @@
                 <template #cell(timestamp)="data">
                   <font size="-1">
                     <b-link :href="'https://etherscan.io/tx/' + data.item.txHash" v-b-popover.hover.bottom="'Block #' + commify0(data.item.blockNumber) + ', txIndex: ' + data.item.txIndex + ', logIndex: ' + data.item.logIndex" target="_blank">
-                      {{ formatTimestamp(data.item.timestamp) }}
+                      <span v-if="data.item.timestamp">
+                        {{ formatTimestamp(data.item.timestamp) }}
+                      </span>
+                      <span v-else>
+                        {{ '#' + commify0(data.item.blockNumber) }}
+                      </span>
                     </b-link>
                     <!-- <br />
                     <font size="-1">
@@ -699,7 +704,7 @@
                 }
               }
               if (include) {
-                const timestamp = this.blockTimestamps[event.blockNumber] || "(unknown)";
+                const timestamp = this.blockTimestamps[event.blockNumber] || null;
                 results.push({ ...event, type: contractType, decimals, timestamp });
               }
             }
