@@ -59,29 +59,33 @@ URL: [https://bokkypoobah.github.io/ApprovalTool/](https://bokkypoobah.github.io
 
 ### Sample Screens
 
-#### Sample Approvals Screen
+#### Sample Approvals Screen - Attached Account
 
-<kbd><img src="images/SampleScreen_Approvals_20231119.png" /></kbd>
+<kbd><img src="images/SampleScreen_Approvals_20231121.png" /></kbd>
 
-#### Sample Events Screen
+#### Sample Events Screen - Attached Account
 
-<kbd><img src="images/SampleScreen_Events_20231119.png" /></kbd>
+<kbd><img src="images/SampleScreen_Events_20231121.png" /></kbd>
+
+#### Sample Events Screen - Specified Accounts
+
+<kbd><img src="images/SampleScreen_Approvals_SpecifiedAccounts_20231121.png" /></kbd>
 
 #### Sample ERC-20 Approval Screen
 
-<kbd><img src="images/SampleScreen_UpdateERC20_20231119.png" /></kbd>
+<kbd><img src="images/SampleScreen_UpdateERC20_20231121.png" /></kbd>
 
 #### Sample ERC-721 Approval Screen
 
-<kbd><img src="images/SampleScreen_UpdateERC721Approval_20231119.png" /></kbd>
+<kbd><img src="images/SampleScreen_UpdateERC721Approval_20231121.png" /></kbd>
 
 #### Sample ERC-721 ApprovalForAll Screen
 
-<kbd><img src="images/SampleScreen_UpdateERC721ApprovalForAll_20231119.png" /></kbd>
+<kbd><img src="images/SampleScreen_UpdateERC721ApprovalForAll_20231121.png" /></kbd>
 
 #### Sample ERC-1155 ApprovalForAll Screen
 
-<kbd><img src="images/SampleScreen_UpdateERC1155ApprovalForAll_20231119.png" /></kbd>
+<kbd><img src="images/SampleScreen_UpdateERC1155ApprovalForAll_20231121.png" /></kbd>
 
 <br />
 
