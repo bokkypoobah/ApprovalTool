@@ -949,6 +949,7 @@
                 newAccountsMap[event.spender] = { source: "spenders" };
               }
             }
+            const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
             const erc721Helper = new ethers.Contract(ERC721HELPERADDRESS, ERC721HELPERABI, provider);
             this.sync.completed = 0;
             this.sync.total = Object.keys(newAccountsMap).length;
@@ -996,7 +997,6 @@
                       } catch (e1) {
                         accountData.type = "unknown1";
                       }
-                      // console.log("  " + account + " " + symbol + " " + name + " " + mask);
                     }
                   }
                 } catch (e) {
@@ -1007,7 +1007,14 @@
               accounts[account] = accountData;
               this.sync.completed++;
             }
-            // console.log("accounts: " + JSON.stringify(accounts, null, 2));
+            for (const [account, accountData] of Object.entries(accounts)) {
+              if (!(["erc20", "erc721", "erc1155", "ftexchange", "nftexchange"].includes(accountData.type)) && !(account in CUSTOMNAMES)) {
+                const allnames = await ensReverseRecordsContract.getNames([account]);
+                if (allnames.length >= 0 && allnames[0].length > 0) {
+                  accounts[account].name = allnames[0];
+                }
+              }
+            }
             localStorage.approvalAccounts = JSON.stringify(accounts);
             Vue.set(this, 'accounts', accounts);
             console.log(moment().format("HH:mm:ss") + " syncAccounts END");
