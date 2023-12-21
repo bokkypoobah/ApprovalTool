@@ -840,7 +840,7 @@
             this.sync.completed = 0;
             this.sync.total = 0;
             this.sync.section = 'Approval Events';
-            console.log(moment().format("HH:mm:ss") + " syncApprovalEvents - accountsToSearch: " + JSON.stringify(this.accountsToSearch));
+            // console.log(moment().format("HH:mm:ss") + " syncApprovalEvents - accountsToSearch: " + JSON.stringify(this.accountsToSearch));
             const accountsAs32Bytes = this.accountsToSearch.map(e => '0x000000000000000000000000' + e.substring(2, 42).toLowerCase());
             const approvalLogs = await provider.getLogs({
               address: null,
