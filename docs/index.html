@@ -52,7 +52,7 @@
           <b-navbar-nav class="ml-auto">
             <b-nav-item size="sm" @click="settings.tabIndex = 0; saveSettings();" :active="settings.tabIndex == 0" active-class="active" v-b-popover.hover="'Approvals'">Approvals</b-nav-item>
             <b-nav-item size="sm" @click="settings.tabIndex = 1; saveSettings();" :active="settings.tabIndex == 1" active-class="active" v-b-popover.hover="'Events'">Events</b-nav-item>
-            <!-- <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'Accounts'">Accounts</b-nav-item> -->
+            <b-nav-item size="sm" @click="settings.tabIndex = 2; saveSettings();" :active="settings.tabIndex == 2" active-class="active" v-b-popover.hover="'Accounts'">Accounts</b-nav-item>
             <b-avatar v-if="coinbase && coinbase != nameOrAddress(coinbase)" rounded variant="light" size="3.0rem" :src="'https://metadata.ens.domains/mainnet/avatar/' + nameOrAddress(coinbase, 100)" v-b-popover.hover="'Your ENS avatar if set'"></b-avatar>
             <b-button size="sm" variant="outline-primary" class="ml-1" @click="connectToWeb3(); processNewBlock(0);" v-b-popover.hover.bottom="'Click to update wallet'">{{ coinbase ? nameOrAddress(coinbase, 16) : 'Connect' }}</b-button>
           </b-navbar-nav>
@@ -200,17 +200,26 @@
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredEvents.length) + '/' + commify0(totalEvents) }}</font>
                 </div>
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                  <font size="-2" v-b-popover.hover.bottom="'# accounts'">{{ commify0(totalAccounts) }}</font>
+                </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.approvalsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedApprovals.length" :per-page="settings.approvalsTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.eventsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedEvents.length" :per-page="settings.eventsTable.pageSize" style="height: 0;"></b-pagination>
                 </div>
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                  <b-pagination size="sm" v-model="settings.accountsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedAccounts.length" :per-page="settings.accountsTable.pageSize" style="height: 0;"></b-pagination>
+                </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.approvalsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.eventsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
+                </div>
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.accountsTable.pageSize" @change="saveSettings();" :options="pageSizes" v-b-popover.hover.bottom="'Yeah. Page size'"></b-form-select>
                 </div>
               </div>
             </b-card-text>
@@ -380,6 +389,7 @@
 
               <b-card-text v-if="settings.tabIndex == 2 && !settings.showInfo" class="mt-5">
                 Work in progress. See <b-link size="sm" @click="settings.tabIndex = 1; saveSettings();" v-b-popover.hover="'Events'">Events</b-link>
+                {{ pagedFilteredSortedAccounts }}
               </b-card-text>
 
               <b-row v-if="false" class="m-0 p-0">
@@ -458,7 +468,13 @@
               pageSize: 100,
               sortOption: 'txorderdsc',
             },
-            version: 11,
+            accountsTable: {
+              filter: null,
+              currentPage: 1,
+              pageSize: 100,
+              sortOption: 'nameasc',
+            },
+            version: 12,
           },
           sync: {
             section: null,
@@ -485,6 +501,12 @@
           eventsSortOptions: [
             { value: 'txorderasc', text: '▲ TxOrder' },
             { value: 'txorderdsc', text: '▼ TxOrder' },
+          ],
+          accountsSortOptions: [
+            { value: 'addressasc', text: '▲ Address' },
+            { value: 'addressdsc', text: '▼ Address' },
+            { value: 'nameasc', text: '▲ Name' },
+            { value: 'namedsc', text: '▼ Name' },
           ],
           pageSizes: [
             { value: 5, text: '5' },
@@ -724,6 +746,20 @@
           pagedFilteredSortedEvents() {
             // console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedEvents - results[0..9]: " + JSON.stringify(this.filteredSortedEvents.slice(0, 10), null, 2));
             return this.filteredSortedEvents.slice((this.settings.eventsTable.currentPage - 1) * this.settings.eventsTable.pageSize, this.settings.eventsTable.currentPage * this.settings.eventsTable.pageSize);
+          },
+
+          totalAccounts() {
+            const accounts = this.accounts[this.chainId] || {};
+            return Object.keys(accounts).length;
+          },
+
+          filteredSortedAccounts() {
+            return this.filteredSortedEvents;
+          },
+
+          pagedFilteredSortedAccounts() {
+            console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAccounts - results[0..9]: " + JSON.stringify(this.filteredSortedAccounts.slice(0, 10), null, 2));
+            return this.filteredSortedAccounts.slice((this.settings.accountsTable.currentPage - 1) * this.settings.accountsTable.pageSize, this.settings.accountsTable.currentPage * this.settings.accountsTable.pageSize);
           },
 
         },
