@@ -198,7 +198,7 @@
                   <font size="-2" v-b-popover.hover.bottom="'# approvals'">{{ commify0(filteredApprovals.length) + '/' + commify0(approvals.length) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredEvents.length) + '/' + commify0(events.length) }}</font>
+                  <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredEvents.length) + '/' + commify0(totalEvents) }}</font>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.approvalsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedApprovals.length" :per-page="settings.approvalsTable.pageSize" style="height: 0;"></b-pagination>
@@ -652,6 +652,17 @@
             return this.filteredSortedApprovals.slice((this.settings.approvalsTable.currentPage - 1) * this.settings.approvalsTable.pageSize, this.settings.approvalsTable.currentPage * this.settings.approvalsTable.pageSize);
           },
 
+          totalEvents() {
+            let result = this.forceRefresh % 2 == 0 ? 0 : 0;
+            const events = this.events[this.chainId] || {};
+            for (const blockNumber of Object.keys(events)) {
+              const blockNumberData = events[blockNumber];
+              for (const logIndex of Object.keys(blockNumberData)) {
+                result++;
+              }
+            }
+            return result;
+          },
           filteredEvents() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
             const events = this.events[this.chainId] || {};
