@@ -1014,7 +1014,7 @@
                 }
               }
             }
-            console.log(moment().format("HH:mm:ss") + " syncAccounts - accounts[" + this.chainId + "]:" + JSON.stringify(accounts[this.chainId]));
+            console.log(moment().format("HH:mm:ss") + " syncAccounts - accounts[" + this.chainId + "]:" + JSON.stringify(accounts[this.chainId] || {}, null, 2));
             localStorage.approvalAccounts = JSON.stringify(accounts);
             Vue.set(this, 'accounts', accounts);
             console.log(moment().format("HH:mm:ss") + " syncAccounts END");
@@ -1083,7 +1083,7 @@
                 }
               }
             }
-            console.log(moment().format("HH:mm:ss") + " processData - accounts[" + this.chainId + "]: " + JSON.stringify(accounts[this.chainId], null, 2));
+            console.log(moment().format("HH:mm:ss") + " processData - accounts[" + this.chainId + "]: " + JSON.stringify(accounts[this.chainId] || {}, null, 2));
             localStorage.approvalAccounts = JSON.stringify(accounts);
             Vue.set(this, 'accounts', accounts);
             // TODO: UI not updating
