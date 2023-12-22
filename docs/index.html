@@ -949,7 +949,7 @@
               }
             }
             const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
-            const erc721Helper = new ethers.Contract(ERC721HELPERADDRESS, ERC721HELPERABI, provider);
+            // const erc721Helper = new ethers.Contract(ERC721HELPERADDRESS, ERC721HELPERABI, provider);
             this.sync.completed = 0;
             this.sync.total = Object.keys(newAccountsMap).length;
             this.sync.section = 'Addresses';
@@ -963,36 +963,34 @@
                 accountData.decimals = CUSTOMNAMES[account].length >= 4 ? CUSTOMNAMES[account][3] : undefined;
               } else {
                 let accountType = null;
-                const code = await provider.getCode(account);
-                console.log(account + " => " + code.length);
-                if (code.length == 2) {
-                  accountType = "eoa";
-                }
-                const erc165Contract = new ethers.Contract(account, erc165Abi, provider);
-                if (!accountType) {
-                  try {
-                    const result = await erc165Contract.supportsInterface(ERC721_INTERFACE);
-                    if (result) {
-                      accountType = "erc721";
-                    }
-                  } catch (e1) {
-                  }
-                }
-                if (!accountType) {
-                  try {
-                    const result = await erc165Contract.supportsInterface(ERC1155_INTERFACE);
-                    if (result) {
-                      accountType = "erc1155";
-                    }
-                  } catch (e1) {
-                  }
-                }
                 let symbol = undefined;
                 let name = undefined;
                 let decimals = undefined;
                 let totalSupply = undefined;
-                const erc20Contract = new ethers.Contract(account, ERC20ABI, provider);
-                if (accountType != "eoa") {
+                const code = await provider.getCode(account);
+                if (code.length == 2) {
+                  accountType = "eoa";
+                } else {
+                  const erc165Contract = new ethers.Contract(account, erc165Abi, provider);
+                  if (!accountType) {
+                    try {
+                      const result = await erc165Contract.supportsInterface(ERC721_INTERFACE);
+                      if (result) {
+                        accountType = "erc721";
+                      }
+                    } catch (e1) {
+                    }
+                  }
+                  if (!accountType) {
+                    try {
+                      const result = await erc165Contract.supportsInterface(ERC1155_INTERFACE);
+                      if (result) {
+                        accountType = "erc1155";
+                      }
+                    } catch (e1) {
+                    }
+                  }
+                  const erc20Contract = new ethers.Contract(account, ERC20ABI, provider);
                   try {
                     symbol = await erc20Contract.symbol();
                   } catch (e1) {
@@ -1010,11 +1008,11 @@
                   } catch (e1) {
                   }
                 }
-                console.log(account + " => " + code.length + " " + accountType + ", symbol: " + symbol + ", name: " + name + ", decimals: " + decimals + ", totalSupply: " + totalSupply);
+                console.log(account + " => code.length: " + code.length + ", accountType: " + accountType + ", symbol: " + symbol + ", name: " + name + ", decimals: " + decimals + ", totalSupply: " + totalSupply);
                 if (!accountType && decimals && totalSupply) {
                   accountType = "erc20";
-                  accountData.decimals = decimals;
-                  accountData.totalSupply = totalSupply;
+                  accountData.decimals = parseInt(decimals);
+                  accountData.totalSupply = totalSupply.toString();
                 }
                 accountData.type = accountType || "unknown";
                 accountData.symbol = symbol;
@@ -1065,11 +1063,14 @@
               accounts[this.chainId][account] = accountData;
               this.sync.completed++;
             }
-            for (const [account, accountData] of Object.entries(accounts[this.chainId])) {
-              if (!(["erc20", "erc721", "erc1155", "ftexchange", "nftexchange"].includes(accountData.type)) && !(account in CUSTOMNAMES)) {
-                const allnames = await ensReverseRecordsContract.getNames([account]);
-                if (allnames.length >= 0 && allnames[0].length > 0) {
-                  accounts[this.chainId][account].name = allnames[0];
+            // ETH Mainnet ENS
+            if (this.chainId == 1) {
+              for (const [account, accountData] of Object.entries(accounts[this.chainId])) {
+                if (!(["erc20", "erc721", "erc1155", "ftexchange", "nftexchange"].includes(accountData.type)) && !(account in CUSTOMNAMES)) {
+                  const allnames = await ensReverseRecordsContract.getNames([account]);
+                  if (allnames.length >= 0 && allnames[0].length > 0) {
+                    accounts[this.chainId][account].name = allnames[0];
+                  }
                 }
               }
             }
