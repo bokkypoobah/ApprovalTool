@@ -1105,6 +1105,7 @@
                   const allnames = await ensReverseRecordsContract.getNames([account]);
                   if (allnames.length >= 0 && allnames[0].length > 0) {
                     accounts[this.chainId][account].name = allnames[0];
+                    console.log(account + " => " + allnames[0]);
                   }
                 }
               }
@@ -1240,8 +1241,9 @@
           },
           nameOrAddress(address, length = 0) {
             let result = null;
-            if (address in this.accounts) {
-              result = this.accounts[address].name || address;
+            const accounts = this.accounts[this.chainId] || {};
+            if (address in accounts) {
+              result = accounts[address].name || address;
             } else {
               result = address;
             }
