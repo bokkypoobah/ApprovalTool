@@ -810,12 +810,12 @@
             if (!devMode) {
               await this.syncBlockTimestamps(provider);
             }
-            if (!devMode) {
-              await this.syncAccounts(provider);
-            }
             // if (!devMode) {
-              await this.processData(provider);
+              await this.syncAccounts(provider, devMode);
             // }
+            if (!devMode) {
+              await this.processData(provider);
+            }
             this.sync.section = null;
             this.sync.halt = false;
           },
@@ -930,9 +930,9 @@
             console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps END");
           },
 
-          async syncAccounts(provider) {
+          async syncAccounts(provider, devMode) {
             console.log(moment().format("HH:mm:ss") + " syncAccounts BEGIN");
-            const accounts = this.accounts;
+            const accounts = devMode ? {} : this.accounts;
             if (!(this.chainId in accounts)) {
               accounts[this.chainId] = {};
             }
@@ -953,6 +953,7 @@
             this.sync.completed = 0;
             this.sync.total = Object.keys(newAccountsMap).length;
             this.sync.section = 'Addresses';
+            const erc165Abi = [ "function supportsInterface(bytes4 interfaceID) external view returns (bool)" ];
 
             for (const [account, accountData] of Object.entries(newAccountsMap)) {
               if ((account in CUSTOMNAMES)) {
@@ -961,6 +962,51 @@
                 accountData.name = CUSTOMNAMES[account][2];
                 accountData.decimals = CUSTOMNAMES[account].length >= 4 ? CUSTOMNAMES[account][3] : undefined;
               } else {
+                let accountType = null;
+                const code = await provider.getCode(account);
+                console.log(account + " => " + code.length);
+                if (code.length == 2) {
+                  accountType = "eoa";
+                }
+                const erc165Contract = new ethers.Contract(account, erc165Abi, provider);
+                if (!accountType) {
+                  try {
+                    const result = await erc165Contract.supportsInterface(ERC721_INTERFACE);
+                    if (result) {
+                      accountType = "erc721";
+                    }
+                  } catch (e1) {
+                  }
+                }
+                if (!accountType) {
+                  try {
+                    const result = await erc165Contract.supportsInterface(ERC1155_INTERFACE);
+                    if (result) {
+                      accountType = "erc1155";
+                    }
+                  } catch (e1) {
+                  }
+                }
+                let symbol = null;
+                let name = null;
+                let decimals = undefined;
+                const erc20Contract = new ethers.Contract(account, ERC20ABI, provider);
+                if (accountType != "eoa") {
+                  try {
+                    symbol = await erc20Contract.symbol();
+                  } catch (e1) {
+                  }
+                  try {
+                    name = await erc20Contract.name();
+                  } catch (e1) {
+                  }
+                  try {
+                    decimals = await erc20Contract.decimals();
+                  } catch (e1) {
+                  }
+                }
+                console.log(account + " => " + code.length + " " + accountType + " " + symbol + " " + name + " " + decimals);
+
                 try {
                   const tokenInfos = await erc721Helper.tokenInfo([account], { gasLimit: 1000000 });
                   for (let i = 0; i < tokenInfos[0].length; i++) {
