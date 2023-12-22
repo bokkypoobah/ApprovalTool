@@ -686,14 +686,11 @@
 
           filteredEvents() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
-            // console.log(moment().format("HH:mm:ss") + " filteredEvents - events: " + JSON.stringify(this.events, null, 2));
             const events = this.events[this.chainId] || {};
             for (const blockNumber of Object.keys(events).sort((a, b) => { return a - b })) {
               const blockNumberData = events[blockNumber];
-              // console.log("blockNumber: " + blockNumber + " " + JSON.stringify(blockNumberData));
               for (const logIndex of Object.keys(blockNumberData).sort((a, b) => { return a - b })) {
                 const eventData = events[blockNumber][logIndex];
-                console.log("logIndex: " + logIndex + " " + JSON.stringify(eventData));
                   let include = true;
                   const contractType = this.accounts[this.chainId] && this.accounts[this.chainId][eventData.contract] && this.accounts[this.chainId][eventData.contract].type || null;
                   const decimals = contractType == "erc20" ? this.accounts[this.chainId] && this.accounts[this.chainId][eventData.contract] && this.accounts[this.chainId][eventData.contract].decimals : undefined;
@@ -703,30 +700,17 @@
                     }
                   }
                   if (include) {
+                    if (!(this.accountsToSearch.includes(eventData.owner))) {
+                      include = false;
+                    }
+                  }
+                  if (include) {
                     const timestamp = this.blockTimestamps[this.chainId] && this.blockTimestamps[this.chainId][blockNumber] || null;
                     results.push({ blockNumber, logIndex, ...eventData, type: contractType, decimals, timestamp });
                   }
               }
             }
-            // const blockNumbers = Object.keys(events).sort((a, b) => { return b - a });
-            console.log(moment().format("HH:mm:ss") + " filteredEvents - results: " + JSON.stringify(results, null, 2));
-
-
-
-            // for (const event of this.events) {
-            //   let include = true;
-            //   const contractType = this.accounts[this.chainId] && this.accounts[this.chainId][event.contract] && this.accounts[this.chainId][event.contract].type || null;
-            //   const decimals = contractType == "erc20" ? this.accounts[this.chainId] && this.accounts[this.chainId][event.contract] && this.accounts[this.chainId][event.contract].decimals : undefined;
-            //   if (!this.settings.eventsTable.includeFluff) {
-            //     if (contractType == "erc721" && event.spender == ADDRESS0) {
-            //       include = false;
-            //     }
-            //   }
-            //   if (include) {
-            //     const timestamp = this.blockTimestamps[this.chainId] && this.blockTimestamps[this.chainId][event.blockNumber] || null;
-            //     results.push({ ...event, type: contractType, decimals, timestamp });
-            //   }
-            // }
+            // console.log(moment().format("HH:mm:ss") + " filteredEvents - results: " + JSON.stringify(results, null, 2));
             return results;
           },
           filteredSortedEvents() {
@@ -834,9 +818,9 @@
             // if (!devMode) {
               await this.syncEvents(provider, latestBlockNumber);
             // }
-            if (!devMode) {
+            // if (!devMode) {
               await this.syncBlockTimestamps(provider);
-            }
+            // }
             if (!devMode) {
               await this.syncAccounts(provider, devMode);
             }
@@ -912,8 +896,6 @@
                     latestBlockNumber,
                   };
                 }
-                // events.push({ blockNumber: log.blockNumber, txIndex: log.transactionIndex, txHash: log.transactionHash,
-                //   logIndex: log.logIndex, contract: log.address, eventName, owner, spender, value });
               }
             }
             localStorage.approvalEvents = JSON.stringify(events);
@@ -928,10 +910,11 @@
             if (!(this.chainId in blockTimestamps)) {
               blockTimestamps[this.chainId] = {};
             }
+            const events = this.events[this.chainId] || {};
             const newBlockNumbersMap = {};
-            for (const event of this.events) {
-              if (!(event.blockNumber in blockTimestamps[this.chainId]) && !(event.blockNumber in newBlockNumbersMap)) {
-                newBlockNumbersMap[event.blockNumber] = true;
+            for (const blockNumber of Object.keys(events)) {
+              if (!(blockNumber in blockTimestamps[this.chainId]) && !(blockNumber in newBlockNumbersMap)) {
+                newBlockNumbersMap[blockNumber] = true;
               }
             }
             const newBlockNumbers = Object.keys(newBlockNumbersMap);
@@ -983,15 +966,21 @@
               accounts[this.chainId] = {};
             }
             const newAccountsMap = {};
-            for (const event of this.events) {
-              if (!(event.owner in accounts[this.chainId]) && !(event.owner in newAccountsMap)) {
-                newAccountsMap[event.owner] = { source: "owner" };
-              }
-              if (!(event.owner in accounts[this.chainId]) && !(event.contract in newAccountsMap)) {
-                newAccountsMap[event.contract] = { source: "contracts" };
-              }
-              if (!(event.owner in accounts[this.chainId]) && !(event.spender in newAccountsMap)) {
-                newAccountsMap[event.spender] = { source: "spenders" };
+
+            const events = this.events[this.chainId] || {};
+            for (const blockNumber of Object.keys(events).sort((a, b) => { return a - b })) {
+              const blockNumberData = events[blockNumber];
+              for (const logIndex of Object.keys(blockNumberData).sort((a, b) => { return a - b })) {
+                const eventData = events[blockNumber][logIndex];
+                if (!(eventData.owner in accounts[this.chainId]) && !(eventData.owner in newAccountsMap)) {
+                  newAccountsMap[eventData.owner] = { source: "owner" };
+                }
+                if (!(eventData.owner in accounts[this.chainId]) && !(eventData.contract in newAccountsMap)) {
+                  newAccountsMap[eventData.contract] = { source: "contracts" };
+                }
+                if (!(eventData.owner in accounts[this.chainId]) && !(eventData.spender in newAccountsMap)) {
+                  newAccountsMap[eventData.spender] = { source: "spenders" };
+                }
               }
             }
             const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
@@ -1129,49 +1118,54 @@
           async processData(provider) {
             console.log(moment().format("HH:mm:ss") + " processData BEGIN");
             const accounts = this.accounts;
-            for (const [eventIndex, event] of this.events.entries()) {
-              const contract = event.contract;
-              const account = accounts[this.chainId] && accounts[this.chainId][contract] || null;
-              // console.log(event.blockNumber + "." + event.txIndex + "." + event.logIndex + " " + JSON.stringify(event) + " " + JSON.stringify(account));
-              if (account) {
-                if (account.type == "erc20") {
-                  if (!('approvals' in account)) {
-                    account.approvals = {};
-                  }
-                  if (!(event.owner in account.approvals)) {
-                    account.approvals[event.owner] = {};
-                  }
-                  account.approvals[event.owner][event.spender] = event.value;
-                } else if (account.type == "erc721") {
-                  if (event.eventName == "Approval") {
+            const events = this.events[this.chainId] || {};
+            for (const blockNumber of Object.keys(events).sort((a, b) => { return a - b })) {
+              const blockNumberData = events[blockNumber];
+              for (const logIndex of Object.keys(blockNumberData).sort((a, b) => { return a - b })) {
+                const eventData = events[blockNumber][logIndex];
+                const contract = eventData.contract;
+                const account = accounts[this.chainId] && accounts[this.chainId][contract] || null;
+                // console.log(event.blockNumber + "." + event.txIndex + "." + event.logIndex + " " + JSON.stringify(event) + " " + JSON.stringify(account));
+                if (account) {
+                  if (account.type == "erc20") {
                     if (!('approvals' in account)) {
                       account.approvals = {};
                     }
-                    if (!(event.owner in account.approvals)) {
-                      account.approvals[event.owner] = {};
+                    if (!(eventData.owner in account.approvals)) {
+                      account.approvals[eventData.owner] = {};
                     }
-                    account.approvals[event.owner][event.value] = event.spender;
-                  } else if (event.eventName == "ApprovalForAll") {
+                    account.approvals[eventData.owner][eventData.spender] = eventData.value;
+                  } else if (account.type == "erc721") {
+                    if (eventData.eventName == "Approval") {
+                      if (!('approvals' in account)) {
+                        account.approvals = {};
+                      }
+                      if (!(eventData.owner in account.approvals)) {
+                        account.approvals[eventData.owner] = {};
+                      }
+                      account.approvals[eventData.owner][eventData.value] = eventData.spender;
+                    } else if (eventData.eventName == "ApprovalForAll") {
+                      if (!('approvalsForAll' in account)) {
+                        account.approvalsForAll = {};
+                      }
+                      if (!(eventData.owner in account.approvalsForAll)) {
+                        account.approvalsForAll[eventData.owner] = {};
+                      }
+                      account.approvalsForAll[eventData.owner][eventData.spender] = eventData.value;
+                    }
+                  } else if (account.type == "erc1155") {
                     if (!('approvalsForAll' in account)) {
                       account.approvalsForAll = {};
                     }
-                    if (!(event.owner in account.approvalsForAll)) {
-                      account.approvalsForAll[event.owner] = {};
+                    if (!(eventData.owner in account.approvalsForAll)) {
+                      account.approvalsForAll[eventData.owner] = {};
                     }
-                    account.approvalsForAll[event.owner][event.spender] = event.value;
+                    account.approvalsForAll[eventData.owner][eventData.spender] = eventData.value;
                   }
-                } else if (account.type == "erc1155") {
-                  if (!('approvalsForAll' in account)) {
-                    account.approvalsForAll = {};
-                  }
-                  if (!(event.owner in account.approvalsForAll)) {
-                    account.approvalsForAll[event.owner] = {};
-                  }
-                  account.approvalsForAll[event.owner][event.spender] = event.value;
+                  Vue.set(this.accounts[this.chainId], contract, account);
+                } else {
+                  console.log("Account: " + contract + " not found");
                 }
-                Vue.set(this.accounts[this.chainId], contract, account);
-              } else {
-                console.log("Account: " + contract + " not found");
               }
             }
             // Get current ERC-20 allowances as these amounts are reduced by `transferFrom(...)` calls
