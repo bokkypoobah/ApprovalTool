@@ -490,7 +490,7 @@
               pageSize: 100,
               sortOption: 'txorderdsc',
             },
-            version: 10,
+            version: 11,
           },
           sync: {
             section: null,
@@ -498,7 +498,7 @@
             completed: null,
             halt: false,
           },
-          events: [],
+          events: {},
           accounts: {},
           blockTimestamps: {},
           modalApproval: {
@@ -804,15 +804,15 @@
             const latestBlockNumber = block && block.number || null;
             console.log(moment().format("HH:mm:ss") + " syncIt - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
 
-            if (!devMode) {
-              await this.syncApprovalEvents(provider, latestBlockNumber);
-            }
+            // if (!devMode) {
+              await this.syncEvents(provider, latestBlockNumber);
+            // }
             if (!devMode) {
               await this.syncBlockTimestamps(provider);
             }
-            // if (!devMode) {
+            if (!devMode) {
               await this.syncAccounts(provider, devMode);
-            // }
+            }
             if (!devMode) {
               await this.processData(provider);
             }
@@ -820,7 +820,7 @@
             this.sync.halt = false;
           },
 
-          async syncApprovalEvents(provider, latestBlockNumber) {
+          async syncEvents(provider, latestBlockNumber) {
             // ERC-20 Approval (index_topic_1 address owner, index_topic_2 address spender, uint256 value)
             // 0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925
             // ERC-721 Approval (index_topic_1 address owner, index_topic_2 address approved, index_topic_3 uint256 tokenId)
@@ -829,11 +829,11 @@
             // 0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
             // ERC-1155 ApprovalForAll (index_topic_1 address account, index_topic_2 address operator, bool approved)
             // 0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31
-            console.log(moment().format("HH:mm:ss") + " syncApprovalEvents BEGIN");
+            console.log(moment().format("HH:mm:ss") + " syncEvents BEGIN");
             this.sync.completed = 0;
             this.sync.total = 0;
             this.sync.section = 'Approval Events';
-            // console.log(moment().format("HH:mm:ss") + " syncApprovalEvents - accountsToSearch: " + JSON.stringify(this.accountsToSearch));
+            // console.log(moment().format("HH:mm:ss") + " syncEvents - accountsToSearch: " + JSON.stringify(this.accountsToSearch));
             const accountsAs32Bytes = this.accountsToSearch.map(e => '0x000000000000000000000000' + e.substring(2, 42).toLowerCase());
             const approvalLogs = await provider.getLogs({
               address: null,
@@ -848,10 +848,13 @@
               ],
             });
             this.sync.completed = approvalLogs.length;
-            const events = [];
+            const events = this.events;
+            if (!(this.chainId in events)) {
+              events[this.chainId] = {};
+            }
             for (const log of approvalLogs) {
               const topic0 = log.topics[0];
-              const eventName = topic0 == '0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31' ? 'ApprovalForAll': 'Approval';
+              const eventName = topic0 == '0x17307eab39ab6107e8899845ad3d59bd9653f200f220920489ca2b5937696c31' ? 'ApprovalForAll' : 'Approval';
               let owner = null;
               let spender = null;
               let value = null;
@@ -867,13 +870,29 @@
                 console.log("topic length <> 4: " + log.topics.length + " " + JSON.stringify(log));
               }
               if (owner) {
-                events.push({ blockNumber: log.blockNumber, txIndex: log.transactionIndex, txHash: log.transactionHash,
-                  logIndex: log.logIndex, contract: log.address, eventName, owner, spender, value });
+                if (!(log.blockNumber in events[this.chainId])) {
+                  events[this.chainId][log.blockNumber] = {};
+                }
+                if (!(log.logIndex in events[this.chainId][log.blockNumber])) {
+                  events[this.chainId][log.blockNumber][log.logIndex] = {
+                    txIndex: log.transactionIndex,
+                    txHash: log.transactionHash,
+                    contract: log.address,
+                    eventName,
+                    owner,
+                    spender,
+                    value,
+                    latestBlockNumber,
+                  };
+                }
+                // events.push({ blockNumber: log.blockNumber, txIndex: log.transactionIndex, txHash: log.transactionHash,
+                //   logIndex: log.logIndex, contract: log.address, eventName, owner, spender, value });
               }
             }
             localStorage.approvalEvents = JSON.stringify(events);
             Vue.set(this, 'events', events);
-            console.log(moment().format("HH:mm:ss") + " syncApprovalEvents END");
+            // console.log(moment().format("HH:mm:ss") + " syncEvents - events: " + JSON.stringify(events, null, 2));
+            console.log(moment().format("HH:mm:ss") + " syncEvents END");
           },
 
           async syncBlockTimestamps(provider) {
