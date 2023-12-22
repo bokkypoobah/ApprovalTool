@@ -987,9 +987,10 @@
                   } catch (e1) {
                   }
                 }
-                let symbol = null;
-                let name = null;
+                let symbol = undefined;
+                let name = undefined;
                 let decimals = undefined;
+                let totalSupply = undefined;
                 const erc20Contract = new ethers.Contract(account, ERC20ABI, provider);
                 if (accountType != "eoa") {
                   try {
@@ -1004,50 +1005,62 @@
                     decimals = await erc20Contract.decimals();
                   } catch (e1) {
                   }
-                }
-                console.log(account + " => " + code.length + " " + accountType + " " + symbol + " " + name + " " + decimals);
-
-                try {
-                  const tokenInfos = await erc721Helper.tokenInfo([account], { gasLimit: 1000000 });
-                  for (let i = 0; i < tokenInfos[0].length; i++) {
-                    const mask = tokenInfos[0][i].toNumber();
-                    const symbol = tokenInfos[1][i];
-                    const name = tokenInfos[2][i];
-                    if ((mask & MASK_ISEOA) == MASK_ISERC721) {
-                      accountData.type = "eoa";
-                    } else if ((mask & MASK_ISERC20) == MASK_ISERC20) {
-                      accountData.type = "erc20";
-                      accountData.symbol = symbol;
-                      accountData.name = name;
-                      const erc20Contract = new ethers.Contract(account, ERC20ABI, provider);
-                      try {
-                        accountData.decimals = await erc20Contract.decimals();
-                      } catch (e1) {
-                        accountData.decimals = 0;
-                      }
-                    } else if ((mask & MASK_ISERC721) == MASK_ISERC721) {
-                      accountData.type = "erc721";
-                      accountData.symbol = symbol;
-                      accountData.name = name;
-                    } else {
-                      const erc165Abi = [ "function supportsInterface(bytes4 interfaceID) external view returns (bool)" ];
-                      const erc165Contract = new ethers.Contract(account, erc165Abi, provider);
-                      try {
-                        const result = await erc165Contract.supportsInterface(ERC1155_INTERFACE);
-                        if (result) {
-                          accountData.type = "erc1155";
-                        } else {
-                          accountData.type = "unknown2";
-                        }
-                      } catch (e1) {
-                        accountData.type = "unknown1";
-                      }
-                    }
+                  try {
+                    totalSupply = await erc20Contract.totalSupply();
+                  } catch (e1) {
                   }
-                } catch (e) {
-                  console.log("syncAccounts erc721Helper - ERROR: " + account + ", message: " + e.message);
-                  accountData.type = "unknown0";
                 }
+                console.log(account + " => " + code.length + " " + accountType + ", symbol: " + symbol + ", name: " + name + ", decimals: " + decimals + ", totalSupply: " + totalSupply);
+                if (!accountType && decimals && totalSupply) {
+                  accountType = "erc20";
+                  accountData.decimals = decimals;
+                  accountData.totalSupply = totalSupply;
+                }
+                accountData.type = accountType || "unknown";
+                accountData.symbol = symbol;
+                accountData.name = name;
+
+                // try {
+                //   const tokenInfos = await erc721Helper.tokenInfo([account], { gasLimit: 1000000 });
+                //   for (let i = 0; i < tokenInfos[0].length; i++) {
+                //     const mask = tokenInfos[0][i].toNumber();
+                //     const symbol = tokenInfos[1][i];
+                //     const name = tokenInfos[2][i];
+                //     if ((mask & MASK_ISEOA) == MASK_ISERC721) {
+                //       accountData.type = "eoa";
+                //     } else if ((mask & MASK_ISERC20) == MASK_ISERC20) {
+                //       accountData.type = "erc20";
+                //       accountData.symbol = symbol;
+                //       accountData.name = name;
+                //       const erc20Contract = new ethers.Contract(account, ERC20ABI, provider);
+                //       try {
+                //         accountData.decimals = await erc20Contract.decimals();
+                //       } catch (e1) {
+                //         accountData.decimals = 0;
+                //       }
+                //     } else if ((mask & MASK_ISERC721) == MASK_ISERC721) {
+                //       accountData.type = "erc721";
+                //       accountData.symbol = symbol;
+                //       accountData.name = name;
+                //     } else {
+                //       const erc165Abi = [ "function supportsInterface(bytes4 interfaceID) external view returns (bool)" ];
+                //       const erc165Contract = new ethers.Contract(account, erc165Abi, provider);
+                //       try {
+                //         const result = await erc165Contract.supportsInterface(ERC1155_INTERFACE);
+                //         if (result) {
+                //           accountData.type = "erc1155";
+                //         } else {
+                //           accountData.type = "unknown2";
+                //         }
+                //       } catch (e1) {
+                //         accountData.type = "unknown1";
+                //       }
+                //     }
+                //   }
+                // } catch (e) {
+                //   console.log("syncAccounts erc721Helper - ERROR: " + account + ", message: " + e.message);
+                //   accountData.type = "unknown0";
+                // }
               }
               accounts[this.chainId][account] = accountData;
               this.sync.completed++;
