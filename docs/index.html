@@ -1166,7 +1166,6 @@
             navigator.clipboard.writeText(str);
           },
           async connectToWeb3() {
-            // console.log(moment().format("HH:mm:ss") + " connectToWeb3 - chainId: " + this.chainId);
             if (!window.ethereum) {
               this.connected = false;
             } else {
@@ -1178,12 +1177,10 @@
                 this.connected = false;
               }
             }
-            // console.log(moment().format("HH:mm:ss") + " connectToWeb3 - connected: " + this.connected);
             if (!this.connected) {
               alert("Please use the https://metamask.io addon with Firefox, Chromium, Opera or Chrome, or any other other web3 browser, for web3 data retrieval. And refresh!");
             } else {
               const t = this;
-              // console.log(moment().format("HH:mm:ss") + " connectToWeb3 - installing listeners");
               function handleChainChanged(_chainId) {
                 t.chainId = _chainId;
                 console.log(moment().format("HH:mm:ss") + " connectToWeb3 - handleChainChanged - this.chainId: " + t.chainId);
@@ -1211,7 +1208,7 @@
               this.coinbase = await signer.getAddress();
               const network = await provider.getNetwork();
               this.chainId = network.chainId;
-              console.log(moment().format("HH:mm:ss") + " connectToWeb3 - chainId: " + this.chainId);
+              console.log(moment().format("HH:mm:ss") + " connectToWeb3[" + this.chainId + "]");
             }
           },
         },
@@ -1249,9 +1246,6 @@
               }
             }
           }
-          // console.log("this.events: " + JSON.stringify(this.events));
-          // console.log("this.accounts: " + JSON.stringify(this.accounts));
-          // console.log("this.blockTimestamps: " + JSON.stringify(this.blockTimestamps));
         },
       })
     </script>
