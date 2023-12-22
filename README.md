@@ -51,6 +51,13 @@ URL: [https://bokkypoobah.github.io/ApprovalTool/](https://bokkypoobah.github.io
 * No backend servers are necessary, only a web3 connection
 * This dapp uses basic web3 calls for compatibility across EVM chains using the same ERC-20, ERC-721 and ERC-1155 standards
 
+<br />
+
+---
+
+### Warning
+
+* This is experimental unaudited software. Please check your transaction data carefully before signing
 
 <br />
 

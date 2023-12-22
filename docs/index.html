@@ -60,7 +60,7 @@
 
         <b-card no-body class="p-0 mt-0" style="min-height: 666px;">
           <b-alert v-if="false" size="sm" dismissible variant="warning" show class="m-1 my-0">
-            Warning: This is experimental unaudited software. Revoke permissions when not required, at this early stage.
+            Warning: This is experimental unaudited software. Please check your transaction data carefully before signing
           </b-alert>
           <b-card class="m-2 p-1" header-class="warningheader" header="Welcome" v-if="!coinbase">
             <b-card-text>
@@ -253,9 +253,9 @@
                     <li>No backend servers are necessary, only a web3 connection</li>
                   </ul>
 
-                  <h5 class="mt-3">To Do</h5>
+                  <h5 class="mt-3">Warning</h5>
                   <ul>
-                    <li>Handle non-ETH chains</li>
+                    <li>This is experimental unaudited software. Please check your transaction data carefully before signing</li>
                   </ul>
 
                   <h5 class="mt-3">Troubleshooting</h5>
