@@ -146,12 +146,12 @@
             <b-card-text v-if="coinbase" class="m-0 p-0">
               <div class="d-flex flex-wrap m-0 p-0">
                 <div class="mt-1 pr-1">
-                  <b-form-checkbox size="sm" v-model.trim="settings.searchAttachedAccount" @input="saveSettings" v-b-popover.hover.bottom="'Search for approval events emitted by your attached web3 account'">
+                  <b-form-checkbox size="sm" :disabled="sync.section != null" v-model.trim="settings.searchAttachedAccount" @input="saveSettings" v-b-popover.hover.bottom="'Search for approval events emitted by your attached web3 account'">
                     Attached
                   </b-form-checkbox>
                 </div>
                 <div v-if="!settings.searchAttachedAccount" class="mt-0 pr-1" style="width: 25.0rem;">
-                  <b-form-textarea type="text" size="sm" v-model.trim="settings.searchAccounts" @change="saveSettings" debounce="600" rows="3" max-rows="10" v-b-popover.hover.top="'Search for approval events emitted this list of owner addresses'" :placeholder="'0x12...34\n0x23...45 0x34...56'"></b-form-textarea>
+                  <b-form-textarea :disabled="sync.section != null" size="sm" v-model.trim="settings.searchAccounts" @change="saveSettings" debounce="600" rows="3" max-rows="10" v-b-popover.hover.top="'Search for approval events emitted this list of owner addresses'" :placeholder="'0x12...34\n0x23...45 0x34...56'"></b-form-textarea>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-1 pr-1">
                   <b-form-checkbox size="sm" v-model.trim="settings.approvalsTable.includeInactive" @input="saveSettings" v-b-popover.hover.bottom="'Include inactive approvals'">
@@ -335,12 +335,6 @@
                         {{ '#' + commify0(data.item.blockNumber) }}
                       </span>
                     </b-link>
-                    <!-- <br />
-                    <font size="-1">
-                      <b-badge pill variant="transparent" v-b-popover.hover="'Block Number'" class="px-0">{{ commify0(data.item.blockNumber) }}</b-badge>
-                      <b-badge pill variant="transparent" v-b-popover.hover="'Transaction Index'" class="px-0">{{ data.item.txIndex }}</b-badge>
-                      <b-badge pill variant="transparent" v-b-popover.hover="'Log Index'" class="px-0">{{ data.item.logIndex }}</b-badge>
-                    </font> -->
                   </font>
                 </template>
                 <template #cell(owner)="data">
