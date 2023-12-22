@@ -222,15 +222,11 @@
                   <h4>Welcome</h4>
                   <b>ApprovalTool</b> is a lightweigh web3 dapp tool to manage your approvals for ERC-20, ERC-721 and ERC-1155 token contracts.
 
-                  <!-- This dapp retrieves historical log events from the <b-link href="https://cryptopunks.app/" target="_blank">CryptoPunks</b-link> contracts on the Ethereum mainnet, collates the data, and provides an interface for users to query the data.
-                  This dapp currently takes about 10 minutes to retrieve the data initially, and about a minute to sync subsequently. -->
-
                   <h5 class="mt-4">How This Works</h5>
                   <ul>
                     <li>This tool scans for <b-link href="https://eips.ethereum.org/EIPS/eip-20#events" target="_blank">ERC-20</b-link>, <b-link href="https://eips.ethereum.org/EIPS/eip-721#specification" target="_blank">ERC-721</b-link> and <b-link href="https://eips.ethereum.org/EIPS/eip-1155#specification" target="_blank">ERC-1155</b-link> <b>Approval</b> and <b>ApprovalForAll</b> log events from the owner's account. This is done using the <b-link href="https://docs.ethers.org/v5/api/providers/provider/#Provider-getLogs" target="_blank">getLogs(filter)</b-link> web3 call</li>
                     <li>These event logs are then processed to determine the approval states for the various ERC-20, ERC-721 and ERC-1155 contracts</li>
                     <li>The latest ERC-20 approval amounts are retrieved using the ERC-20 <b>allowance(...)</b> function</li>
-                    <!-- <li>This tool retrieves block timestamps from <b-link href="https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks" target="_blank">https://api.thegraph.com/subgraphs/name/blocklytics/ethereum-blocks</b-link></li> -->
                   </ul>
 
                   <h5 class="mt-3">Requirements</h5>
@@ -255,7 +251,6 @@
                   <ul>
                     <li>This dapp is designed to have minimal external dependencies - all code is statically served from GitHub</li>
                     <li>No backend servers are necessary, only a web3 connection</li>
-                    <!-- <li>Block timestamps are retrieved from TheGraph for speed - this can be replaced with slower calls to <b>getBlock({blockNumber}).timestamp</b></li> -->
                   </ul>
 
                   <h5 class="mt-3">To Do</h5>
@@ -263,29 +258,15 @@
                     <li>Handle non-ETH chains</li>
                   </ul>
 
-                  <!-- <h5 class="mt-3">Some Info</h5>
-                  <ul>
-                    <li>Three v1s were claimed with invalid ids <b-link href="https://etherscan.io/tx/0x39d77a95637640b6291bea0b015be4f6578c95f9a57af6a9399dabd70b56d50c" target="_blank">9845944</b-link>, <b-link href="https://etherscan.io/tx/0xdc37a82d43eb253077abd4618683efea615fc8573bfc669568fab04098ab24b1" target="_blank">76623</b-link> and <b-link href="https://etherscan.io/tx/0x7da83b5002251ca83537aef8833f443263a9109a1ccca502b0b03a0529813aa2" target="_blank">0xffff...ffff</b-link>. This resulted in 3 unassigned v1s 1416, 1838 and 1841</li>
-                    <li>LarvaLabs airdropped these 3 unassigned v2s <b-link href="https://cryptopunks.app/cryptopunks/details/1416" target="_blank">1416</b-link>, <b-link href="https://cryptopunks.app/cryptopunks/details/1838" target="_blank">1838</b-link> and <b-link href="https://cryptopunks.app/cryptopunks/details/1841" target="_blank">1841</b-link> to <b-link href="https://etherscan.io/address/0x5b098b00621eda6a96b7a476220661ad265f083f" target="_blank">0x5b098b...</b-link></li>
-                    <li>Two v2s <b-link href="https://etherscan.io/tx/0xce9bdec865497ba6d3c7e26bdfac54d4270285361a0f65ff09f042997b318b38" target="_blank">2838</b-link> and <b-link href="https://etherscan.io/tx/0x2c7a8584e8c3d5c14232881f2e7aef4cbacfe1cb729b67b129f84b0384018330" target="_blank">5449</b-link> have been incorrectly transferred to the v2 CryptoPunk contract</li>
-                  </ul> -->
                   <h5 class="mt-3">Troubleshooting</h5>
                   <ul>
                     <li>If this dapp is not receiving the latest Mainnet data, reset your MetaMask web3 connection using <b>Settings</b> -> <b>Advanced</b> -> <b>Clear activity and nonce data</b></li>
                     <li>Reset this dapp data by removing LocalStorage entries with the keys beginning with <b>approval</b></li>
                   </ul>
-                  <!-- <h5 class="mt-3">CryptoPunks History</h5>
-                  <ul>
-                    <li>The v1 contract was deployed to <b-link href="https://etherscan.io/address/0x6Ba6f2207e343923BA692e5Cae646Fb0F566DB8D#code" target="_blank">0x6Ba6f2207e343923BA692e5Cae646Fb0F566DB8D</b-link> at Jun-09-2017 12:22:50 AM +UTC</li>
-                    <li><b-link href="https://www.reddit.com/r/ethereum/comments/6g8cma/cryptopunks_an_experiment_in_digital_collectibles/" target="_blank">CryptoPunks: An experiment in digital collectibles on Ethereum</b-link> announced on Reddit at Jun-09-2017 01:19:08 AM UTC</li>
-                    <li>Due to a <b-link href="https://twitter.com/cryptopunksnfts/status/876106428200738816" target="_blank">bug in v1 contract</b-link>, <b-link href="https://twitter.com/cryptopunksnfts/status/878353034194984961" target="_blank">v2 was deployed</b-link> to <b-link href="https://etherscan.io/address/0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB#code" target="_blank">0xb47e3cd837dDF8e4c57F05d70Ab865de6e193BBB</b-link> at Jun-22-2017 07:40:00 PM +UTC</li>
-                    <li>The ERC-721 wrapper for the v2 contract was deployed to <b-link href="https://etherscan.io/address/0xb7F7F6C52F2e2fdb1963Eab30438024864c313F6#code" target="_blank">0xb7F7F6C52F2e2fdb1963Eab30438024864c313F6</b-link> at Sep-08-2020 03:11:25 PM +UTC</li>
-                    <li>The ERC-721 wrapper for the v1 contract was deployed to <b-link href="https://etherscan.io/address/0x282BDD42f4eb70e7A9D9F40c8fEA0825B7f68C5D#code" target="_blank">0x282BDD42f4eb70e7A9D9F40c8fEA0825B7f68C5D</b-link> at Jan-17-2022 10:15:07 AM +UTC</li>
-                  </ul> -->
                 </b-card-body>
               </b-card>
 
-              <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" ref="approvalsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='approvalsRowSelected' :fields="approvalsFields" :items="pagedFilteredSortedApprovals" show-empty empty-html="Click Sync above to retrieve ERC-20, ERC-721 and ERC-1155 Approval and ApprovalForAll events" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="settings.tabIndex == 0 && !settings.showInfo" ref="approvalsTable" small fixed striped responsive hover selectable select-mode="single" @row-selected='approvalsRowSelected' :fields="approvalsFields" :items="pagedFilteredSortedApprovals" show-empty empty-html="Click Sync above to retrieve ERC-20, ERC-721 and ERC-1155 approval events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
                     {{ parseInt(data.index) + ((settings.approvalsTable.currentPage - 1) * settings.approvalsTable.pageSize) + 1 }}
@@ -338,7 +319,7 @@
                 </template>
               </b-table>
 
-              <b-table v-if="settings.tabIndex == 1 && !settings.showInfo && events" small fixed striped responsive hover :fields="eventsFields" :items="pagedFilteredSortedEvents" show-empty empty-html="Click Sync above to retrieve ERC-20, ERC-721 and ERC-1155 Approval and ApprovalForAll events" head-variant="light" class="mx-0 my-1">
+              <b-table v-if="settings.tabIndex == 1 && !settings.showInfo && events" small fixed striped responsive hover :fields="eventsFields" :items="pagedFilteredSortedEvents" show-empty empty-html="Click Sync above to retrieve ERC-20, ERC-721 and ERC-1155 approval events" head-variant="light" class="mx-0 my-1">
                 <template #cell(number)="data">
                   <font size="-1">
                     {{ parseInt(data.index) + ((settings.eventsTable.currentPage - 1) * settings.eventsTable.pageSize) + 1 }}
@@ -1017,11 +998,14 @@
               }
               accounts[this.chainId][account] = accountData;
               this.sync.completed++;
+              if (this.sync.halt) {
+                break;
+              }
             }
             // ETH Mainnet ENS
             if (this.chainId == 1) {
               for (const [account, accountData] of Object.entries(accounts[this.chainId])) {
-                if (!(["erc20", "erc721", "erc1155", "ftexchange", "nftexchange"].includes(accountData.type)) && !(account in CUSTOMNAMES)) {
+                if (!(["erc20", "erc721", "erc1155", "ftexchange", "nftexchange"].includes(accountData.type)) && !(account in CUSTOMNAMES) && !this.sync.halt) {
                   const allnames = await ensReverseRecordsContract.getNames([account]);
                   if (allnames.length >= 0 && allnames[0].length > 0) {
                     accounts[this.chainId][account].name = allnames[0];
@@ -1084,7 +1068,7 @@
                   }
                   Vue.set(this.accounts[this.chainId], contract, account);
                 } else {
-                  console.log("Account: " + contract + " not found");
+                  console.log(moment().format("HH:mm:ss") + " processData - account: " + contract + " not found");
                 }
               }
             }
@@ -1103,7 +1087,7 @@
             this.sync.completed = 0;
             this.sync.section = 'Latest ERC-20 Allowances';
             for (const [account, accountData] of Object.entries(accounts[this.chainId])) {
-              if (accountData.type == "erc20") {
+              if (accountData.type == "erc20" && !this.sync.halt) {
                 for (const owner of this.accountsToSearch) {
                   const approvals = 'approvals' in accountData && accountData.approvals && accountData.approvals[owner] || {};
                   for (const [spender, approved] of Object.entries(approvals)) {
