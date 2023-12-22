@@ -150,7 +150,7 @@
                     Attached
                   </b-form-checkbox>
                 </div>
-                <div v-if="!settings.searchAttachedAccount" class="mt-0 pr-1" style="min-width: 25.0rem; max-width: 25.0rem;">
+                <div v-if="!settings.searchAttachedAccount" class="mt-0 pr-1" style="width: 25.0rem;">
                   <b-form-textarea type="text" size="sm" v-model.trim="settings.searchAccounts" @change="saveSettings" debounce="600" rows="3" max-rows="10" v-b-popover.hover.top="'Search for approval events emitted this list of owner addresses'" :placeholder="'0x12...34\n0x23...45 0x34...56'"></b-form-textarea>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-1 pr-1">
@@ -171,7 +171,7 @@
                 <div v-if="false && !sync.section" class="mt-0 pr-1">
                   <b-button size="sm" :disabled="accountsToSearch.length == 0" @click="saveSettings(); syncIt(true);" variant="outline-primary" v-b-popover.hover.bottom="'This will do dev things'">Dev</b-button>
                 </div>
-                <div v-if="sync.section" class="mt-1 p-0" style="width: 350px;">
+                <div v-if="sync.section" class="mt-1 p-0" style="width: 300px;">
                   <b-progress height="1.5rem" :max="sync.total" show-progress :animated="!sync.section" :variant="sync.section ? 'success' : 'secondary'" v-b-popover.hover.bottom="'Click the button on the right to stop this process'">
                     <b-progress-bar :value="sync.completed">
                       {{ sync.total == null || sync.total == 0 ? (sync.completed + ' ' + sync.section) : (sync.completed + '/' + sync.total + ' ' + ((sync.completed / sync.total) * 100).toFixed(0) + '% ' + sync.section) }}
@@ -899,8 +899,10 @@
               blockTimestamps[this.chainId][newBlockNumbers[i]] = parseInt(block.timestamp);
               this.sync.completed++;
             }
-            localStorage.approvalBlockTimestamps = JSON.stringify(blockTimestamps);
-            Vue.set(this, 'blockTimestamps', blockTimestamps);
+            if (!this.sync.halt) {
+              localStorage.approvalBlockTimestamps = JSON.stringify(blockTimestamps);
+              Vue.set(this, 'blockTimestamps', blockTimestamps);
+            }
             console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps END");
           },
 
@@ -1014,8 +1016,10 @@
               }
             }
             // console.log(moment().format("HH:mm:ss") + " syncAccounts - accounts[" + this.chainId + "]:" + JSON.stringify(accounts[this.chainId] || {}, null, 2));
-            localStorage.approvalAccounts = JSON.stringify(accounts);
-            Vue.set(this, 'accounts', accounts);
+            if (!this.sync.halt) {
+              localStorage.approvalAccounts = JSON.stringify(accounts);
+              Vue.set(this, 'accounts', accounts);
+            }
             console.log(moment().format("HH:mm:ss") + " syncAccounts END");
           },
 
@@ -1093,7 +1097,6 @@
                   for (const [spender, approved] of Object.entries(approvals)) {
                     const erc20Contract = new ethers.Contract(account, ERC20ABI, provider);
                     const newValue = await erc20Contract.allowance(owner, spender);
-                    // console.log(account + ", " + owner + ", " + spender + " => " + approved + " to " + newValue.toString());
                     accountData.approvals[owner][spender] = newValue.toString();
                     Vue.set(this.accounts[this.chainId], account, accountData);
                     this.sync.completed++;
@@ -1101,11 +1104,11 @@
                 }
               }
             }
-            // console.log(moment().format("HH:mm:ss") + " processData - accounts[" + this.chainId + "]: " + JSON.stringify(accounts[this.chainId] || {}, null, 2));
-            localStorage.approvalAccounts = JSON.stringify(accounts);
-            Vue.set(this, 'accounts', accounts);
-            // TODO: UI not updating
-            this.forceRefresh++;
+            if (!this.sync.halt) {
+              localStorage.approvalAccounts = JSON.stringify(accounts);
+              Vue.set(this, 'accounts', accounts);
+            }
+            this.forceRefresh++; // UI refresh workaround
             console.log(moment().format("HH:mm:ss") + " processData END");
           },
 
