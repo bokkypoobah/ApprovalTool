@@ -753,8 +753,45 @@
             return Object.keys(accounts).length;
           },
 
+          filteredAccounts() {
+            let results = this.forceRefresh % 2 == 0 ? [] : [];
+            const accounts = this.accounts[this.chainId] || {};
+            for (const [address, accountData] of Object.entries(accounts)) {
+              const [contract, type, symbol, name, source] = [address, accountData.type, accountData.symbol, accountData.name, accountData.source];
+              results.push({ contract, type, symbol, name, source });
+            }
+
+
+            // const events = this.events[this.chainId] || {};
+            // for (const blockNumber of Object.keys(events).sort((a, b) => { return a - b })) {
+            //   const blockNumberData = events[blockNumber];
+            //   for (const logIndex of Object.keys(blockNumberData).sort((a, b) => { return a - b })) {
+            //     const eventData = events[blockNumber][logIndex];
+            //     let include = true;
+            //     const contractType = this.accounts[this.chainId] && this.accounts[this.chainId][eventData.contract] && this.accounts[this.chainId][eventData.contract].type || null;
+            //     const decimals = contractType == "erc20" ? this.accounts[this.chainId] && this.accounts[this.chainId][eventData.contract] && this.accounts[this.chainId][eventData.contract].decimals : undefined;
+            //     if (!this.settings.eventsTable.includeFluff) {
+            //       if (contractType == "erc721" && eventData.spender == ADDRESS0) {
+            //         include = false;
+            //       }
+            //     }
+            //     if (include) {
+            //       if (!(this.accountsToSearch.includes(eventData.owner))) {
+            //         include = false;
+            //       }
+            //     }
+            //     if (include) {
+            //       const timestamp = this.blockTimestamps[this.chainId] && this.blockTimestamps[this.chainId][blockNumber] || null;
+            //       results.push({ blockNumber, logIndex, ...eventData, type: contractType, decimals, timestamp });
+            //     }
+            //   }
+            // }
+            // console.log(moment().format("HH:mm:ss") + " filteredEvents - results: " + JSON.stringify(results, null, 2));
+            return results;
+          },
+
           filteredSortedAccounts() {
-            return this.filteredSortedEvents;
+            return this.filteredAccounts;
           },
 
           pagedFilteredSortedAccounts() {
