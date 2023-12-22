@@ -62,9 +62,9 @@
           <b-alert v-if="false" size="sm" dismissible variant="warning" show class="m-1 my-0">
             Warning: This is experimental unaudited software. Revoke permissions when not required, at this early stage.
           </b-alert>
-          <b-card class="m-2 p-1" header-class="warningheader" header="Welcome" v-if="!coinbase || chainId != '1'">
+          <b-card class="m-2 p-1" header-class="warningheader" header="Welcome" v-if="!coinbase">
             <b-card-text>
-              Please install the MetaMask extension, connect to the Ethereum Mainnet and refresh this page. Then click the [Connect] button on the top right.
+              Please install the MetaMask extension and connect to the Ethereum Mainnet or an EVM compatible chain. Then refresh this page, and click the [Connect] button on the top right.
             </b-card-text>
           </b-card>
 
@@ -1095,7 +1095,7 @@
             localStorage.approvalToolSettings = JSON.stringify(this.settings);
           },
           async processNewBlock(blockNumber) {
-            console.log(moment().format("HH:mm:ss") + " processNewBlock #" + this.commify0(blockNumber) + ", latest #" + this.commify0(this.blockNumber) + " @ " + moment.unix(this.timestamp).format("YYYY-MM-DD HH:mm:ss") + " " + moment.unix(this.timestamp).fromNow());
+            console.log(moment().format("HH:mm:ss") + " processNewBlock[" + this.chainId + "] #" + this.commify0(blockNumber) + ", latest #" + this.commify0(this.blockNumber) + " @ " + moment.unix(this.timestamp).format("YYYY-MM-DD HH:mm:ss") + " " + moment.unix(this.timestamp).fromNow());
           },
           async halt() {
             this.sync.halt = true;
@@ -1166,7 +1166,7 @@
             navigator.clipboard.writeText(str);
           },
           async connectToWeb3() {
-            console.log(moment().format("HH:mm:ss") + " connectToWeb3");
+            // console.log(moment().format("HH:mm:ss") + " connectToWeb3 - chainId: " + this.chainId);
             if (!window.ethereum) {
               this.connected = false;
             } else {
@@ -1211,7 +1211,7 @@
               this.coinbase = await signer.getAddress();
               const network = await provider.getNetwork();
               this.chainId = network.chainId;
-              // console.log(moment().format("HH:mm:ss") + " connectToWeb3 - chainId: " + this.chainId);
+              console.log(moment().format("HH:mm:ss") + " connectToWeb3 - chainId: " + this.chainId);
             }
           },
         },
