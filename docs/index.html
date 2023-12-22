@@ -567,7 +567,8 @@
           approvals() {
             // TODO: Fix janky workaround
             let results = this.forceRefresh % 2 == 0 ? [] : [];
-            for (const [address, accountData] of Object.entries(this.accounts)) {
+            const accounts = this.accounts[this.chainId] || {};
+            for (const [address, accountData] of Object.entries(accounts)) {
               const [contract, type, symbol, name, source] = [address, accountData.type, accountData.symbol, accountData.name, accountData.source];
               for (let owner of this.accountsToSearch) {
                 const approvals = 'approvals' in accountData && owner in accountData.approvals && accountData.approvals[owner] || null;
