@@ -168,7 +168,7 @@
                 <div v-if="!sync.section" class="mt-0 pr-1">
                   <b-button size="sm" :disabled="accountsToSearch.length == 0" @click="saveSettings(); syncIt(false);" variant="primary" v-b-popover.hover.bottom="'Sync blockchain approval events'">Sync</b-button>
                 </div>
-                <div v-if="!sync.section" class="mt-0 pr-1">
+                <div v-if="false && !sync.section" class="mt-0 pr-1">
                   <b-button size="sm" :disabled="accountsToSearch.length == 0" @click="saveSettings(); syncIt(true);" variant="outline-primary" v-b-popover.hover.bottom="'This will do dev things'">Dev</b-button>
                 </div>
                 <div v-if="sync.section" class="mt-1 p-0" style="width: 350px;">
@@ -199,13 +199,6 @@
                 </div>
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'# events'">{{ commify0(filteredEvents.length) + '/' + commify0(events.length) }}</font>
-                </div>
-                <div v-if="settings.tabIndex == 112 && blockNumber && timestamp" class="mt-0 pl-1">
-                  <font size="-2" v-b-popover.hover.bottom="'latest block'">
-                    <b-link v-if="blockNumber" :href="'https://etherscan.io/block/' + blockNumber" v-b-popover.hover.bottom="formatTimestamp(timestamp)" target="_blank">
-                      {{ '#' + commify0(blockNumber) + ' ' + formatTimeDiff(timestamp) }}
-                    </b-link>
-                  </font>
                 </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <b-pagination size="sm" v-model="settings.approvalsTable.currentPage" @input="saveSettings" :total-rows="filteredSortedApprovals.length" :per-page="settings.approvalsTable.pageSize" style="height: 0;"></b-pagination>
@@ -815,12 +808,12 @@
             const latestBlockNumber = block && block.number || null;
             console.log(moment().format("HH:mm:ss") + " syncIt - latestBlockNumber: " + latestBlockNumber + ", chainId: " + this.chainId);
 
-            // if (!devMode) {
+            if (!devMode) {
               await this.syncEvents(provider, latestBlockNumber);
-            // }
-            // if (!devMode) {
+            }
+            if (!devMode) {
               await this.syncBlockTimestamps(provider);
-            // }
+            }
             if (!devMode) {
               await this.syncAccounts(provider, devMode);
             }
@@ -844,7 +837,6 @@
             this.sync.completed = 0;
             this.sync.total = 0;
             this.sync.section = 'Approval Events';
-            // console.log(moment().format("HH:mm:ss") + " syncEvents - accountsToSearch: " + JSON.stringify(this.accountsToSearch));
             const accountsAs32Bytes = this.accountsToSearch.map(e => '0x000000000000000000000000' + e.substring(2, 42).toLowerCase());
             const approvalLogs = await provider.getLogs({
               address: null,
@@ -921,38 +913,10 @@
             this.sync.completed = 0;
             this.sync.total = newBlockNumbers.length;
             this.sync.section = 'Block Timestamps';
-            const NEWMETHOD = true;
-            if (NEWMETHOD) {
-              for (let i = 0; i < newBlockNumbers.length && !this.sync.halt; i++) {
-                const block = await provider.getBlock(parseInt(newBlockNumbers[i]));
-                blockTimestamps[this.chainId][newBlockNumbers[i]] = parseInt(block.timestamp);
-                this.sync.completed++;
-              }
-            } else {
-              const BATCHSIZE = 1000;
-              for (let i = 0; i < newBlockNumbers.length; i += BATCHSIZE) {
-                const batch = newBlockNumbers.slice(i, parseInt(i) + BATCHSIZE);
-                const data = await fetch(BLOCKTIMESTAMPSUBGRAPHURL, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                  },
-                  body: JSON.stringify({
-                    query: BLOCKTIMESTAMPINQUERY,
-                    variables: { blockNumbers: batch.map(e => parseInt(e)) },
-                  })
-                }).then(response => response.json())
-                .catch(function(e) {
-                  console.log("error: " + e);
-                });
-                const timestamps = data.data && data.data.blocks || [];
-                for (const timestampItem of timestamps) {
-                  blockTimestamps[this.chainId][timestampItem.number] = parseInt(timestampItem.timestamp);
-                }
-                this.sync.completed += timestamps.length;
-                console.log(moment().format("HH:mm:ss") + " syncBlockTimestamps " + this.sync.completed + " of " + newBlockNumbers.length);
-              }
+            for (let i = 0; i < newBlockNumbers.length && !this.sync.halt; i++) {
+              const block = await provider.getBlock(parseInt(newBlockNumbers[i]));
+              blockTimestamps[this.chainId][newBlockNumbers[i]] = parseInt(block.timestamp);
+              this.sync.completed++;
             }
             localStorage.approvalBlockTimestamps = JSON.stringify(blockTimestamps);
             Vue.set(this, 'blockTimestamps', blockTimestamps);
@@ -966,7 +930,6 @@
               accounts[this.chainId] = {};
             }
             const newAccountsMap = {};
-
             const events = this.events[this.chainId] || {};
             for (const blockNumber of Object.keys(events).sort((a, b) => { return a - b })) {
               const blockNumberData = events[blockNumber];
@@ -984,7 +947,6 @@
               }
             }
             const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
-            // const erc721Helper = new ethers.Contract(ERC721HELPERADDRESS, ERC721HELPERABI, provider);
             this.sync.completed = 0;
             this.sync.total = Object.keys(newAccountsMap).length;
             this.sync.section = 'Addresses';
@@ -1043,7 +1005,7 @@
                   } catch (e1) {
                   }
                 }
-                console.log(account + " => code.length: " + code.length + ", accountType: " + accountType + ", symbol: " + symbol + ", name: " + name + ", decimals: " + decimals + ", totalSupply: " + totalSupply);
+                console.log(moment().format("HH:mm:ss") + " syncAccounts " + account + " => code.length: " + code.length + ", accountType: " + accountType + ", symbol: " + symbol + ", name: " + name + ", decimals: " + decimals + ", totalSupply: " + totalSupply);
                 if (!accountType && decimals && totalSupply) {
                   accountType = "erc20";
                   accountData.decimals = parseInt(decimals);
@@ -1052,48 +1014,6 @@
                 accountData.type = accountType || "unknown";
                 accountData.symbol = symbol;
                 accountData.name = name;
-
-                // try {
-                //   const tokenInfos = await erc721Helper.tokenInfo([account], { gasLimit: 1000000 });
-                //   for (let i = 0; i < tokenInfos[0].length; i++) {
-                //     const mask = tokenInfos[0][i].toNumber();
-                //     const symbol = tokenInfos[1][i];
-                //     const name = tokenInfos[2][i];
-                //     if ((mask & MASK_ISEOA) == MASK_ISERC721) {
-                //       accountData.type = "eoa";
-                //     } else if ((mask & MASK_ISERC20) == MASK_ISERC20) {
-                //       accountData.type = "erc20";
-                //       accountData.symbol = symbol;
-                //       accountData.name = name;
-                //       const erc20Contract = new ethers.Contract(account, ERC20ABI, provider);
-                //       try {
-                //         accountData.decimals = await erc20Contract.decimals();
-                //       } catch (e1) {
-                //         accountData.decimals = 0;
-                //       }
-                //     } else if ((mask & MASK_ISERC721) == MASK_ISERC721) {
-                //       accountData.type = "erc721";
-                //       accountData.symbol = symbol;
-                //       accountData.name = name;
-                //     } else {
-                //       const erc165Abi = [ "function supportsInterface(bytes4 interfaceID) external view returns (bool)" ];
-                //       const erc165Contract = new ethers.Contract(account, erc165Abi, provider);
-                //       try {
-                //         const result = await erc165Contract.supportsInterface(ERC1155_INTERFACE);
-                //         if (result) {
-                //           accountData.type = "erc1155";
-                //         } else {
-                //           accountData.type = "unknown2";
-                //         }
-                //       } catch (e1) {
-                //         accountData.type = "unknown1";
-                //       }
-                //     }
-                //   }
-                // } catch (e) {
-                //   console.log("syncAccounts erc721Helper - ERROR: " + account + ", message: " + e.message);
-                //   accountData.type = "unknown0";
-                // }
               }
               accounts[this.chainId][account] = accountData;
               this.sync.completed++;
@@ -1105,12 +1025,11 @@
                   const allnames = await ensReverseRecordsContract.getNames([account]);
                   if (allnames.length >= 0 && allnames[0].length > 0) {
                     accounts[this.chainId][account].name = allnames[0];
-                    console.log(account + " => " + allnames[0]);
                   }
                 }
               }
             }
-            console.log(moment().format("HH:mm:ss") + " syncAccounts - accounts[" + this.chainId + "]:" + JSON.stringify(accounts[this.chainId] || {}, null, 2));
+            // console.log(moment().format("HH:mm:ss") + " syncAccounts - accounts[" + this.chainId + "]:" + JSON.stringify(accounts[this.chainId] || {}, null, 2));
             localStorage.approvalAccounts = JSON.stringify(accounts);
             Vue.set(this, 'accounts', accounts);
             console.log(moment().format("HH:mm:ss") + " syncAccounts END");
@@ -1170,6 +1089,19 @@
               }
             }
             // Get current ERC-20 allowances as these amounts are reduced by `transferFrom(...)` calls
+            this.sync.total = 0;
+            for (const [account, accountData] of Object.entries(accounts[this.chainId])) {
+              if (accountData.type == "erc20") {
+                for (const owner of this.accountsToSearch) {
+                  const approvals = 'approvals' in accountData && accountData.approvals && accountData.approvals[owner] || {};
+                  for (const [spender, approved] of Object.entries(approvals)) {
+                    this.sync.total++;
+                  }
+                }
+              }
+            }
+            this.sync.completed = 0;
+            this.sync.section = 'Latest ERC-20 Allowances';
             for (const [account, accountData] of Object.entries(accounts[this.chainId])) {
               if (accountData.type == "erc20") {
                 for (const owner of this.accountsToSearch) {
@@ -1177,14 +1109,15 @@
                   for (const [spender, approved] of Object.entries(approvals)) {
                     const erc20Contract = new ethers.Contract(account, ERC20ABI, provider);
                     const newValue = await erc20Contract.allowance(owner, spender);
-                    console.log(account + ", " + owner + ", " + spender + " => " + approved + " to " + newValue.toString());
+                    // console.log(account + ", " + owner + ", " + spender + " => " + approved + " to " + newValue.toString());
                     accountData.approvals[owner][spender] = newValue.toString();
                     Vue.set(this.accounts[this.chainId], account, accountData);
+                    this.sync.completed++;
                   }
                 }
               }
             }
-            console.log(moment().format("HH:mm:ss") + " processData - accounts[" + this.chainId + "]: " + JSON.stringify(accounts[this.chainId] || {}, null, 2));
+            // console.log(moment().format("HH:mm:ss") + " processData - accounts[" + this.chainId + "]: " + JSON.stringify(accounts[this.chainId] || {}, null, 2));
             localStorage.approvalAccounts = JSON.stringify(accounts);
             Vue.set(this, 'accounts', accounts);
             // TODO: UI not updating
@@ -1253,12 +1186,13 @@
             return result;
           },
           addressDescription(address) {
-            if (address in this.accounts) {
-              result = "type=" + this.accounts[address].type + "; symbol=" + this.accounts[address].symbol + "; name=" + this.accounts[address].name;
-              if (this.accounts[address].decimals) {
-                result = result + "; decimals=" + this.accounts[address].decimals;
+            const accounts = this.accounts[this.chainId] || {};
+            if (address in accounts) {
+              result = "type=" + accounts[address].type + "; symbol=" + accounts[address].symbol + "; name=" + accounts[address].name;
+              if (accounts[address].decimals) {
+                result = result + "; decimals=" + accounts[address].decimals;
               }
-              result = result + "; source=" + this.accounts[address].source + "; address=" + address;
+              result = result + "; source=" + accounts[address].source + "; address=" + address;
             } else {
               result = address;
             }
