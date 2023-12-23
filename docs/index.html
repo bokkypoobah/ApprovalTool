@@ -838,26 +838,30 @@
             let results = this.filteredAccounts;
             if (this.settings.accountsTable.sortOption == 'typenameasc') {
               results.sort((a, b) => {
-                const typea = a.customType || a.type;
-                const typeb = b.customType || b.type;
-                if (('' + typea).localeCompare(typeb) == 0) {
+                const typeA = a.customType || a.type;
+                const typeB = b.customType || b.type;
+                const sortIndexA = this.accountTypeOptions.findIndex(e => e.value == typeA);
+                const sortIndexB = this.accountTypeOptions.findIndex(e => e.value == typeB);
+                if (sortIndexA == sortIndexB) {
                   const namea = a.customName || a.name;
                   const nameb = b.customName || b.name;
                   return ('' + namea).localeCompare(nameb);
                 } else {
-                  return ('' + typea).localeCompare(typeb);
+                  return sortIndexA - sortIndexB;
                 }
               });
             } else if (this.settings.accountsTable.sortOption == 'typenamedsc') {
               results.sort((a, b) => {
-                const typea = a.customType || a.type;
-                const typeb = b.customType || b.type;
-                if (('' + typea).localeCompare(typeb) == 0) {
+                const typeA = a.customType || a.type;
+                const typeB = b.customType || b.type;
+                const sortIndexA = this.accountTypeOptions.findIndex(e => e.value == typeA);
+                const sortIndexB = this.accountTypeOptions.findIndex(e => e.value == typeB);
+                if (sortIndexA == sortIndexB) {
                   const namea = a.customName || a.name;
                   const nameb = b.customName || b.name;
                   return ('' + nameb).localeCompare(namea);
                 } else {
-                  return ('' + typeb).localeCompare(typea);
+                  return sortIndexB - sortIndexA;
                 }
               });
             } else if (this.settings.accountsTable.sortOption == 'nameasc') {
