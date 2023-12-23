@@ -552,10 +552,10 @@
           ],
           accountTypeOptions: [
             { value: null, text: '(use default)' },
+            { value: "eoa", text: 'EOA' },
             { value: "erc20", text: 'ERC-20' },
             { value: "erc721", text: 'ERC-721' },
             { value: "erc1155", text: 'ERC-1155' },
-            { value: "eoa", text: 'EOA' },
             { value: "ftexchange", text: 'FTExchange' },
             { value: "nftexchange", text: 'NFTExchange' },
             { value: "unknown", text: '(Unknown)' },
@@ -707,7 +707,9 @@
               });
             } else if (this.settings.approvalsTable.sortOption == 'typenameasc') {
               results.sort((a, b) => {
-                if (a.type == b.type) {
+                const sortIndexA = this.accountTypeOptions.findIndex(e => e.value == a.type);
+                const sortIndexB = this.accountTypeOptions.findIndex(e => e.value == b.type);
+                if (sortIndexA == sortIndexB) {
                   if (('' + a.name).localeCompare(b.name) == 0) {
                     if (('' + b.approvalType).localeCompare(a.approvalType) == 0) {
                       return ('' + a.owner).localeCompare(b.owner);
@@ -718,12 +720,14 @@
                     return ('' + a.name).localeCompare(b.name);
                   }
                 } else {
-                  return parseInt(a.type.substring(3)) - parseInt(b.type.substring(3));
+                  return sortIndexA - sortIndexB;
                 }
               });
             } else if (this.settings.approvalsTable.sortOption == 'typenamedsc') {
               results.sort((a, b) => {
-                if (a.type == b.type) {
+                const sortIndexA = this.accountTypeOptions.findIndex(e => e.value == a.type);
+                const sortIndexB = this.accountTypeOptions.findIndex(e => e.value == b.type);
+                if (sortIndexA == sortIndexB) {
                   if (('' + a.name).localeCompare(b.name) == 0) {
                     if (('' + a.approvalType).localeCompare(b.approvalType) == 0) {
                       return ('' + b.owner).localeCompare(a.owner);
@@ -734,7 +738,7 @@
                     return ('' + b.name).localeCompare(a.name);
                   }
                 } else {
-                  return parseInt(b.type.substring(3)) - parseInt(a.type.substring(3));
+                  return sortIndexB - sortIndexA;
                 }
               });
             }
