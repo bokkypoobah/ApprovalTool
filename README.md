@@ -20,7 +20,7 @@ URL: [https://bokkypoobah.github.io/ApprovalTool/](https://bokkypoobah.github.io
 
 ### Requirements
 
-* This dapp runs in web3 enabled desktop browsers connected to the Ethereum mainnet
+* This dapp runs in web3 enabled desktop browsers connected to the Ethereum mainnet, and should work with other Ethereum-Virtual-Machine compatible chains
 
 <br />
 
@@ -57,7 +57,7 @@ URL: [https://bokkypoobah.github.io/ApprovalTool/](https://bokkypoobah.github.io
 
 ### Warning
 
-* This is experimental unaudited software. Please check your transaction data carefully before signing
+* This is experimental unaudited software. Please check your transaction data carefully when updating your approvals!
 
 <br />
 
