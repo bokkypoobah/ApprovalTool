@@ -1331,9 +1331,9 @@
           addressDescription(address) {
             const accounts = this.accounts[this.chainId] || {};
             if (address in accounts) {
-              result = "type=" + accounts[address].type + "; symbol=" + accounts[address].symbol + "; name=" + accounts[address].name;
+              result = "type=" + accounts[address].type + "; customType=" + (accounts[address].customType || null)+ "; symbol=" + accounts[address].symbol + "; name=" + accounts[address].name + "; customName=" + (accounts[address].customName || null);
               if (accounts[address].decimals) {
-                result = result + "; decimals=" + accounts[address].decimals;
+                result = result + "; decimals=" + accounts[address].decimals + "; customDecimals=" + (accounts[address].customDecimals || null);
               }
               result = result + "; source=" + accounts[address].source + "; address=" + address;
             } else {
