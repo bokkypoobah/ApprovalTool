@@ -1,7 +1,7 @@
 const CUSTOMNAMES = {
   "0x0000000000000000000000000000000000000000": ["eoa", "Null", "Null:0x0000...0000"],
   "0x00000000000111AbE46ff893f3B2fdF1F759a8A8": ["nftexchange", "ExecutionDelegate", "Blur:ExecutionDelegate"],
-  "0x000000000022D473030F116dDEE9F6B43aC78BA3": ["erc20", "Permit2", "Uniswap:Permit2"],
+  "0x000000000022D473030F116dDEE9F6B43aC78BA3": ["ftexchange", "Permit2", "Uniswap:Permit2"],
   "0x011C77fa577c500dEeDaD364b8af9e8540b808C0": ["erc721", "IPC", "ImmortalPlayerCharacter"],
   "0x0fc584529a2AEfA997697FAfAcbA5831faC0c22d": ["nftexchange", "NFTXMarketplaceZap", "NFTX:NFTXMarketplaceZap"],
   "0x1776e1F26f98b1A5dF9cD347953a26dd3Cb46671": ["erc20", "NMR", "Numeraire"],

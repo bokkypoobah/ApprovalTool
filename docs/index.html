@@ -145,7 +145,7 @@
             <!-- :TOOLBAR -->
             <b-card-text v-if="coinbase" class="m-0 p-0">
               <div class="d-flex flex-wrap m-0 p-0">
-                <div class="mt-1 pr-1">
+                <div v-if="settings.tabIndex == 0 || settings.tabIndex == 1" class="mt-1 pr-1">
                   <b-form-checkbox size="sm" :disabled="sync.section != null" v-model.trim="settings.searchAttachedAccount" @input="saveSettings" v-b-popover.hover.bottom="'Search for approval events emitted by your attached web3 account'">
                     Attached
                   </b-form-checkbox>
