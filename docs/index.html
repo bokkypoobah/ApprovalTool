@@ -765,7 +765,9 @@
                 const eventData = events[blockNumber][logIndex];
                 let include = true;
                 const contractType = this.accounts[this.chainId] && this.accounts[this.chainId][eventData.contract] && this.accounts[this.chainId][eventData.contract].type || null;
+                const contractCustomType = this.accounts[this.chainId] && this.accounts[this.chainId][eventData.contract] && this.accounts[this.chainId][eventData.contract].customType || null;
                 const decimals = contractType == "erc20" ? this.accounts[this.chainId] && this.accounts[this.chainId][eventData.contract] && this.accounts[this.chainId][eventData.contract].decimals : undefined;
+                const customDecimals = (contractCustomType == "erc20" || (contractCustomType == null && contractType == "erc20")) ? this.accounts[this.chainId] && this.accounts[this.chainId][eventData.contract] && this.accounts[this.chainId][eventData.contract].customDecimals : undefined;
                 if (!this.settings.eventsTable.includeFluff) {
                   if (contractType == "erc721" && eventData.spender == ADDRESS0) {
                     include = false;
@@ -778,7 +780,7 @@
                 }
                 if (include) {
                   const timestamp = this.blockTimestamps[this.chainId] && this.blockTimestamps[this.chainId][blockNumber] || null;
-                  results.push({ blockNumber, logIndex, ...eventData, type: contractType, decimals, timestamp });
+                  results.push({ blockNumber, logIndex, ...eventData, type: contractCustomType || contractType, decimals: customDecimals || decimals, timestamp });
                 }
               }
             }
@@ -1319,7 +1321,7 @@
             let result = null;
             const accounts = this.accounts[this.chainId] || {};
             if (address in accounts) {
-              result = accounts[address].name || address;
+              result = accounts[address].customName || accounts[address].name || address;
             } else {
               result = address;
             }
