@@ -1355,11 +1355,12 @@
           addressDescription(address) {
             const accounts = this.accounts[this.chainId] || {};
             if (address in accounts) {
-              result = "type=" + accounts[address].type + "; customType=" + (accounts[address].customType || null)+ "; symbol=" + accounts[address].symbol + "; name=" + accounts[address].name + "; customName=" + (accounts[address].customName || null);
-              if (accounts[address].decimals) {
-                result = result + "; decimals=" + accounts[address].decimals + "; customDecimals=" + (accounts[address].customDecimals || null);
+              result = "address=" + address;
+              for (let key of ['type', 'customType', 'symbol', 'name', 'customName', 'decimals', 'customDecimals', 'source']) {
+                if (key in accounts[address] && accounts[address][key]) {
+                  result = result + "; " + key + "=" + accounts[address][key];
+                }
               }
-              result = result + "; source=" + accounts[address].source + "; address=" + address;
             } else {
               result = address;
             }
