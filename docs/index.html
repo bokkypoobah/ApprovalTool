@@ -825,7 +825,6 @@
             const accounts = this.accounts[this.chainId] || {};
             return Object.keys(accounts).length;
           },
-
           filteredAccounts() {
             let results = this.forceRefresh % 2 == 0 ? [] : [];
             const accounts = this.accounts[this.chainId] || {};
@@ -835,16 +834,31 @@
             }
             return results;
           },
-
           filteredSortedAccounts() {
             let results = this.filteredAccounts;
-            if (this.settings.accountsTable.sortOption == 'addressasc') {
+            if (this.settings.accountsTable.sortOption == 'typenameasc') {
               results.sort((a, b) => {
-                return ('' + a.address).localeCompare(b.address);
+                const typea = a.customType || a.type;
+                const typeb = b.customType || b.type;
+                if (('' + typea).localeCompare(typeb) == 0) {
+                  const namea = a.customName || a.name;
+                  const nameb = b.customName || b.name;
+                  return ('' + namea).localeCompare(nameb);
+                } else {
+                  return ('' + typea).localeCompare(typeb);
+                }
               });
-            } else if (this.settings.accountsTable.sortOption == 'addressdsc') {
+            } else if (this.settings.accountsTable.sortOption == 'typenamedsc') {
               results.sort((a, b) => {
-                return ('' + b.address).localeCompare(a.address);
+                const typea = a.customType || a.type;
+                const typeb = b.customType || b.type;
+                if (('' + typea).localeCompare(typeb) == 0) {
+                  const namea = a.customName || a.name;
+                  const nameb = b.customName || b.name;
+                  return ('' + nameb).localeCompare(namea);
+                } else {
+                  return ('' + typeb).localeCompare(typea);
+                }
               });
             } else if (this.settings.accountsTable.sortOption == 'nameasc') {
               results.sort((a, b) => {
@@ -854,15 +868,21 @@
               results.sort((a, b) => {
                 return ('' + b.name).localeCompare(a.name);
               });
+            } else if (this.settings.accountsTable.sortOption == 'addressasc') {
+              results.sort((a, b) => {
+                return ('' + a.address).localeCompare(b.address);
+              });
+            } else if (this.settings.accountsTable.sortOption == 'addressdsc') {
+              results.sort((a, b) => {
+                return ('' + b.address).localeCompare(a.address);
+              });
             }
             return results;
           },
-
           pagedFilteredSortedAccounts() {
             console.log(moment().format("HH:mm:ss") + " pagedFilteredSortedAccounts - results[0..9]: " + JSON.stringify(this.filteredSortedAccounts.slice(0, 10), null, 2));
             return this.filteredSortedAccounts.slice((this.settings.accountsTable.currentPage - 1) * this.settings.accountsTable.pageSize, this.settings.accountsTable.currentPage * this.settings.accountsTable.pageSize);
           },
-
         },
 
         // --- METHODS ---
@@ -1149,7 +1169,9 @@
             // ETH Mainnet ENS
             if (this.chainId == 1) {
               for (const [account, accountData] of Object.entries(accounts[this.chainId])) {
-                if (!(["erc20", "erc721", "erc1155", "ftexchange", "nftexchange"].includes(accountData.type)) && !(account in CUSTOMNAMES) && !this.sync.halt) {
+                const type = accountData.customType || accountData.type;
+                console.log(account + " " + type + " " + accountData.customType);
+                if (!(["erc20", "erc721", "erc1155", "ftexchange", "nftexchange"].includes(type)) && !(account in CUSTOMNAMES) && !this.sync.halt) {
                   const allnames = await ensReverseRecordsContract.getNames([account]);
                   if (allnames.length >= 0 && allnames[0].length > 0) {
                     accounts[this.chainId][account].name = allnames[0];
@@ -1177,7 +1199,8 @@
                 const account = accounts[this.chainId] && accounts[this.chainId][contract] || null;
                 // console.log(event.blockNumber + "." + event.txIndex + "." + event.logIndex + " " + JSON.stringify(event) + " " + JSON.stringify(account));
                 if (account) {
-                  if (account.type == "erc20") {
+                  const type = account.customType || account.type;
+                  if (type == "erc20") {
                     if (!('approvals' in account)) {
                       account.approvals = {};
                     }
@@ -1185,7 +1208,7 @@
                       account.approvals[eventData.owner] = {};
                     }
                     account.approvals[eventData.owner][eventData.spender] = eventData.value;
-                  } else if (account.type == "erc721") {
+                  } else if (type == "erc721") {
                     if (eventData.eventName == "Approval") {
                       if (!('approvals' in account)) {
                         account.approvals = {};
@@ -1203,7 +1226,7 @@
                       }
                       account.approvalsForAll[eventData.owner][eventData.spender] = eventData.value;
                     }
-                  } else if (account.type == "erc1155") {
+                  } else if (type == "erc1155") {
                     if (!('approvalsForAll' in account)) {
                       account.approvalsForAll = {};
                     }
@@ -1221,7 +1244,8 @@
             // Get current ERC-20 allowances as these amounts are reduced by `transferFrom(...)` calls
             this.sync.total = 0;
             for (const [account, accountData] of Object.entries(accounts[this.chainId])) {
-              if (accountData.type == "erc20") {
+              const type = accountData.customType || accountData.type;
+              if (type == "erc20") {
                 for (const owner of this.accountsToSearch) {
                   const approvals = 'approvals' in accountData && accountData.approvals && accountData.approvals[owner] || {};
                   for (const [spender, approved] of Object.entries(approvals)) {
@@ -1233,7 +1257,8 @@
             this.sync.completed = 0;
             this.sync.section = 'Latest ERC-20 Allowances';
             for (const [account, accountData] of Object.entries(accounts[this.chainId])) {
-              if (accountData.type == "erc20" && !this.sync.halt) {
+              const type = accountData.customType || accountData.type;
+              if (type == "erc20" && !this.sync.halt) {
                 for (const owner of this.accountsToSearch) {
                   const approvals = 'approvals' in accountData && accountData.approvals && accountData.approvals[owner] || {};
                   for (const [spender, approved] of Object.entries(approvals)) {
@@ -1255,17 +1280,14 @@
           },
 
           customTypeUpdated(address, type) {
-            console.log(moment().format("HH:mm:ss") + " customTypeUpdated - address: " + address + ", type: " + type);
             Vue.set(this.accounts[this.chainId][address], 'customType', type);
             localStorage.approvalAccounts = JSON.stringify(this.accounts);
           },
           customNameUpdated(address, name) {
-            console.log(moment().format("HH:mm:ss") + " customNameUpdated - address: " + address + ", name: " + name);
             Vue.set(this.accounts[this.chainId][address], 'customName', name);
             localStorage.approvalAccounts = JSON.stringify(this.accounts);
           },
           customDecimalsUpdated(address, decimals) {
-            console.log(moment().format("HH:mm:ss") + " customDecimalsUpdated - address: " + address + ", decimals: " + decimals);
             Vue.set(this.accounts[this.chainId][address], 'customDecimals', decimals);
             localStorage.approvalAccounts = JSON.stringify(this.accounts);
           },
