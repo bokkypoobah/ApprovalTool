@@ -1,5 +1,6 @@
 const CUSTOMNAMES = {
   "0x0000000000000000000000000000000000000000": ["eoa", "Null", "Null:0x0000...0000"],
+  "0x0000000000000000000000000000000000000001": ["eoa", "Null", "Null:0x0000...0001"],
   "0x00000000000111AbE46ff893f3B2fdF1F759a8A8": ["nftexchange", "ExecutionDelegate", "Blur:ExecutionDelegate"],
   "0x000000000022D473030F116dDEE9F6B43aC78BA3": ["ftexchange", "Permit2", "Uniswap:Permit2"],
   "0x011C77fa577c500dEeDaD364b8af9e8540b808C0": ["erc721", "IPC", "ImmortalPlayerCharacter"],
@@ -15,6 +16,7 @@ const CUSTOMNAMES = {
   "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D": ["ftexchange", "UniswapV2:Router02", "UniswapV2:Router02"],
   "0x941A6d105802CCCaa06DE58a13a6F49ebDCD481C": ["nftexchange", "NFTXMarketplace0xZap", "NFTX:Marketplace0xZap"],
   "0x9996FCFa25B234e80BcF876d83d2e7F338F9BDA5": ["nftexchange", "EnsSubdomainStorefront_v2", "ENSVision:EnsSubdomainStorefront_v2"],
+  "0x99a58482BD75cbab83b27EC03CA68fF489b5788f": ["ftexchange", "Curve.fi:SwapRouter", "Curve.fi:SwapRouter"],
   "0xA42f6cADa809Bcf417DeefbdD69C5C5A909249C0": ["nftexchange", "NFT20CasUpgreadableV2", "NFT20:NFT20CasUpgreadableV2"],
   "0xBA12222222228d8Ba445958a75a0704d566BF2C8": ["ftexchange", "Balancer:Vault", "Balancer:Vault"],
   "0xB32979486938AA9694BFC898f35DBED459F44424": ["erc1155", "NYAN", "Nyan Cat"],
@@ -23,6 +25,7 @@ const CUSTOMNAMES = {
   "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2": ["erc20", "WETH", "Wrapped Ether", 18],
   "0xC2C747E0F7004F9E8817Db2ca4997657a7746928": ["erc721", "HM", "Hashmask"],
   "0xd07dc4262BCDbf85190C01c996b4C06a461d2430": ["erc1155", "RARI", "Rarible:RARI Token 3"],
+  "0xD152f549545093347A162Dce210e7293f1452150": ["ftexchange", "Disperse.app", "Disperse.app"],
   "0xD4416b13d2b3a9aBae7AcD5D6C2BbDBE25686401": ["erc1155", "NameWrapper", "ENS:NameWrapper"],
   "0xd9e1cE17f2641f24aE83637ab66a2cca9C378B9F": ["ftexchange", "SushiSwap:Router", "SushiSwap:Router"],
   "0xE592427A0AEce92De3Edee1F18E0157C05861564": ["ftexchange", "UniswapV3:Router", "UniswapV3:Router"],

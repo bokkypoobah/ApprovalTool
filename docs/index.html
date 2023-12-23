@@ -1094,7 +1094,7 @@
             const ensReverseRecordsContract = new ethers.Contract(ENSREVERSERECORDSADDRESS, ENSREVERSERECORDSABI, provider);
             this.sync.completed = 0;
             this.sync.total = Object.keys(newAccountsMap).length;
-            this.sync.section = 'Addresses';
+            this.sync.section = 'Accounts';
             const erc165Abi = [ "function supportsInterface(bytes4 interfaceID) external view returns (bool)" ];
 
             for (const [account, accountData] of Object.entries(newAccountsMap)) {
