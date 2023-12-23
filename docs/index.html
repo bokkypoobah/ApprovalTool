@@ -408,7 +408,7 @@
                   <b-badge pill variant="transparent" v-b-popover.hover="'Detected account type'" class="px-0">{{ accountTypeOptions.filter(e => e.value == data.item.type)[0].text }}</b-badge>
                 </template>
                 <template #cell(customType)="data">
-                  <b-form-select size="sm" v-model="data.item.customType" @change="saveSettings" :options="accountTypeOptions" v-b-popover.hover.bottom="'Override detected type'"></b-form-select>
+                  <b-form-select size="sm" v-model="data.item.customType" @change="customTypeUpdated(data.item.address, $event)" :options="accountTypeOptions" v-b-popover.hover.bottom="'Override detected type'"></b-form-select>
                 </template>
                 <template #cell(symbol)="data">
                   <b-badge pill variant="transparent" v-b-popover.hover="'Symbol for ERC-20, ERC-721 and ERC-1155: ' + data.item.symbol " class="px-0">{{ data.item.symbol }}</b-badge>
@@ -417,14 +417,14 @@
                   <b-badge pill variant="transparent" v-b-popover.hover="'Name: ' + data.item.name" class="px-0">{{ data.item.name }}</b-badge>
                 </template>
                 <template #cell(customName)="data">
-                  <b-form-input size="sm" v-model="data.item.customName" @change="saveSettings" placeholder="Custom name" v-b-popover.hover.bottom="'Override detected name'"></b-form-input>
+                  <b-form-input size="sm" v-model="data.item.customName" @change="customNameUpdated(data.item.address, $event)" placeholder="Custom name" v-b-popover.hover.bottom="'Override detected name'"></b-form-input>
                 </template>
                 <template #cell(decimals)="data">
-                  {{ data.item.decimals }}
+                  <b-badge pill variant="transparent" v-b-popover.hover="'Detected decimals'" class="px-0">{{ data.item.decimals }}</b-badge>
                 </template>
                 <template #cell(customDecimals)="data">
                   <span v-if="(data.item.customType == null && data.item.type == 'erc20') || data.item.customType == 'erc20'">
-                    <b-form-input size="sm" v-model="data.item.customDecimals" @change="saveSettings" placeholder="Custom decimals" v-b-popover.hover.bottom="'Override detected decimals'"></b-form-input>
+                    <b-form-select size="sm" v-model="data.item.customDecimals" @change="customDecimalsUpdated(data.item.address, $event)" :options="decimalsOptions" v-b-popover.hover.bottom="'Override detected decimals'"></b-form-select>
                   </span>
                 </template>
               </b-table>
@@ -551,7 +551,7 @@
             { value: true, text: 'true' },
           ],
           accountTypeOptions: [
-            { value: null, text: '(override)' },
+            { value: null, text: '(custom)' },
             { value: "erc20", text: 'ERC-20' },
             { value: "erc721", text: 'ERC-721' },
             { value: "erc1155", text: 'ERC-1155' },
@@ -559,6 +559,28 @@
             { value: "ftexchange", text: 'FTExchange' },
             { value: "nftexchange", text: 'NFTExchange' },
             { value: "unknown", text: '(Unknown)' },
+          ],
+          decimalsOptions: [
+            { value: null, text: '(custom)' },
+            { value: "0", text: '0' },
+            { value: "1", text: '1' },
+            { value: "2", text: '2' },
+            { value: "3", text: '3' },
+            { value: "4", text: '4' },
+            { value: "5", text: '5' },
+            { value: "6", text: '6 (some)' },
+            { value: "7", text: '7' },
+            { value: "8", text: '8' },
+            { value: "9", text: '9' },
+            { value: "10", text: '10' },
+            { value: "11", text: '11' },
+            { value: "12", text: '12' },
+            { value: "13", text: '13' },
+            { value: "14", text: '14' },
+            { value: "15", text: '15' },
+            { value: "16", text: '16' },
+            { value: "17", text: '17' },
+            { value: "18", text: '18 (common)' },
           ],
           approvalsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
@@ -1228,6 +1250,22 @@
             }
             this.forceRefresh++; // UI refresh workaround
             console.log(moment().format("HH:mm:ss") + " processData END");
+          },
+
+          customTypeUpdated(address, type) {
+            console.log(moment().format("HH:mm:ss") + " customTypeUpdated - address: " + address + ", type: " + type);
+            Vue.set(this.accounts[this.chainId][address], 'customType', type);
+            localStorage.approvalAccounts = JSON.stringify(this.accounts);
+          },
+          customNameUpdated(address, name) {
+            console.log(moment().format("HH:mm:ss") + " customNameUpdated - address: " + address + ", name: " + name);
+            Vue.set(this.accounts[this.chainId][address], 'customName', name);
+            localStorage.approvalAccounts = JSON.stringify(this.accounts);
+          },
+          customDecimalsUpdated(address, decimals) {
+            console.log(moment().format("HH:mm:ss") + " customDecimalsUpdated - address: " + address + ", decimals: " + decimals);
+            Vue.set(this.accounts[this.chainId][address], 'customDecimals', decimals);
+            localStorage.approvalAccounts = JSON.stringify(this.accounts);
           },
 
           saveSettings() {
