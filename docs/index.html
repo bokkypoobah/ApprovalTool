@@ -423,7 +423,9 @@
                   {{ data.item.decimals }}
                 </template>
                 <template #cell(customDecimals)="data">
-                  <b-form-input size="sm" v-model="data.item.customDecimals" @change="saveSettings" placeholder="Custom decimals" v-b-popover.hover.bottom="'Override detected decimals'"></b-form-input>
+                  <span v-if="(data.item.customType == null && data.item.type == 'erc20') || data.item.customType == 'erc20'">
+                    <b-form-input size="sm" v-model="data.item.customDecimals" @change="saveSettings" placeholder="Custom decimals" v-b-popover.hover.bottom="'Override detected decimals'"></b-form-input>
+                  </span>
                 </template>
               </b-table>
 
