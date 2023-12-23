@@ -194,6 +194,9 @@
                 <div v-if="settings.tabIndex == 1" class="mt-0 pl-1">
                   <b-form-select size="sm" v-model="settings.eventsTable.sortOption" @change="saveSettings" :options="eventsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
                 </div>
+                <div v-if="settings.tabIndex == 2" class="mt-0 pl-1">
+                  <b-form-select size="sm" v-model="settings.accountsTable.sortOption" @change="saveSettings" :options="accountsSortOptions" v-b-popover.hover.bottom="'Yeah. Sort'"></b-form-select>
+                </div>
                 <div v-if="settings.tabIndex == 0" class="mt-0 pl-1">
                   <font size="-2" v-b-popover.hover.bottom="'# approvals'">{{ commify0(filteredApprovals.length) + '/' + commify0(approvals.length) }}</font>
                 </div>
@@ -393,20 +396,37 @@
                     {{ parseInt(data.index) + ((settings.accountsTable.currentPage - 1) * settings.accountsTable.pageSize) + 1 }}
                   </font>
                 </template>
+                <template #cell(address)="data">
+                  <b-link :href="'https://etherscan.io/address/' + data.item.address" target="_blank">
+                    <b-badge pill variant="transparent" v-b-popover.hover="addressDescription(data.item.address)" class="px-0">{{ data.item.address.substring(0, 6) + '...' + data.item.address.substring(38) }}</b-badge>
+                  </b-link>
+                </template>
+                <template #cell(source)="data">
+                  <b-badge pill variant="transparent" v-b-popover.hover="'Owner, contract or spender from approvals'" class="px-0">{{ data.item.source.substring(0, 1).toUpperCase() + data.item.source.substring(1) }}</b-badge>
+                </template>
+                <template #cell(type)="data">
+                  <b-badge pill variant="transparent" v-b-popover.hover="'Detected account type'" class="px-0">{{ accountTypeOptions.filter(e => e.value == data.item.type)[0].text }}</b-badge>
+                </template>
+                <template #cell(customType)="data">
+                  <b-form-select size="sm" v-model="data.item.customType" @change="saveSettings" :options="accountTypeOptions" v-b-popover.hover.bottom="'Override detected type'"></b-form-select>
+                </template>
+                <template #cell(symbol)="data">
+                  <b-badge pill variant="transparent" v-b-popover.hover="'Symbol for ERC-20, ERC-721 and ERC-1155: ' + data.item.symbol " class="px-0">{{ data.item.symbol }}</b-badge>
+                </template>
+                <template #cell(name)="data">
+                  <b-badge pill variant="transparent" v-b-popover.hover="'Name: ' + data.item.name" class="px-0">{{ data.item.name }}</b-badge>
+                </template>
+                <template #cell(customName)="data">
+                  <b-form-input size="sm" v-model="data.item.customName" @change="saveSettings" placeholder="Custom name" v-b-popover.hover.bottom="'Override detected name'"></b-form-input>
+                </template>
+                <template #cell(decimals)="data">
+                  {{ data.item.decimals }}
+                </template>
+                <template #cell(customDecimals)="data">
+                  <b-form-input size="sm" v-model="data.item.customDecimals" @change="saveSettings" placeholder="Custom decimals" v-b-popover.hover.bottom="'Override detected decimals'"></b-form-input>
+                </template>
               </b-table>
 
-              <b-row v-if="false" class="m-0 p-0">
-                <b-col class="m-0 p-0">
-                  <!-- :EVENTS -->
-                  <!-- <b-table v-if="settings.tabIndex == 1 && !settings.showInfo" small fixed striped responsive hover :fields="eventsFields" :items="events" show-empty empty-html="Click Sync above to retrieve contract events" head-variant="light" class="mx-0 my-1"> -->
-                  <b-table v-if="settings.tabIndex == 1 && !settings.showInfo" small fixed striped responsive hover :items="events" show-empty empty-html="Click Sync above to retrieve contract events" head-variant="light" class="mx-0 my-1">
-                    <template #cell(number)="data">
-                      {{ parseInt(data.index) + ((settings.activityTable.currentPage - 1) * settings.activityTable.pageSize) + 1 }}
-                    </template>
-                  </b-table>
-
-                </b-col>
-              </b-row>
             </b-card-text>
           </b-card>
         </b-card>
@@ -475,7 +495,7 @@
               filter: null,
               currentPage: 1,
               pageSize: 100,
-              sortOption: 'nameasc',
+              sortOption: 'typenameasc',
             },
             version: 12,
           },
@@ -506,10 +526,12 @@
             { value: 'txorderdsc', text: '▼ TxOrder' },
           ],
           accountsSortOptions: [
-            { value: 'addressasc', text: '▲ Address' },
-            { value: 'addressdsc', text: '▼ Address' },
+            { value: 'typenameasc', text: '▲ Type, ▲ Name' },
+            { value: 'typenamedsc', text: '▼ Type, ▼ Name' },
             { value: 'nameasc', text: '▲ Name' },
             { value: 'namedsc', text: '▼ Name' },
+            { value: 'addressasc', text: '▲ Address' },
+            { value: 'addressdsc', text: '▼ Address' },
           ],
           pageSizes: [
             { value: 5, text: '5' },
@@ -525,6 +547,16 @@
           falseTrueOptions: [
             { value: false, text: 'false' },
             { value: true, text: 'true' },
+          ],
+          accountTypeOptions: [
+            { value: null, text: '(override)' },
+            { value: "erc20", text: 'ERC-20' },
+            { value: "erc721", text: 'ERC-721' },
+            { value: "erc1155", text: 'ERC-1155' },
+            { value: "eoa", text: 'EOA' },
+            { value: "ftexchange", text: 'FTExchange' },
+            { value: "nftexchange", text: 'NFTExchange' },
+            { value: "unknown", text: '(Unknown)' },
           ],
           approvalsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
@@ -548,11 +580,15 @@
           ],
           accountsFields: [
             { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
-            { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'source', label: 'Source', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'source', label: 'Source', sortable: false, thStyle: 'width: 5%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'customType', label: '', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
-            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'customName', label: '', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'decimals', label: 'Decimals', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
+            { key: 'customDecimals', label: '', sortable: false, thStyle: 'width: 10%;', thClass: 'text-right', tdClass: 'text-right' },
           ],
           reportingDateTimeOptions: [
             { value: 0, text: 'Local Time' },
@@ -768,41 +804,32 @@
             let results = this.forceRefresh % 2 == 0 ? [] : [];
             const accounts = this.accounts[this.chainId] || {};
             for (const [address, accountData] of Object.entries(accounts)) {
-              const [type, symbol, name, source] = [accountData.type, accountData.symbol, accountData.name, accountData.source];
-              results.push({ address, type, symbol, name, source });
+              const [ type, symbol, name, decimals, source, customType, customName, customDecimals ] = [ accountData.type, accountData.symbol, accountData.name, accountData.decimals, accountData.source, accountData.customType || null, accountData.customName || null, accountData.customDecimals || null ];
+              results.push({ address, type, symbol, name, decimals, source, customType, customName, customDecimals });
             }
-
-
-            // const events = this.events[this.chainId] || {};
-            // for (const blockNumber of Object.keys(events).sort((a, b) => { return a - b })) {
-            //   const blockNumberData = events[blockNumber];
-            //   for (const logIndex of Object.keys(blockNumberData).sort((a, b) => { return a - b })) {
-            //     const eventData = events[blockNumber][logIndex];
-            //     let include = true;
-            //     const contractType = this.accounts[this.chainId] && this.accounts[this.chainId][eventData.contract] && this.accounts[this.chainId][eventData.contract].type || null;
-            //     const decimals = contractType == "erc20" ? this.accounts[this.chainId] && this.accounts[this.chainId][eventData.contract] && this.accounts[this.chainId][eventData.contract].decimals : undefined;
-            //     if (!this.settings.eventsTable.includeFluff) {
-            //       if (contractType == "erc721" && eventData.spender == ADDRESS0) {
-            //         include = false;
-            //       }
-            //     }
-            //     if (include) {
-            //       if (!(this.accountsToSearch.includes(eventData.owner))) {
-            //         include = false;
-            //       }
-            //     }
-            //     if (include) {
-            //       const timestamp = this.blockTimestamps[this.chainId] && this.blockTimestamps[this.chainId][blockNumber] || null;
-            //       results.push({ blockNumber, logIndex, ...eventData, type: contractType, decimals, timestamp });
-            //     }
-            //   }
-            // }
-            // console.log(moment().format("HH:mm:ss") + " filteredEvents - results: " + JSON.stringify(results, null, 2));
             return results;
           },
 
           filteredSortedAccounts() {
-            return this.filteredAccounts;
+            let results = this.filteredAccounts;
+            if (this.settings.accountsTable.sortOption == 'addressasc') {
+              results.sort((a, b) => {
+                return ('' + a.address).localeCompare(b.address);
+              });
+            } else if (this.settings.accountsTable.sortOption == 'addressdsc') {
+              results.sort((a, b) => {
+                return ('' + b.address).localeCompare(a.address);
+              });
+            } else if (this.settings.accountsTable.sortOption == 'nameasc') {
+              results.sort((a, b) => {
+                return ('' + a.name).localeCompare(b.name);
+              });
+            } else if (this.settings.accountsTable.sortOption == 'namedsc') {
+              results.sort((a, b) => {
+                return ('' + b.name).localeCompare(a.name);
+              });
+            }
+            return results;
           },
 
           pagedFilteredSortedAccounts() {
@@ -1011,10 +1038,10 @@
                   newAccountsMap[eventData.owner] = { source: "owner" };
                 }
                 if (!(eventData.owner in accounts[this.chainId]) && !(eventData.contract in newAccountsMap)) {
-                  newAccountsMap[eventData.contract] = { source: "contracts" };
+                  newAccountsMap[eventData.contract] = { source: "contract" };
                 }
                 if (!(eventData.owner in accounts[this.chainId]) && !(eventData.spender in newAccountsMap)) {
-                  newAccountsMap[eventData.spender] = { source: "spenders" };
+                  newAccountsMap[eventData.spender] = { source: "spender" };
                 }
               }
             }
