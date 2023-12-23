@@ -551,7 +551,7 @@
             { value: true, text: 'true' },
           ],
           accountTypeOptions: [
-            { value: null, text: '(custom)' },
+            { value: null, text: '(use default)' },
             { value: "erc20", text: 'ERC-20' },
             { value: "erc721", text: 'ERC-721' },
             { value: "erc1155", text: 'ERC-1155' },
@@ -561,7 +561,7 @@
             { value: "unknown", text: '(Unknown)' },
           ],
           decimalsOptions: [
-            { value: null, text: '(custom)' },
+            { value: null, text: '(use default)' },
             { value: "0", text: '0' },
             { value: "1", text: '1' },
             { value: "2", text: '2' },
@@ -630,24 +630,24 @@
             let results = this.forceRefresh % 2 == 0 ? [] : [];
             const accounts = this.accounts[this.chainId] || {};
             for (const [address, accountData] of Object.entries(accounts)) {
-              const [contract, type, symbol, name, source] = [address, accountData.type, accountData.symbol, accountData.name, accountData.source];
+              const [ contract, type, symbol, name, decimals, source, customType, customName, customDecimals ] = [ address, accountData.type, accountData.symbol, accountData.name, accountData.decimals, accountData.source, accountData.customType || null, accountData.customName || null, accountData.customDecimals || null ];
               for (let owner of this.accountsToSearch) {
                 const approvals = 'approvals' in accountData && owner in accountData.approvals && accountData.approvals[owner] || null;
                 if (approvals) {
                   if (type == "erc721") {
                     for (const [value, spender] of Object.entries(approvals)) {
-                      results.push({ contract, type, approvalType: "Approval", symbol, name, source, owner, spender, value });
+                      results.push({ contract, type: customType || type, approvalType: "Approval", symbol, name: customName || name, decimals: customDecimals || decimals, source, owner, spender, value });
                     }
                   } else if (type == "erc20") {
                     for (const [spender, value] of Object.entries(approvals)) {
-                      results.push({ contract, type, approvalType: "Approval", symbol, name, source, owner, spender, value, decimals: accountData.decimals });
+                      results.push({ contract, type: customType || type, approvalType: "Approval", symbol, name: customName || name, decimals: customDecimals || decimals, source, owner, spender, value });
                     }
                   }
                 }
                 const approvalsForAll = 'approvalsForAll' in accountData && owner in accountData.approvalsForAll && accountData.approvalsForAll[owner] || null;
                 if (approvalsForAll) {
                   for (const [spender, value] of Object.entries(approvalsForAll)) {
-                    results.push({ contract, type, approvalType: "ApprovalForAll", symbol, name, source, owner, spender, value });
+                    results.push({ contract, type: customType || type, approvalType: "ApprovalForAll", symbol, name: customName || name, decimals: customDecimals || decimals, source, owner, spender, value });
                   }
                 }
               }
