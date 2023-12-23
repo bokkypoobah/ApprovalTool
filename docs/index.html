@@ -387,10 +387,13 @@
                 </template>
               </b-table>
 
-              <b-card-text v-if="settings.tabIndex == 2 && !settings.showInfo" class="mt-5">
-                Work in progress. See <b-link size="sm" @click="settings.tabIndex = 1; saveSettings();" v-b-popover.hover="'Events'">Events</b-link>
-                {{ pagedFilteredSortedAccounts }}
-              </b-card-text>
+              <b-table v-if="settings.tabIndex == 2 && !settings.showInfo && accounts" small fixed striped responsive hover :fields="accountsFields" :items="pagedFilteredSortedAccounts" show-empty empty-html="Click Sync above to retrieve ERC-20, ERC-721 and ERC-1155 approval events" head-variant="light" class="mx-0 my-1">
+                <template #cell(number)="data">
+                  <font size="-1">
+                    {{ parseInt(data.index) + ((settings.accountsTable.currentPage - 1) * settings.accountsTable.pageSize) + 1 }}
+                  </font>
+                </template>
+              </b-table>
 
               <b-row v-if="false" class="m-0 p-0">
                 <b-col class="m-0 p-0">
@@ -542,6 +545,14 @@
             { key: 'eventName', label: 'Event', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
             { key: 'spender', label: 'Spender', sortable: false, thStyle: 'width: 15%;', thClass: 'text-left', tdClass: 'text-truncate' },
             { key: 'approved', label: 'Approved', /*sortable: true,*/ thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
+          ],
+          accountsFields: [
+            { key: 'number', label: '#', sortable: false, thStyle: 'width: 5%;', tdClass: 'text-truncate' },
+            { key: 'address', label: 'Address', sortable: false, thStyle: 'width: 25%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'source', label: 'Source', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'type', label: 'Type', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-left' },
+            { key: 'symbol', label: 'Symbol', sortable: false, thStyle: 'width: 10%;', thClass: 'text-left', tdClass: 'text-truncate' },
+            { key: 'name', label: 'Name', sortable: false, thStyle: 'width: 20%;', thClass: 'text-left', tdClass: 'text-left' },
           ],
           reportingDateTimeOptions: [
             { value: 0, text: 'Local Time' },
@@ -757,8 +768,8 @@
             let results = this.forceRefresh % 2 == 0 ? [] : [];
             const accounts = this.accounts[this.chainId] || {};
             for (const [address, accountData] of Object.entries(accounts)) {
-              const [contract, type, symbol, name, source] = [address, accountData.type, accountData.symbol, accountData.name, accountData.source];
-              results.push({ contract, type, symbol, name, source });
+              const [type, symbol, name, source] = [accountData.type, accountData.symbol, accountData.name, accountData.source];
+              results.push({ address, type, symbol, name, source });
             }
 
 
